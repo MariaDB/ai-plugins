@@ -23,8 +23,8 @@ curated set of agent **skills** and wires up the native, high-performance
 ### Codex
 
 ```text
-/plugin marketplace add mariadb/ai-plugins
-/plugin install dev@mariadb
+/plugins marketplace add mariadb/ai-plugins
+/plugins install dev@mariadb
 ```
 
 Then register the MCP server, which the plugin cannot do for itself on Codex
