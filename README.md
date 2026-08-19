@@ -4,7 +4,7 @@ First-class **MariaDB** support for AI coding agents. This repo packages a
 curated set of agent **skills** and wires up the native, high-performance
 **`mariadb-shell` MCP server**.
 
-Installing a plugin gives your agent two things:
+Installing a plugin gives you three things:
 
 - **Skills** — MariaDB reference material the agent reads when it becomes
   relevant: how `ALTER TABLE` behaves in MariaDB, how vector indexes work, which
@@ -13,6 +13,11 @@ Installing a plugin gives your agent two things:
 - **An MCP server** — a live connection to a MariaDB server, so the agent can
   read your schema, run queries, analyse a slow query with `EXPLAIN`, or start a
   throwaway test instance. This needs a one-time setup, described below.
+- **`mariadb-shell`** — MariaDB's command-line shell, a port of MySQL Shell,
+  installed automatically the first time an agent starts the MCP server. The MCP
+  server runs inside it as a plugin, and it is where your database credentials
+  are stored. You can also use it yourself as a SQL client — run `mariadb-shell`
+  and type `\help`.
 
 > **New to MCP?** The Model Context Protocol is how an AI agent calls tools —
 > here, the tools that talk to MariaDB.
@@ -93,11 +98,9 @@ Run this once per machine:
 mariadb-shell -- mcp setup     # or mcp.setup() from an interactive shell
 ```
 
-> **What is `mariadb-shell`?** MariaDB's command-line shell, a port of MySQL
-> Shell. It does a great deal — connections, credentials, test instances, schema
-> management — which is why it powers the MCP server rather than all of that
-> being rebuilt from scratch. This setup command is normally the only time you
-> use it directly.
+> **Why the shell?** It already handles connections, credentials, test instances
+> and schema management, so the MCP server runs as a plugin inside it rather than
+> reimplementing all of that.
 
 If `mariadb-shell` isn't on your `PATH`, use the copy the launcher installed —
 `~/.local/bin/mariadb-shell`, or
