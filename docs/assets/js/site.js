@@ -76,6 +76,43 @@
     }
   }
 
+  /* --- Hero code samples: mark the ones that are cut off ------------------ */
+  var codeBodies = Array.prototype.slice.call(document.querySelectorAll('.hero-panel__body'));
+  var codePanels = codeBodies.map(function (body) {
+    return { body: body, pre: body.querySelector('.hero-code') };
+  }).filter(function (p) { return p.pre; });
+
+  if (codePanels.length) {
+    /* Below this many pixels hidden, say nothing. It absorbs sub-pixel layout,
+       and a sliver narrower than one character is not worth a marker — the fade
+       that comes with it would cover more than the sliver it announces. */
+    var EDGE_SLACK = 8;
+
+    var markClipped = function () {
+      codePanels.forEach(function (p) {
+        /* How much is still hidden to the RIGHT, so the marker clears once the
+           reader reaches the end rather than staying on because the sample is
+           wide. */
+        var hidden = p.pre.scrollWidth - p.pre.clientWidth - p.pre.scrollLeft;
+        p.body.classList.toggle('is-clipped', hidden > EDGE_SLACK);
+      });
+    };
+
+    codePanels.forEach(function (p) {
+      p.pre.addEventListener('scroll', markClipped, { passive: true });
+    });
+    /* The panel is resized by the container query, by the hero going two-column
+       and by a phone rotating; ResizeObserver catches all three, and the resize
+       listener covers browsers without it. */
+    if ('ResizeObserver' in window) {
+      var ro = new ResizeObserver(markClipped);
+      codePanels.forEach(function (p) { ro.observe(p.pre); });
+    } else {
+      window.addEventListener('resize', markClipped);
+    }
+    markClipped();
+  }
+
   /* --- Tutorial catalog filters ------------------------------------------ */
   var filters = document.querySelector('[data-filters]');
   if (filters) {

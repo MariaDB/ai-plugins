@@ -49,6 +49,16 @@
   --ch-action-outline: #be2026;
   --ch-action-outline-text: #be2026;
 
+  /* mariadb.com's "deep ocean" button colours (.btn-deep-ocean in
+     app.beedb9.css), the fill the sublime gradient is ringed around. Shared by
+     both themes, like the brand action red above. The focus RGB is the
+     reference's --bs-btn-focus-shadow-rgb for that variant. Its darker hover
+     and active FILLS (#0b1e26 / #0b2029) are deliberately not carried over:
+     combined with the gradient outline they are painted as a background COLOUR
+     underneath an opaque gradient background IMAGE, so they never show. */
+  --ch-deep-ocean: #0e2833;
+  --ch-deep-ocean-focus-rgb: 50, 72, 82;
+
   --ch-text: #36414e;
   --ch-text-heading: #16263b;
   --ch-text-muted: #54616e;
@@ -390,8 +400,13 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
             mask: radial-gradient(100% 100% at 50% 50%, transparent 45%, #000 95%) no-repeat center / 100% 100%;
   }
 }
-/* The panels are unpositioned, so they would paint under ::after without this. */
-.hero-panel { position: relative; z-index: 1; }
+/* The panels are unpositioned, so they would paint under ::after without this.
+   The panel is also the query container for the inset below. Containing it here
+   is safe — it already establishes a stacking context and holds nothing
+   absolutely positioned. The CARD must not be the container: layout containment
+   would make it a stacking context and its ::before bloom, which sits at
+   z-index -1 deliberately BEHIND the card, would start painting over it. */
+.hero-panel { position: relative; z-index: 1; container-type: inline-size; }
 
 .hero-panel + .hero-panel { margin-top: 1.35rem; }
 
@@ -406,20 +421,45 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
 }
 .hero-panel__check { width: 18px; height: 18px; color: rgba(255, 255, 255, 0.9); flex-shrink: 0; }
 
-/* Inset from the label bar, as in the reference. */
+/* Inset from the label bar, as in the reference. The horizontal scroll lives on
+   the <pre> rather than here, so that this box stays still and can carry the
+   cut-off marker below; an overlay inside a scroll container scrolls away with
+   the content. */
 .hero-panel__body {
+  position: relative;
   margin: .9rem 1.5rem 0;
   background: rgba(255, 255, 255, .028);
   border: 1px solid var(--card-line);
   border-radius: .7rem;
   padding: .95rem 1.1rem;
-  overflow-x: auto;
 }
 
 .hero-code {
   margin: 0; padding: 0; border: 0; background: none;
   font-size: .78rem; line-height: 1.9;
   color: rgba(255, 255, 255, .84);
+  overflow-x: auto;
+}
+
+/* The samples are wider than the panel on a phone, and again in the two-column
+   hero — they scroll, but nothing says so. While there is more to the right the
+   code fades out at the edge and a … sits in the margin beside it; both go once
+   the reader reaches the end. site.js adds .is-clipped and keeps it current. It
+   is an enhancement only: with JS off the code still scrolls, unmarked.
+   The fade is a mask rather than a gradient in the panel's background colour,
+   which would have to re-state that colour and would drift from it. */
+.hero-panel__body.is-clipped .hero-code {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+          mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+}
+.hero-panel__body.is-clipped::after {
+  content: "…";
+  position: absolute;
+  top: 0; bottom: 0; right: .3rem;
+  display: flex; align-items: center;
+  color: rgba(255, 255, 255, .62);
+  font-size: 1rem; line-height: 1;
+  pointer-events: none;
 }
 /* The One Dark hues the rest of the site's code blocks use, under names local
    to the card so this markup needs no Rouge classes. */
@@ -431,6 +471,20 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
 @media (max-width: 560px) {
   .hero__card { padding: .9rem .85rem 1.05rem; border-radius: 1.2rem; }
   .hero-panel__body { margin: .8rem .6rem 0; padding: .8rem .9rem; }
+}
+
+/* The inset is decorative, and the panel runs out of width in TWO places: on a
+   phone, and again from 901px up, where the hero splits into two columns and
+   the card drops to roughly 400px — narrower than it is on a 768px tablet. In
+   both the code sample is wider than the panel, so the inset is spending width
+   the code needs; below 480px of panel it gives that width back.
+
+   This has to be a container query: panel width is not monotonic in viewport
+   width (679px at a 768px viewport, then 361px at 901px), so no media query can
+   name the cases. Browsers without container query support simply keep the
+   inset and the horizontal scroll, which is today's behaviour. */
+@container (max-width: 480px) {
+  .hero-panel__body { margin-inline: 0; }
 }
 .hero__caption { color: var(--ch-hero-muted); font-size: .8rem; margin: .85rem 0 0; line-height: 1.6; }
 
@@ -456,8 +510,61 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
 .btn:hover { text-decoration: none; transform: translateY(-1px); }
 .btn svg { width: 16px; height: 16px; }
 
-.btn--primary { background: var(--ch-accent-btn); color: #fff; }
-.btn--primary:hover { background: var(--ch-accent-btn-hover); color: #fff; }
+/* Ported from mariadb.com's primary call to action, which is
+   `btn btn-deep-ocean btn-outline-gradient`: a deep-ocean fill sitting inside a
+   3px ring of the sublime gradient, that on hover/focus floods the whole button
+   and flips the label to deep ocean. Only the colours, the gradient and the
+   hover/focus/active behaviour come across — the radius, padding, type and the
+   1px lift stay ours (the reference is a pill). The padding gives back exactly
+   the 3px the ring costs, so the button still measures what it did before.
+
+   How the ring works: the gradient covers the whole border box and never moves;
+   a ::before overlay of deep ocean covers just the padding box, leaving the
+   gradient visible only through the transparent border. Fading that overlay out
+   floods the button. The reference swaps two background LAYERS instead, which
+   is the same picture but snaps, because background-image cannot be animated —
+   an overlay can, so this one crossfades with the rest of the site's hovers.
+
+   The overlay sits at z-index -1, which paints above the button's own
+   background but below its label; `isolation` keeps that negative index from
+   escaping into whatever stacking context the button happens to land in. */
+.btn--primary {
+  position: relative;
+  isolation: isolate;
+  color: #fff;
+  background-color: transparent;
+  background-image: var(--btn-sublime-gradient);
+  background-origin: border-box;
+  background-clip: border-box;
+  border: 3px solid transparent;
+  padding: calc(.55rem - 3px) calc(1.25rem - 3px);
+}
+.btn--primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  /* The containing block is the padding box, so `inset: 0` already stops at the
+     ring; the radius has to be the outer one less the border to match it. */
+  border-radius: calc(var(--ch-radius-sm) - 3px);
+  background: var(--ch-deep-ocean);
+  transition: opacity var(--ch-transition-fast);
+}
+.btn--primary:hover,
+.btn--primary:focus-visible,
+.btn--primary:active {
+  color: var(--ch-deep-ocean);
+  border-color: transparent;
+}
+.btn--primary:hover::before,
+.btn--primary:focus-visible::before,
+.btn--primary:active::before { opacity: 0; }
+/* The reference's focus ring and pressed-in shadow, both from .btn-deep-ocean. */
+.btn--primary:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 .25rem rgba(var(--ch-deep-ocean-focus-rgb), .5);
+}
+.btn--primary:active { box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125); }
 
 .btn--outline {
   background: transparent; color: var(--ch-action-outline-text);
