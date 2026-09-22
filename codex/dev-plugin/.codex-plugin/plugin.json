@@ -1,6 +1,6 @@
 {
   "name": "dev",
-  "version": "26.9.2",
+  "version": "26.9.3",
   "description": "MariaDB skills and the native mariadb-shell MCP server for Codex.",
   "author": { "name": "MariaDB Corporation", "url": "https://mariadb.com" },
   "homepage": "https://github.com/mariadb/ai-plugins",

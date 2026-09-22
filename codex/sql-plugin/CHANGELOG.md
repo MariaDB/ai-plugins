@@ -4,6 +4,31 @@ All notable changes to the MariaDB SQL Codex plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [26.9.3] - 2026-09-22
+
+### Changed
+
+- `MARIADB_SHELL_VERSION`, the *minimum* `mariadb-shell` the launcher accepts,
+  now defaults to `26.9.3`, matching the published release series. An install
+  already at or above that version is still used as-is; only a machine below it
+  fetches anything.
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `1a89bd3` (synced 2026-09-22). The upstream default branch moved on,
+  but nothing under `agent-skills/` did, so this plugin's 47 skills are
+  unchanged.
+- Version bumped to 26.9.3 to stay in lockstep with the other plugins.
+
+## [26.9.2] - 2026-09-12
+
+### Changed
+
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `0e7e033` (synced 2026-09-12). **No skill in this plugin changed**: the
+  `mariadb-migrator` split that took the dev plugins from 76 to 82 skills is
+  dev-only, so this plugin's 47 skills are unchanged.
+- `MARIADB_SHELL_VERSION` now defaults to `26.9.2`.
+- Version bumped to 26.9.2 to stay in lockstep with the other plugins.
+
 ## [26.9.1] - 2026-09-08
 
 ### Changed

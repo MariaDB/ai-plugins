@@ -62,7 +62,7 @@
 
 set -euo pipefail
 
-VERSION="${MARIADB_SHELL_VERSION:-26.9.2}"
+VERSION="${MARIADB_SHELL_VERSION:-26.9.3}"
 REPO="${MARIADB_SHELL_REPO:-mariadb-corporation/mariadb-shell}"
 BINDIR="${MARIADB_SHELL_BINDIR:-$HOME/.local/bin}"
 INSTALLER_URL="https://raw.githubusercontent.com/$REPO/main/install.sh"

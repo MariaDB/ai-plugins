@@ -2,8 +2,8 @@
   "source_repo": "mariadb-corporation/mariadb-docs",
   "subdir": "agent-skills",
   "ref": "main",
-  "commit": "0e7e033a1ca4b9ce8d4938dd2f8f2e32a2e8ec91",
+  "commit": "1a89bd3d6cf9678ae16dd73d84bfa26024d9e24d",
   "baseline": "11.8 LTS",
   "skills_synced": 47,
-  "synced_at": "2026-09-12"
+  "synced_at": "2026-09-22"
 }

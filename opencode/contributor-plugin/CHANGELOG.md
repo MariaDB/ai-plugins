@@ -4,6 +4,28 @@ All notable changes to the MariaDB contributor OpenCode plugin are documented he
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [26.9.3] - 2026-09-22
+
+### Changed
+
+- Skills re-vendored from `mariadb-corporation/mariadb-shell` `.claude/skills/`
+  at commit `291bf84` (synced 2026-09-22). The upstream default branch moved on,
+  but nothing under `.claude/skills/` did, so both skills here are unchanged.
+- Version bumped to 26.9.3 to stay in lockstep with the other plugins. This
+  plugin ships skills only and no MCP server, so the `MARIADB_SHELL_VERSION`
+  floor the others moved to 26.9.3 does not apply here.
+
+## [26.9.2] - 2026-09-12
+
+### Changed
+
+- Skills re-vendored from `mariadb-corporation/mariadb-shell` `.claude/skills/`
+  at commit `1d859c7` (synced 2026-09-12). Nothing under `.claude/skills/`
+  changed, so both skills here are unchanged.
+- Version bumped to 26.9.2 to stay in lockstep with the other plugins. This
+  plugin ships skills only and no MCP server, so the `MARIADB_SHELL_VERSION`
+  floor the others moved to 26.9.2 does not apply here.
+
 ## [26.9.1] - 2026-09-08
 
 ### Changed

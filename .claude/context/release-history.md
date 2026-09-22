@@ -2,7 +2,12 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
-## Landed on `main` (through PR #18)
+## Landed on `main` (through PR #19)
+
+**#19** `1732462` split this context set out of a single 84KB `PROJECT_CONTEXT.md`
+(the line count hid the size — 340 lines at ~250 chars each), and rewrote
+`/checkpoint` to take a target subfolder and detect three layouts. **#18**
+`054e1a5` was the DevHub polish. PR **#20** (release 26.9.3) is open.
 
 Landed on `main` since the last checkpoint, newest first: **#17** `12410f3` (MSM
 e2e config-home fix), **#16** `d5e2bfc` (Release 26.9.2 — shell floor + plugin
@@ -13,6 +18,22 @@ version-comparison tutorial), **#13** `c5759e5` (mariadb-migrator split into an
 overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-open
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
+
+## Release v26.9.2 (2026-09-12, tagged retroactively 2026-09-22)
+
+- **Merged as `d5e2bfc` (#16) on 2026-09-12 but never tagged at the time.** The
+  annotated tag `v26.9.2` (tag object `a5c2928`) was created on 2026-09-22 and
+  pushed to **both** `origin` and `fork` as the same object, verified with
+  `git ls-remote --tags`. Tags are continuous again: v26.9.0 → v26.9.1 → v26.9.2.
+- **No GitHub release accompanies the tag** — unlike v26.9.1 and v26.9.0, which
+  were published as prereleases on both repos. See next steps.
+- **Its CHANGELOG entries were also added retroactively**, in the 26.9.3 release
+  (PR #20): all ten plugins had gone straight from 26.9.1 to 26.9.3. The entry
+  was reconstructed from the commit, not invented.
+- Contents: the `mariadb-migrator` split into an overview plus six topic skills
+  (dev 76 → 82 skills; sql unchanged at 47), a skills re-vendor to `0e7e033`,
+  and both versions moved to 26.9.2. The DevHub also went live in this window,
+  but that is `docs/` only and ships inside no plugin.
 
 ## Release v26.9.1 (2026-09-08)
 

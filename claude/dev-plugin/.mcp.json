@@ -4,7 +4,7 @@
       "command": "${CLAUDE_PLUGIN_ROOT}/scripts/mariadb-mcp-launcher.sh",
       "args": [],
       "env": {
-        "MARIADB_SHELL_VERSION": "26.9.2"
+        "MARIADB_SHELL_VERSION": "26.9.3"
       }
     }
   }

@@ -1,6 +1,6 @@
 # MariaDB SQL plugin for Claude Code
 
-Version **26.9.2**
+Version **26.9.3**
 
 This plugin gives Claude Code first-class MariaDB SQL support through two parts:
 
@@ -35,7 +35,7 @@ Configured in [.mcp.json](.mcp.json):
     "mariadb": {
       "command": "${CLAUDE_PLUGIN_ROOT}/scripts/mariadb-mcp-launcher.sh",
       "args": [],
-      "env": { "MARIADB_SHELL_VERSION": "26.9.2" }
+      "env": { "MARIADB_SHELL_VERSION": "26.9.3" }
     }
   }
 }
@@ -43,7 +43,7 @@ Configured in [.mcp.json](.mcp.json):
 
 The launcher ([scripts/mariadb-mcp-launcher.sh](scripts/mariadb-mcp-launcher.sh)):
 
-- Resolves the minimum version from `MARIADB_SHELL_VERSION` (default `26.9.2`).
+- Resolves the minimum version from `MARIADB_SHELL_VERSION` (default `26.9.3`).
 - Runs the first `mariadb-shell` that meets it: `$MARIADB_SHELL_BIN`, then one on
   `PATH`, then a local install at `~/.local/bin/mariadb-shell`
   (`%LOCALAPPDATA%\Programs\mariadb-shell\bin\mariadb-shell.cmd` on Windows).

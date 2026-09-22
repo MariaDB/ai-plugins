@@ -1,6 +1,6 @@
 # MariaDB plugin for Pi
 
-Version **26.9.2**
+Version **26.9.3**
 
 This plugin gives the [Pi coding agent](https://pi.dev) first-class MariaDB
 support as a **pi extension**, through two parts:
@@ -112,7 +112,7 @@ else already there):
     "mariadb": {
       "command": "<plugin>/scripts/mariadb-mcp-launcher.sh",
       "args": [],
-      "env": { "MARIADB_SHELL_VERSION": "26.9.2" },
+      "env": { "MARIADB_SHELL_VERSION": "26.9.3" },
       "lifecycle": "lazy"
     }
   }

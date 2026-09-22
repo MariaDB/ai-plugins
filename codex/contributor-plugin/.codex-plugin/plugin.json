@@ -1,6 +1,6 @@
 {
   "name": "contributor",
-  "version": "26.9.2",
+  "version": "26.9.3",
   "description": "Skills for contributing to MariaDB tooling, for Codex.",
   "author": { "name": "MariaDB Corporation", "url": "https://mariadb.com" },
   "homepage": "https://github.com/mariadb/ai-plugins",
