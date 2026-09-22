@@ -2,7 +2,14 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
-## Landed on `main` (through PR #19)
+## Landed on `main` (through PR #20)
+
+**#20** `b6ed467` was release 26.9.3 (below). **#19** `1732462` split this context
+set out of a single 84KB `PROJECT_CONTEXT.md`
+(the line count hid the size — 340 lines at ~250 chars each), and rewrote
+`/checkpoint` to take a target subfolder and detect three layouts. **#18**
+`054e1a5` was the DevHub polish. No PR is open, and `origin` now carries only
+`main` — the stale `wip/*` remotes are deleted.
 
 **#19** `1732462` split this context set out of a single 84KB `PROJECT_CONTEXT.md`
 (the line count hid the size — 340 lines at ~250 chars each), and rewrote
@@ -18,6 +25,27 @@ version-comparison tutorial), **#13** `c5759e5` (mariadb-migrator split into an
 overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-open
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
+
+## Release v26.9.3 (2026-09-22)
+
+- **Merged as `b6ed467` (#20), tagged `v26.9.3`** (annotated object `a38774d`),
+  pushed to **both** `origin` and `fork` as the same object, and published as a
+  **prerelease on both repos**. Release bodies checksum identical to the tag
+  annotation once GitHub's appended trailing newline is stripped.
+- Contents: both versions to 26.9.3 (`set-mariadb-shell-version.sh`, 31 files;
+  `set-plugin-version.sh`, 17 files), with mariadb-shell 26.9.3 already released
+  beforehand.
+- **The skills re-vendor was a no-op beyond provenance**: `mariadb-docs`
+  `0e7e033` → `1a89bd3` and the contributor source `1d859c7` → `291bf84`, but no
+  vendored skill content changed — only the ten `skills-source.json` files.
+  Counts held at 82 dev / 47 sql / 2 contributor. **Check `git status` after a
+  sync rather than assuming it shipped something.**
+- **CHANGELOG entries for 26.9.3 and, retroactively, 26.9.2**, so all ten
+  plugins now run continuously from 26.9.0. The 26.9.2 entry was reconstructed
+  from `d5e2bfc`, not invented.
+- Also carried the logo SVG re-export (Affinity Studio; `serif:` → `affinity:`),
+  which was found already modified in the working tree and kept as its own
+  commit.
 
 ## Release v26.9.2 (2026-09-12, tagged retroactively 2026-09-22)
 
