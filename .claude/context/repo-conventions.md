@@ -16,8 +16,8 @@ DevHub's GitHub/Issues links point there deliberately, and *our* PRs are still
 opened on `origin`.
 
 **The fork deliberately differs from `origin` in two files**, which every
-upstream sync into the fork must preserve (MariaDB/ai-plugins PR #3, opened
-2026-09-23):
+upstream sync into the fork must preserve (MariaDB/ai-plugins PR #3, merged
+2026-09-23 as `6682ff1`):
 
 - `docs/CNAME` — fork: `ai-plugins.mariadb.org`; `origin`: `ai-plugins.mariadb.com`.
 - `docs/_config.yml` `url:` — fork: `https://ai-plugins.mariadb.org`.
@@ -25,9 +25,15 @@ upstream sync into the fork must preserve (MariaDB/ai-plugins PR #3, opened
 Why: both repos serve the DevHub from GitHub Pages (`main` + `/docs`), and a
 custom domain can only be claimed by one repo. With `.com` held by `origin`, the
 fork's CNAME was ignored (`cname: null`) and the site fell back to
-`mariadb.github.io/ai-plugins/`, where `baseurl: ""` 404s every asset. For
-`.org` to be served by the fork, its DNS must point at `mariadb.github.io`; as of
-2026-09-23 it still points at `websites.mariadb.org`, which 301-redirects to `.com`. The
+`mariadb.github.io/ai-plugins/`, where `baseurl: ""` 404s every asset.
+
+**`https://ai-plugins.mariadb.org/` is LIVE** (verified 2026-09-23), served by
+the fork's Pages: DNS is a CNAME to `mariadb.github.io` (it used to point at
+`websites.mariadb.org`, which 301-redirected to `.com`), the fork's Pages
+`cname` is `ai-plugins.mariadb.org` with an approved certificate, the canonical
+tag names `.org`, and `mariadb.github.io/ai-plugins/` 301s to it. **"Enforce
+HTTPS" is still off on both repos' Pages settings**, so that 301 lands on
+`http://` and plain-http visits aren't upgraded. The
 alternative that keeps the fork 1:1 — an Actions-based Pages deploy, which
 ignores `CNAME` and takes the domain from each repo's settings — was not taken.
 
