@@ -62,9 +62,10 @@ migrations run fine — and then fails in specific, hard-to-diagnose places:
 | --- | --- | --- |
 | Vector distance queries | supported | `RuntimeException: Vector distance queries are only supported by Postgres and MariaDB.` |
 | `uuid()` column | native `uuid` type (MariaDB 10.7+) | `char(36)` |
-| `renameColumn()` | legacy syntax before 10.5.2 | MySQL syntax, fails on old servers |
+| `renameColumn()` | the 10.5.2 threshold | the 8.0.3 threshold, so MariaDB 10.4 and older get syntax they reject |
 | `geometry()` SRID | `ref_system_id=` | `srid=`, rejected by MariaDB |
-| `date()` / `year()` defaults | `CURRENT_TIMESTAMP` handled | wrong default emitted |
+| `vectorIndex()` | `vector index ... M=6 DISTANCE=cosine` | `RuntimeException: The database driver in use does not support vector indexes.` |
+| JSON paths (`where('data->k')`) | `json_value(...)` | `json_unquote(json_extract(...))` |
 | Lateral joins | explicit "not supported" error | invalid SQL sent to the server |
 
 Check what a connection actually uses:
