@@ -117,7 +117,7 @@ SQL_INCLUDE_LAYERS=("granular-statements" "granular-functions" "topical" "additi
 # sql plugins select a subset (see SQL_INCLUDE_LAYERS). Add a new subfolder here
 # to make it selectable via the "additional-<subfolder>" include key.
 ADDITIONAL_SKILLS_DIR="$REPO_ROOT/additional-skills"
-ADDITIONAL_SUBDIRS=("sql" "rest" "schema-management" "migrator")
+ADDITIONAL_SUBDIRS=("sql" "rest" "schema-management" "migrator" "laravel")
 
 # The "contributor" plugins vendor a DIFFERENT source: the skills tracked in the
 # mariadb-shell repository under .claude/skills/ (no manifest — every SKILL.md
