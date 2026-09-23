@@ -15,8 +15,9 @@ description: >-
   Learn MariaDB with AI coding agents — hands-on tutorials for the MariaDB
   agent skills and the mariadb-shell MCP server.
 
-# Change both of these if the site moves to a custom domain (then baseurl: "").
-url: "https://mariadb.github.io"
+# Custom domain (docs/CNAME). This tracking fork serves ai-plugins.mariadb.org;
+# mariadb-corporation/ai-plugins serves ai-plugins.mariadb.com.
+url: "https://ai-plugins.mariadb.org"
 baseurl: ""
 
 repo: "https://github.com/mariadb/ai-plugins"
