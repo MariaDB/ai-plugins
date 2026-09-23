@@ -26,33 +26,21 @@ schema in it, and a clear picture of which part of the work came from the
 Nothing here touches a database you care about. The sandbox is a throwaway
 server that lives in one folder, and the last step deletes it.
 
-## Ask for the whole thing at once
+## Ask for the schema
 
 Open your agent in an empty directory — one that is on the MCP server's
-allowed-paths list — and give it the whole task. Agents do this better as one
-instruction than as four, because the later steps constrain the earlier ones:
+allowed-paths list — and start with the schema itself. No database is involved
+yet; this step produces a file:
 
 <div class="prompt" markdown="1">
-*Work in the current directory and complete every step in order.*
-
-*1. Create a MariaDB database schema named `notes_app` for a note-taking app and
+*Create a MariaDB database schema named `notes_app` for a note-taking app and
 store it in a `notes_app.sql` file.*
-
-*2. Spin up a sandbox instance on port 3310 with root password `demo-pw`,
-connect to it and run `notes_app.sql` via the MCP server.*
-
-*3. List the tables you created and show me the columns of the `note` table.*
 </div>
 
-Then read on to see what each step should look like — and what to do if it does
-not.
-
-## Watch the skills shape the schema
-
-The agent writes `notes_app.sql` first. Before it writes a single `CREATE`, it
-reads the `mariadb-schema-create-script` skill, and from there the
-`mariadb-create-table` and `mariadb-create-index` skills. That is what makes the
-output *MariaDB* SQL rather than generic SQL.
+Before it writes a single `CREATE`, the agent reads the
+`mariadb-schema-create-script` skill, and from there the `mariadb-create-table`
+and `mariadb-create-index` skills. That is what makes the output *MariaDB* SQL
+rather than generic SQL.
 
 Three tells that the skills were actually used:
 
@@ -108,11 +96,22 @@ the agent only reaches for because a skill told it about it.
 
 ## Deploy the sandbox
 
-Now the MCP tools take over. The agent calls `sandbox.deploy`:
+Now the MCP tools take over, and a real server appears:
+
+<div class="prompt" markdown="1">
+*Spin up a MariaDB sandbox instance on port 3310.*
+</div>
+
+That is everything you type. What the agent runs in response is the call below —
+shown so you can recognise it going past:
 
 ```text
-sandbox.deploy(port=3310, password="demo-pw", ssl=False)
+sandbox.deploy(port=3310, password="…", ssl=False)
 ```
+
+A port is all you have to give. You do not need to invent a root password — the
+agent sets one and hands it to the MCP server with the connection, so nothing
+downstream ever asks you for it.
 
 Three things happen that are worth knowing about:
 
@@ -128,48 +127,74 @@ Three things happen that are worth knowing about:
 - TLS is off (`ssl: False`), which is why a command-line client may need
   `--skip-ssl` later. Turning it on requires `openssl` on the machine.
 
+### When you do want to choose the password
+
+Name one in the prompt whenever you intend to reach the server from outside the
+agent — a command-line client, a GUI, an application you are pointing at it:
+
+<div class="prompt" markdown="1">
+*Spin up a MariaDB sandbox instance on port 3310 with root password `demo-pw`.*
+</div>
+
+The same call the agent made before, now carrying the password you chose:
+
+```text
+sandbox.deploy(port=3310, password="demo-pw", ssl=False)
+```
+
+The rest of this tutorial works either way; the later steps go through the agent,
+which already has the credentials.
+
 <div class="callout callout--warn" markdown="1">
-**The root password must not be blank.** `sandbox.deploy` will accept a blank
-one, but the connection that gets registered then fails to open, and the failure
-looks like an allow-list problem rather than a password problem. Always give a
-password.
+**Do not ask for a blank password.** It is the one value that is accepted and
+then breaks everything: the connection gets registered, nothing can open it, and
+the failure reads like a permissions problem rather than a password problem.
+Either say nothing and let the agent choose, or give it a real one.
 </div>
 
 If the deploy *hangs* rather than failing, the sandbox directory is not on the
-allowed-paths list — the path guard falls back to an interactive prompt that the
-agent cannot answer. Run `mariadb-shell -- mcp setup` and add it.
+allowed-paths list — the path guard is waiting for a confirmation a headless
+agent cannot give. Run `mariadb-shell -- mcp setup` and add it.
 
 ## Connect and run the script
 
-With the sandbox up, the agent opens the connection and runs the file:
+With the sandbox up, point the agent at the file you made in step 1:
+
+<div class="prompt" markdown="1">
+*Connect to that sandbox and run `notes_app.sql` against it.*
+</div>
+
+Two calls this time by the agent — one to open the connection, one to run
+the file down it:
 
 ```text
 db.connect(uri="root@127.0.0.1:3310")
 db.execute_sql_script(file_path="/abs/path/notes_app.sql", connection_id="…")
 ```
 
-Two details about `db.execute_sql_script` that explain most of the surprises:
+Two behaviours here explain most of the surprises people hit later:
 
-- **`file_path` must be inside an allowed path.** If it is not, the call is
-  refused. The agent's fallback is to pass the script inline as `sql_script`
-  instead, which works fine and is what it will usually do if your working
-  directory was never allowed.
-- **Each statement runs in a fresh session.** That is invisible for a normal
-  create script, but it matters for anything that depends on session state
-  carrying across statements — the MariaDB REST Service grammar, for instance,
-  needs one continuous session, so those statements go through `db.execute_sql`
-  one at a time instead. (That is [Tutorial 8](../rest-endpoints/).)
+- **The script file has to be somewhere the MCP server was given access to.**
+  If your working directory was never allowed, the agent simply sends the same
+  SQL inline instead — which works just as well, and is why you will sometimes
+  see it paste a script rather than point at one.
+- **Each statement in a script runs on its own fresh session.** Invisible for an
+  ordinary create script; fatal for anything that sets something in one
+  statement and reads it in the next. When that is what you need, say so and ask
+  for the statements to be run one at a time on a single connection. The MariaDB
+  REST Service grammar is the usual case — that is
+  [Tutorial 8](../rest-endpoints/).
 
 ## Read the result back
 
-The last step is the one that turns "the agent said it worked" into "it worked".
-Ask it to inspect the server rather than to summarize its own output:
+The last step is the one that turns "the agent said it worked" into "it worked",
+and it is worth asking for explicitly. The difference is between the agent
+summarizing what it just did and the agent going back to the server to look:
 
-```text
-db.list_schemas(connection_id="…")
-db.list_objects(connection_id="…", schema_name="notes_app", object_type="table")
-db.get_object_details(connection_id="…", schema_name="notes_app", object_name="note")
-```
+<div class="prompt" markdown="1">
+*Don't tell me what you ran — go and read it back off the server. Which schemas
+exist, which tables are in `notes_app`, and what are `note`'s columns?*
+</div>
 
 You should see `notes_app` in the schema list, your five tables in the object
 list, and `note`'s columns — including the `UUID` primary key and the foreign
@@ -180,9 +205,9 @@ key to `user` — in the details.
 note count.*
 </div>
 
-That last query is a good sanity check on the foreign keys, and it is a job for
-`db.execute_sql`, not the script tool — see [Tutorial 2](../run-sql-and-scripts/)
-for when to use which.
+That last query is a good sanity check on the foreign keys. It is also a
+question rather than a script, which is a distinction worth knowing about —
+[Tutorial 2](../run-sql-and-scripts/) covers when it matters.
 
 ## Clean up
 
@@ -192,14 +217,47 @@ The sandbox is a real server process. Stop it and delete it when you are done:
 *Stop and delete the sandbox on port 3310.*
 </div>
 
+Which the agent carries out as two calls, in this order:
+
 ```text
-sandbox.stop(port=3310, password="demo-pw")
+sandbox.stop(port=3310, password="…")
 sandbox.delete(port=3310)
 ```
 
-`sandbox.delete` **refuses to delete a running instance**, so the `stop` has to
-land first. If a stop fails — a wedged server, a forgotten password —
-`sandbox.kill` forces it down, and then `delete` will work.
+A sandbox cannot be deleted while it is running, so the stop has to land first.
+If a stop fails — a wedged server, a forgotten password — the agent forces it
+down and then deletes it. Asking for both in one sentence, as above, means you
+never have to think about the order.
+
+<h2 class="no-step" id="one-prompt">The whole thing in one prompt</h2>
+
+You have now seen each step on its own. In practice you would not type five
+prompts — you would type one, because agents do this *better* as a single
+instruction than as five: the later steps constrain the earlier ones, so an
+agent that knows it will have to run the script on a real server writes a more
+careful script.
+
+This is the same tutorial as one prompt, and it is the shape to use once you
+trust what it does:
+
+<div class="prompt" markdown="1">
+*Work in the current directory and complete every step in order.*
+
+*1. Create a MariaDB database schema named `notes_app` for a note-taking app and
+store it in a `notes_app.sql` file.*
+
+*2. Spin up a sandbox instance on port 3310, connect to it and run
+`notes_app.sql` against it.*
+
+*3. Don't tell me what you ran — read it back off the server. List the tables you
+created and show me the columns of the `note` table.*
+
+*4. Then stop and delete the sandbox, even if an earlier step failed.*
+</div>
+
+Step 4 is the habit worth forming early: ask for the teardown in the same breath
+as the creation, so a run that times out halfway does not leave a server
+listening and a directory behind.
 
 <h2 class="no-step" id="what-you-built">What you built</h2>
 
@@ -212,8 +270,8 @@ is a deeper version of one of them.
 
 **Where to go next**
 
-- [Run SQL and SQL scripts](../run-sql-and-scripts/) — `db.execute_sql` vs.
-  `db.execute_sql_script`, and why the distinction keeps biting people.
+- [Run SQL and SQL scripts](../run-sql-and-scripts/) — a statement versus a whole
+  file, and why the difference keeps biting people.
 - [Explore an existing database](../browse-schema-objects/) — the same tools
   pointed at a schema you did *not* write.
 - [Version the schema with MSM](../versioned-schema-with-msm/) — turn this

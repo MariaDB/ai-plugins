@@ -770,15 +770,27 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
 
 /* An "ask your agent this" prompt block — the site's signature element. */
 .prompt {
-  position: relative; margin: 1.5rem 0; padding: 1rem 1.15rem 1rem 3rem;
+  position: relative; margin: 1.5rem 0; padding: 1.68rem 1.15rem 1rem 3rem;
   background: var(--ch-highlight-bg); border: 1px solid var(--ch-highlight-border);
   border-radius: var(--ch-radius-sm);
   font-size: .95rem; line-height: 1.65; color: var(--ch-text-heading);
 }
-.prompt::before {
-  content: "›"; position: absolute; left: 1.15rem; top: .85rem;
-  font-size: 1.3rem; line-height: 1; font-weight: 700; color: var(--ch-brand-action);
+/* The gutter mark is TWO pseudo-elements, because a single `content` string
+   cannot be styled in parts — one font-size would have to serve both the tiny
+   label and the chevron, and sizing one right makes the other wrong. The label
+   is tucked into the top-left corner ABOVE the chevron, which keeps the
+   chevron's original 3rem gutter and its offset from the first line of text. */
+.prompt::before, .prompt::after {
+  position: absolute; left: 1.15rem; line-height: 1;
+  font-weight: 700; color: var(--ch-brand-action);
 }
+.prompt::after  { content: "PROMPT"; top: .7rem; font-size: .7rem; letter-spacing: .08em; }
+.prompt::before { content: "›"; top: 1.7rem; font-size: 1.3rem; }
+/* The action red is only 2.4:1 on the dark prompt background — fine nowhere, and
+   the small label is the case that exposed it. The dark theme's own softened
+   red is 6.1:1. Applies to the chevron too, which was below AA large here. */
+html[data-theme="dark"] .prompt::before,
+html[data-theme="dark"] .prompt::after { color: var(--ch-red); }
 .prompt p { margin: 0 0 .6rem; }
 .prompt p:last-child { margin-bottom: 0; }
 .prompt em { font-style: italic; }

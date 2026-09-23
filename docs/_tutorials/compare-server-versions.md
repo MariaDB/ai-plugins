@@ -31,13 +31,19 @@ newest 11.8 on port 3311 and one on the newest 12.3 on port 3312, run
 
 ## See what you can actually deploy
 
+<div class="prompt" markdown="1">
+*Which MariaDB server versions can you deploy on this machine?*
+</div>
+
+That question becomes a tool call the agent makes on your behalf:
+
 ```text
 sandbox.list_available_versions()
   → 11.8.9, 12.3.3
 ```
 
-With no argument you get the **newest patch of each release series**. Pass a
-series — `series="11.8"`, or just `series="11"` — to see every release below it.
+By default you get the **newest patch of each release series**. Ask for a series
+— *"every 11.8 release"*, or *"everything on 11"* — to see the patches below it.
 
 Two things this list is telling you, and both matter here:
 
@@ -51,14 +57,14 @@ Two things this list is telling you, and both matter here:
 
 ## Deploy both
 
-```text
-sandbox.deploy(port=3311, password="demo-pw", server_version="11.8")
-sandbox.deploy(port=3312, password="demo-pw", server_version="12.3")
-```
+<div class="prompt" markdown="1">
+*Deploy a sandbox on the newest 11.8 on port 3311 and one on the newest 12.3 on
+port 3312.*
+</div>
 
-`server_version` takes as much or as little as you want to pin. `11.8` means
-"the newest 11.8", `11` means "the newest 11 anything", and `11.8.9` pins it
-exactly. Each level you leave off is filled in with the newest release below it.
+Pin as much or as little as you care about. "The newest 11.8" and "anything on
+11" are both valid asks, and so is `11.8.9` exactly — each level you leave off is
+filled in with the newest release below it.
 
 <div class="callout callout--tip" markdown="1">
 **Read the deploy message — it tells you where the server came from.** It says
@@ -72,38 +78,37 @@ order doing its job, not a fault.
 </div>
 
 <div class="callout callout--warn" markdown="1">
-**A downloaded server is not on your `PATH`, and that changes two things.**
-`sandbox.start` needs the `mariadbd_path` the deploy reported, and **shutdown
-needs `sandbox.kill`, not `sandbox.stop`** — the stop path takes no
-`mariadbdPath` and cannot find the binary. The deploy message tells you both at
-the time. Plan the cleanup step below around it.
+**A downloaded server cannot be shut down gracefully.** The graceful path needs
+the server binary on the `PATH`, and a downloaded one is not there — so the
+agent has to force these instances down instead. It handles that on its own; the
+thing that matters for your prompt is to ask for the cleanup in a way that
+tolerates it, which the teardown prompt below does.
 </div>
 
 ## Confirm you got what you asked for
 
 Never take the version from the request. Take it from the server:
 
-```text
-sandbox.version(port=3311)   → 11.8.9
-sandbox.version(port=3312)   → 12.3.3
-```
-
 <div class="prompt" markdown="1">
 *Connect to both sandboxes and run `SELECT VERSION()` on each, so we are
 comparing what the servers say rather than what we asked for.*
 </div>
 
-## Run the same script on both
+This is what the agent will execute:
 
 ```text
-db.connect(uri="root@127.0.0.1:3311")
-db.connect(uri="root@127.0.0.1:3312")
-db.execute_sql_script(connection_id="…3311", file_path="/abs/path/notes_app.sql")
-db.execute_sql_script(connection_id="…3312", file_path="/abs/path/notes_app.sql")
+sandbox.version(port=3311)   → 11.8.9
+sandbox.version(port=3312)   → 12.3.3
 ```
 
-Both connections are registered automatically by their deploys, so there is no
-`mcp setup` step between here and there.
+## Run the same script on both
+
+<div class="prompt" markdown="1">
+*Run `notes_app.sql` against both sandboxes.*
+</div>
+
+Both connections were registered automatically when the sandboxes were deployed,
+so there is no setup step between here and there.
 
 This is the moment the exercise pays for itself. A script that **fails on one
 version** has told you something immediately. But the more interesting case is
@@ -120,9 +125,9 @@ servers ended up with:
 indexes and constraints from both servers and show me only the differences.*
 </div>
 
-The agent should be reading this out of the servers with
-`db.get_object_details` and `INFORMATION_SCHEMA`, not inferring it from the
-script. A query that makes the comparison concrete:
+Insist that it reads this **out of the servers** rather than inferring it from
+the script it just ran — the whole point is that the script does not tell you
+what the servers did with it. A query that makes the comparison concrete:
 
 ```sql
 SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE,
@@ -174,20 +179,16 @@ done instantly has grown release by release, so an `ALTER` that is instant on
 
 ## Clean up both
 
-```text
-sandbox.kill(port=3311)
-sandbox.delete(port=3311)
-sandbox.kill(port=3312)
-sandbox.delete(port=3312)
-```
-
 <div class="prompt" markdown="1">
 *Stop and delete both sandboxes, even if one of them fails.*
 </div>
 
-`sandbox.kill` rather than `sandbox.stop` for any instance running a downloaded
-server — see the warning above. `sandbox.delete` refuses a running instance, so
-the kill has to land first.
+"Even if one of them fails" is doing real work in that sentence. At least one of
+these servers was probably downloaded rather than found on the `PATH`, so it has
+to be forced down rather than stopped gracefully — and a sandbox cannot be
+deleted while it is still running. Phrasing the teardown so a failure does not
+abandon the second instance is the difference between a clean machine and two
+orphans.
 
 The **downloaded server packages are deliberately not removed** by
 `sandbox.delete`. They live one directory per version under
@@ -197,12 +198,12 @@ the space back.
 
 <h2 class="no-step" id="what-you-built">What you learned</h2>
 
-- `sandbox.list_available_versions` shows what your platform can run; anything
-  listed can be deployed, downloading if needed.
-- `server_version` pins as much as you care about — `11.8.9`, `11.8` or `11` —
-  and the newest match fills in the rest.
-- The deploy message names where the server came from, and a downloaded one
-  needs `mariadbd_path` on `start` and `sandbox.kill` on shutdown.
+- Ask what versions are available first; anything listed can be deployed, and it
+  downloads itself if it has to.
+- Pin as much of the version as you care about — `11.8.9`, `11.8` or `11` — and
+  the newest match fills in the rest.
+- The agent tells you where each server came from; a downloaded one cannot be
+  stopped gracefully, so ask for teardown that tolerates a failure.
 - **Running on both is the easy half; diffing the resulting schemas is the
   half that finds things.** Read the result out of the servers, and check
   warnings, not just exit status.

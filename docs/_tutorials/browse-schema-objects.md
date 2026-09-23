@@ -4,8 +4,8 @@ slug: browse-schema-objects
 title: "Explore a database you did not design"
 description: >-
   Point the agent at an existing MariaDB server and have it map the place out —
-  schemas, tables, views, routines, columns, indexes and foreign keys — using
-  the read-only db.* tools rather than a pile of SHOW statements.
+  schemas, tables, views, routines, columns, indexes and foreign keys — and
+  answer the questions about a schema that a pile of SHOW statements cannot.
 level: beginner
 duration: "15 min"
 area: sql
@@ -16,10 +16,9 @@ prerequisites:
   - "A configured connection to a MariaDB server with a schema in it — the `notes_app` sandbox from [Tutorial 1](../notes-app-sandbox/) works."
 ---
 
-Inheriting a database is a normal Tuesday. The three read-only `db.*` tools are
-built for exactly that: they return structured results the agent can reason over,
-which is a different thing from dumping `SHOW CREATE TABLE` output into the
-conversation and hoping.
+Inheriting a database is a normal Tuesday. The agent can read a schema back as
+structured detail and reason over it, which is a different thing from dumping
+`SHOW CREATE TABLE` output into the conversation and hoping.
 
 <div class="prompt" markdown="1">
 *Connect to the sandbox on port 3310 and give me a map of the `notes_app`
@@ -27,58 +26,63 @@ schema: every table with its columns, primary key and foreign keys, plus any
 views or stored routines. Tell me which tables have no primary key.*
 </div>
 
-## Start at the top: `db.list_schemas`
+That one prompt is most of this tutorial. The rest is what to expect back, and
+which follow-up questions are worth asking.
+
+## Ask for everything, not for tables
+
+Start by finding out what is on the server at all:
+
+<div class="prompt" markdown="1">
+*What schemas are on the sandbox on port 3310?*
+</div>
+
+You never type that call yourself. The agent makes it and reports back what
+came out:
 
 ```text
 db.list_schemas(connection_id="…")
   → information_schema, mysql, performance_schema, sys, notes_app
 ```
 
-The system schemas are always in the list. If a schema you expect is missing, it
-is nearly always the account's privileges rather than the tool — MariaDB shows a
-schema only to an account that has some privilege on it, so a read-only MCP
-account scoped to one schema will see exactly one non-system schema. That is the
-setup working as intended.
-
-## List objects by type: `db.list_objects`
-
-```text
-db.list_objects(connection_id="…", schema_name="notes_app", object_type="table")
-  → user, notebook, note, tag, note_tag
-```
-
-`object_type` accepts the usual kinds — `table`, `view`, `procedure`,
-`function`, `trigger`, `event`. It defaults to `table`, so a call without it
-lists tables.
+The system schemas are always in the list. If a schema you expect is **missing**,
+it is nearly always the account's privileges rather than a fault — MariaDB shows
+a schema only to an account with some privilege on it, so a read-only account
+scoped to one schema will see exactly one non-system schema. That is the setup
+working as intended.
 
 <div class="callout callout--tip" markdown="1">
-**Ask for all types in one go.** The agent will fan out across the types on its
-own if you phrase the request as "everything in this schema" rather than naming
-tables. That is four calls instead of one, but it catches the view nobody
+**Say "everything in this schema", not "the tables".** Asked for tables, the
+agent lists tables. Asked for everything, it fans out across views, procedures,
+functions, triggers and events as well — which is what catches the view nobody
 mentioned and the trigger that explains the mystery column.
 </div>
 
-## Describe one object: `db.get_object_details`
+## Ask for one object in detail before changing it
 
-```text
-db.get_object_details(connection_id="…", schema_name="notes_app",
-                      object_name="note", object_type="table")
-```
+<div class="prompt" markdown="1">
+*Show me the full definition of the `note` table — columns, types, nullability,
+defaults, indexes and foreign keys.*
+</div>
 
-For a table, that comes back as structured detail — columns with types,
-nullability and defaults, the primary key, indexes, and foreign key constraints —
-rather than as a `CREATE TABLE` string the agent has to re-parse. For a view or a
-routine, you get its definition.
+What comes back is structured detail rather than a `CREATE TABLE` string the
+agent has to re-parse, which is why it can answer questions about the table
+instead of quoting it at you. For a view or a routine you get its definition.
 
-This is the tool to reach for before *any* schema change. An `ALTER TABLE`
+This is the step to insist on before *any* schema change. An `ALTER TABLE`
 proposed without reading the current definition is a guess.
 
-## Ask the questions `INFORMATION_SCHEMA` answers better
+## Ask the questions a schema listing cannot answer
 
-The three tools above are the right shape for "show me this object". For
-questions *about* the schema as a whole, one `db.execute_sql` against
-`INFORMATION_SCHEMA` beats a hundred tool calls — and the agent knows it, because
+Listing objects is the wrong shape for questions *about* the schema as a whole.
+Those are one query against `INFORMATION_SCHEMA`, and the agent knows it —
 that is what the `mariadb-show` and `mariadb-information-functions` skills teach.
+You do not have to write these; you have to know they are askable.
+
+<div class="prompt" markdown="1">
+*Which tables in `notes_app` have no primary key, what does the foreign key
+graph look like, and where has the space actually gone?*
+</div>
 
 **Tables with no primary key** — the classic one, because a table without a
 primary key breaks row-based replication and makes InnoDB pick a hidden one:
@@ -118,10 +122,10 @@ ORDER BY DATA_LENGTH + INDEX_LENGTH DESC;
 ```
 
 <div class="callout callout--warn" markdown="1">
-`TABLE_ROWS` is an **estimate** for InnoDB, sometimes off by a large factor. Use
-it to rank tables by rough size, never to report a count. For a real count the
-agent has to run `SELECT COUNT(*)`, and it should tell you it is doing so on a
-big table.
+**`TABLE_ROWS` is an estimate**, sometimes off by a large factor. It is fine for
+ranking tables by rough size and useless as a count. If the number matters, ask
+for a real one — *"give me actual `COUNT(*)` figures, not estimates"* — and
+expect the agent to say so before running it on a big table.
 </div>
 
 ## Two MariaDB-specific things to look for
@@ -132,11 +136,11 @@ the map *means*, and both are covered by skills:
 - **System-versioned tables.** A table declared `WITH SYSTEM VERSIONING` keeps
   its own row history. `SELECT *` shows only current rows, so a table can be far
   larger on disk than its row count suggests, and `DELETE` does not actually
-  remove anything. If `db.get_object_details` shows a table with system
-  versioning, that is the explanation for both.
+  remove anything. If a table turns out to be system-versioned, that is the
+  explanation for both.
 - **Invisible columns.** A column declared `INVISIBLE` is absent from
-  `SELECT *` and from `INSERT` without a column list. It will show up in the
-  object details and not in a query — which looks like a bug until you know.
+  `SELECT *` and from `INSERT` without a column list. It shows up in the object
+  details and not in a query — which looks like a bug until you know.
 
 <div class="prompt" markdown="1">
 *Are any tables in this schema system-versioned? If so, show me what the `note`
@@ -159,10 +163,10 @@ codebase you are new to.
 
 <h2 class="no-step" id="what-you-built">What you learned</h2>
 
-- `db.list_schemas` → `db.list_objects` → `db.get_object_details` is the drill-down,
-  and the details call is mandatory before proposing any schema change.
-- Schema-wide questions belong in one `INFORMATION_SCHEMA` query via
-  `db.execute_sql`, not in a loop of tool calls.
+- Ask for the whole schema at once, then for one object in detail — and insist on
+  the detail before any change is proposed.
+- Schema-wide questions ("which tables have no primary key", "where did the space
+  go") are one query, not a tour. Ask them directly.
 - A missing schema is usually privileges; a surprising row count is usually
   system versioning or an estimate.
 

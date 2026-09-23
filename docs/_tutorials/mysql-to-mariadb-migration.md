@@ -3,9 +3,10 @@ order: 9
 slug: mysql-to-mariadb-migration
 title: "Migrate a MySQL database to MariaDB"
 description: >-
-  Drive the MySQL-to-MariaDB Migrator from the agent — choose a mode, write a
-  configuration that will not be refused, plan it, run it, and verify the
-  result. Rehearsed on two throwaway servers before it touches anything real.
+  Drive the MySQL-to-MariaDB Migrator from the agent — choose a mode, ask for it
+  in a prompt that carries everything the agent needs, plan it, run it, and
+  verify the result. Rehearsed on two throwaway servers before it touches
+  anything real.
 level: advanced
 duration: "60 min"
 area: migration
@@ -16,6 +17,7 @@ prerequisites:
   - "**Linux or macOS.** The migration tooling is a POSIX shell program and is not available on Windows."
   - "The tooling installed: `mariadb-shell -- mcp setup --installMigrator`, then **restart the MCP server** — the tools only register on the next start."
   - "`mariadb` and `mariadb-dump` on the server's `PATH`. `pv` should be there too."
+  - "**A local MySQL Server installation**, if you want to follow the rehearsal below. MariaDB sandboxes are downloaded on demand; MySQL ones are not."
   - "Both the source and the target as **configured MCP connections**."
 ---
 
@@ -23,16 +25,18 @@ The MySQL-to-MariaDB Migrator is a standalone program — a Python orchestrator
 driving a directory of shell scripts — that copies databases from a MySQL source
 to a MariaDB target. The four `migrator.*` tools configure it and drive it.
 
-Getting the *configuration* right is most of the work. A wrong one is refused
-outright, which is good; a plausible-but-incomplete one fails deep inside the
-dump step, which is not.
+You do not drive it yourself: you ask the agent, and it writes the migrator's
+configuration and calls the tools. So **getting your prompt right is most of the
+work**. A configuration the agent cannot write correctly is refused outright,
+which is good; a plausible-but-incomplete one fails deep inside the dump step,
+which is not — and the difference is usually something your prompt left out.
 
 <div class="callout callout--warn" markdown="1">
-**If you cannot see `migrator.set_config`, the tooling is not installed.** The
-server advertises no `migrator.*` tools at all rather than four tools whose every
-call would fail. Install with
-`mariadb-shell -- mcp setup --installMigrator` and **restart the server** — the
-change takes effect on the next start, not the current one.
+**If the agent says it has no `migrator.*` tools, the tooling is not installed.**
+The server advertises none of them at all rather than four tools whose every call
+would fail. Install with `mariadb-shell -- mcp setup --installMigrator` and
+**restart the server** — the change takes effect on the next start, not the
+current one.
 </div>
 
 ## Rehearse on two sandboxes first
@@ -48,144 +52,160 @@ view, a stored procedure and a trigger — and seed it with data. Then confirm b
 show up in `db.list_connections`.*
 </div>
 
-`sandbox.vendor(port=3307)` will tell you which is which. Both are registered
-with the MCP server automatically, which matters for the next step.
+<div class="callout callout--tip" markdown="1">
+**MariaDB sandboxes arrive on demand; MySQL ones do not.** If the MariaDB
+package for the version you ask for is not on the machine already, it is
+downloaded and set up for you. A MySQL sandbox is built from a local MySQL
+Server installation, so that one has to be there first.
+</div>
+
+If you lose track of which port got which server, ask. The agent checks the
+servers rather than assuming, with a call like this:
+
+```text
+sandbox.vendor(port=3307)   → "MySQL"
+sandbox.vendor(port=3308)   → "MariaDB"
+```
+
+Both sandboxes are registered as MCP connections when they are deployed, which
+matters for the next step.
 
 ## Choose a mode
 
-Pass the mode to `set_config` (as the file's default) **and** to `plan`/`run`.
-The per-call one wins, so keep them the same.
+If your prompt does not name a mode, the agent picks the **Serial Streaming
+Copy** — the simplest and most predictable of the four. Name one explicitly when
+something below applies, and use the name rather than the id: the ids are
+internal, and the name is what the agent will use when it talks back to you.
 
-| Mode | Type | What it does | Pick it when |
-| --- | --- | --- | --- |
-| `one_step` | offline | `mysqldump` piped straight into the target client, tables sequentially. | **The default choice.** Start here unless something below applies. |
-| `two_step` | offline | Schema-only dump, then parallel data load via `mariadb-mtk`, then triggers, routines and events. | Large databases *and* `mariadb-mtk` installed — it is **not** bundled. |
-| `staged` | offline | Per-database compressed dumps to disk with a SHA-256 manifest, then a separate load. | The dump must land on disk first, or you want checksums. **Needs bash 4.** |
-| `binlog` | online | Consistent snapshot with binlog coordinates, then MariaDB replicates from the MySQL binary log. | Low-downtime cutover. Needs **MySQL 8.0+**, `binlog_format=ROW`, and **no JSON columns**. |
+| Ask for | Mode id | Type | What it does | Pick it when |
+| --- | --- | --- | --- | --- |
+| **Serial Streaming Copy** | `one_step` | offline | `mysqldump` piped straight into the target client, tables sequentially. | **The default choice.** Start here unless something below applies. |
+| **Parallel Restartable Streaming Copy** | `two_step` | offline | Schema-only dump, then parallel data load via `mariadb-mtk`, then triggers, routines and events. | Large databases *and* `mariadb-mtk` installed — it is **not** bundled. |
+| **Offline Copy** | `staged` | offline | Per-database compressed dumps to disk with a SHA-256 manifest, then a separate load. | The dump must land on disk first, or you want checksums. **Needs bash 4.** |
+| **Replication** | `binlog` | online | Consistent snapshot with binlog coordinates, then MariaDB replicates from the MySQL binary log. | Low-downtime cutover. Needs **MySQL 8.0+**, `binlog_format=ROW`, and **no JSON columns**. |
 
-There are two further modes, `inplace` and `replace_slave`, that replace MySQL on
-the source host itself over SSH. **Do not pick them.** They are excluded from the
-tooling's own menu and documented for advanced scripting only.
+You do not have to check those requirements yourself — ask, and let the agent
+tell you what is actually available:
 
-## Write a configuration that will not be refused
-
-`migrator.set_config` writes the tooling's `config/migration.yaml`. Two rules are
-enforced by *refusing the configuration* rather than by failing later, and both
-are there to stop an agent inventing infrastructure or leaking a secret.
-
-**Rule 1 — every account you name must be a configured connection.** Each account
-key is paired with its side's host and port to compose a URI, which then has to
-resolve against `db.list_connections`:
-
-| Account key | Resolved as |
-| --- | --- |
-| `SRC_ADMIN_USER`, `SRC_USER` | `<user>@<SRC_HOST>:<SRC_PORT>` |
-| `TGT_ADMIN_USER`, `TGT_USER` | `<user>@<TGT_HOST>:<TGT_PORT>` |
-| `REPL_USER` | `<user>@<SRC_HOST>:<SRC_PORT>` — the replication user lives on the **source** |
-
-<div class="callout callout--warn" markdown="1">
-**Always set `SRC_PORT` and `TGT_PORT` explicitly.** The port is half of the URI
-the password is looked up under. Omit it and it reads as 3306 — so on any other
-port the lookup silently finds nothing and the run fails much later, somewhere
-that does not mention ports.
+<div class="prompt" markdown="1">
+*I need the shortest possible downtime on this migration. Which mode can I
+actually use here — check the source version and whether the schema has any JSON
+columns before you answer.*
 </div>
 
-**Rule 2 — you can never set a password.** `SRC_PASS`, `SRC_ADMIN_PASS`,
-`TGT_PASS`, `TGT_ADMIN_PASS` and `REPL_PASS` are **refused** if you give them a
-value. Set the user, host and port; the password is read from the shell's secret
-store at the moment the migration runs. The call returns a `passwords_from` map
-telling you which connection each will come from — never the secret itself.
+## What your prompt has to tell the agent
 
-Values are strings; numbers and booleans are converted for you, and a list or a
-dict is refused outright.
+The agent writes the migrator's configuration with `migrator.set_config`, and
+that call is **refused** rather than allowed to fail later if it names a server
+that is not a configured connection or tries to set a password. Both refusals
+are there to stop an agent inventing infrastructure or leaking a secret — and
+both are things your prompt can steer.
 
-A complete `one_step` configuration:
+Three things to supply. Only the third is unusual.
 
-{% raw %}
-```text
-migrator.set_config(
-    mode="one_step",
-    env={
-        # Source — must resolve to the configured connection root@127.0.0.1:3307
-        "SRC_HOST": "127.0.0.1",
-        "SRC_PORT": "3307",
-        "SRC_ADMIN_USER": "root",
-        "SRC_USER": "root",
-        "SRC_DBS": "shop,billing",
-        "SRC_SSL_MODE": "DISABLED",
+**Name both servers, with their ports.** The agent can only use servers that are
+already configured connections, so name them the way `db.list_connections` lists
+them. Sandboxes are registered when they are deployed, so in this rehearsal they
+are already there.
 
-        # Target — root@127.0.0.1:3308
-        "TGT_HOST": "127.0.0.1",
-        "TGT_PORT": "3308",
-        "TGT_ADMIN_USER": "root",
-        "TGT_USER": "root",
+<div class="callout callout--warn" markdown="1">
+**Always give the port, on both sides.** The port is half of the URI the
+password is looked up under. Leave it out and it reads as 3306 — so on any other
+port the lookup silently finds nothing and the run fails much later, somewhere
+that does not mention ports. Be consistent about the host, too: if the
+connection is `root@127.0.0.1:3307`, do not write `root@localhost:3307`.
+</div>
 
-        "MARIADB_DUMP_BIN": "/usr/local/mysql/bin/mysqldump",
-        "ALLOW_ROOT_USERS": "1",
-        "MIGRATE_APP_USERS": "0",
-    })
-```
-{% endraw %}
+**Name the databases schema to migrate.** One, or a list. If you are asking for an
+Offline Copy and intend to dump now and load somewhere else later, say that —
+it is a different request from a straight-through migration, and the dump
+location is the one thing you will need to carry forward.
 
-Per-mode extras: `one_step`, `two_step` and `binlog` need `SRC_DB` (one database)
-or `SRC_DBS` (comma-separated); `binlog` also needs `REPL_USER`; `staged` needs
-`STAGED_PHASE` and, for `load_only`, `STAGED_DUMP_DIR`.
+**Never put a password in your prompt.** The agent cannot set one — every
+password key is refused if given a value — and it does not need one. Each
+password is read from the shell's secret store at the moment the migration runs.
+If you paste a credential in, you have leaked it into the transcript for nothing.
+
+Put together, a prompt that carries everything:
+
+<div class="prompt" markdown="1">
+*Migrate the `shop` and `billing` databases from `root@127.0.0.1:3307` to
+`root@127.0.0.1:3308` with a Serial Streaming Copy. Plan it first and show me
+the steps before you run anything.*
+</div>
 
 ## Plan before you run
 
-```text
-migrator.plan(mode="one_step")
-```
-
-`plan` resolves the step list and validates the configuration. It **executes
-nothing** and does not need a reachable server, which makes it free to run as
-often as you like. Read the step list — it is the contract for what `run` will
-do.
+Always plan first. `plan` resolves the step list and validates the
+configuration — it **executes nothing** and does not need a reachable server,
+which makes it free to run as often as you like.
 
 <div class="prompt" markdown="1">
-*Plan the migration and walk me through what each step will do to the source and
-to the target, before we run anything.*
+*Plan a migration of `shop` and `billing` from `root@127.0.0.1:3307` to
+`root@127.0.0.1:3308`, and walk me through what each step will do to the source
+and to the target, before we run anything.*
 </div>
+
+Read the step list — it is the contract for what `run` will do. The call the
+agent makes to produce it:
+
+```text
+migrator.plan(mode="one_step")   → the resolved step list, nothing executed
+```
 
 ## Run it
 
+Once the plan looks right, run it.
+
+<div class="prompt" markdown="1">
+*Go ahead and run it.*
+</div>
+
+This is the one that actually moves data. The agent invokes it; you watch what
+comes back:
+
 ```text
-migrator.run(mode="one_step")
+migrator.run(mode="one_step")   → a report, one entry per step
 ```
 
 <div class="callout callout--warn" markdown="1">
-**The rule that silently produces a false success.** The orchestrator is
-resume-safe: if `out` points at a directory that already holds a `state.json`
-from an earlier run, the new run reports every step `SKIPPED`, **exits 0, and
-migrates nothing**.
+**Never accept "migration completed successfully" on its own.** A run can report
+success and move nothing — most often because it reused an earlier run's working
+directory, in which case every step is skipped and the run still exits cleanly.
+The agent's summary will not necessarily say so. Ask for the detail:
 
-So: **omit `out` for every new migration.** A fresh
-`artifacts/<command>_<mode>_<timestamp>` directory is chosen for you. Pass `out`
-only to `migrator.resume`.
+*Show me the status of every step in that run, and the row counts now on the
+target — don't just tell me it succeeded.*
 
-And **never trust `succeeded` on its own** — check that every step in the report
-says `DONE`. A run of all-`SKIPPED` steps is a "success" that did nothing.
+Every step should say `DONE`. A run of skipped steps is a "success" that did
+nothing.
 </div>
-
-`out` is always relative to the install directory; an absolute path is refused.
-Every invocation gets a closed stdin, so an incomplete configuration fails saying
-what is missing rather than hanging on a prompt.
 
 ## Resume a failed run
 
-```text
-migrator.resume(mode="one_step", out="artifacts/migrate_one_step_20260911T101500")
-```
+If a run stops partway — a timeout, a dropped connection, a failed step — it can
+be picked up where it left off rather than started again.
 
-`resume` continues from the `state.json` in that run's directory — the one case
-where `out` is required. Steps already marked `DONE` are skipped, and the run
-picks up at the first one that is not.
+<div class="prompt" markdown="1">
+*That run stopped partway. Resume it from where it got to.*
+</div>
+
+Steps already marked `DONE` are skipped and the run picks up at the first one
+that is not. Resuming needs the stopped run's artifacts directory, so ask in the
+same session, while the agent still has it — otherwise tell it which run
+directory to use. The agent fills that directory in from the stopped run and
+calls:
+
+```text
+migrator.resume(mode="one_step", out="artifacts/migrate_one_step_…")
+```
 
 ## Verify on the target
 
-The migrator's report is a claim. Verification is a `db.execute_sql` against the
-target — and this is where the agent earns its keep, because it can check
-everything rather than the two tables you would have thought to check:
+The migrator writes its own report when a run finishes. Treat it as a claim, not
+a result: the check that counts is a query against the target, and this is where
+the agent earns its keep, because it can check everything rather than the few
+schema objects you would have thought to check.
 
 <div class="prompt" markdown="1">
 *Connect to the target and verify the migration: every table from the source
@@ -204,9 +224,10 @@ Things worth checking explicitly, because they are what actually differs:
   `mysql-to-mariadb` skill covers the substitutions.
 - **`JSON` columns.** MySQL's `JSON` is a native binary type; MariaDB's is a
   `LONGTEXT` alias with a check constraint. Data survives, but anything relying
-  on MySQL's internal ordering does not — and the `binlog` mode refuses JSON
+  on MySQL's internal ordering does not — and Replication mode refuses JSON
   columns entirely.
-- **Accounts and grants**, if you set `MIGRATE_APP_USERS`.
+- **Accounts and grants**, if you asked for the application's users to come
+  across as well.
 
 ## Then read the application side
 
@@ -225,13 +246,14 @@ MariaDB has that MySQL does not?*
 
 - The tools only exist once the tooling is installed **and the server is
   restarted**. Linux and macOS only.
-- Configuration is refused, not deferred: every account must be a configured
-  connection, `SRC_PORT`/`TGT_PORT` must be explicit, and passwords can never be
-  set by you.
-- `plan` is free and executes nothing — run it first, every time.
-- **Omit `out` on a new run.** Reusing a directory with a `state.json` skips
-  everything and exits 0. Check every step says `DONE`, not just `succeeded`.
-- Verify on the target with queries, not by reading the report.
+- Rehearse on two sandboxes — a MySQL source and a MariaDB target — before the
+  migration touches anything real.
+- The agent writes the configuration, but only from what you gave it: **name both
+  servers with their ports, name the databases, and never paste a password.**
+- Ask for a mode by name. Say nothing and you get a Serial Streaming Copy.
+- Planning is free and executes nothing — ask for a plan first, every time.
+- **"Succeeded" is not verification.** Ask for every step's status, then verify on
+  the target with queries rather than reading the report.
 
 **Where to go next**
 

@@ -41,8 +41,9 @@ LIMIT 20;
 
 ## Read the schema first
 
-The agent should call `db.get_object_details` on `note` and `user` before it
-looks at any plan. Half of all slow-query answers are visible in the DDL:
+Insist on the table definitions before any plan is discussed — *"show me the
+definitions of `note` and `user` first"*. Half of all slow-query answers are
+visible in the DDL, and an index suggested without reading it is a guess:
 
 - Is there an index on `notebook_id`? On `created_at`? On **both**, in an order
   that serves this predicate?
@@ -54,10 +55,10 @@ looks at any plan. Half of all slow-query answers are visible in the DDL:
 
 ## `EXPLAIN` — what the optimizer intends
 
-```text
-db.execute_sql(connection_id="…", sql="EXPLAIN <the query>")
-db.execute_sql(connection_id="…", sql="EXPLAIN FORMAT=JSON <the query>")
-```
+<div class="prompt" markdown="1">
+*Show me `EXPLAIN` for that query, and then `EXPLAIN FORMAT=JSON` — I want the
+filtering percentages, not just the table.*
+</div>
 
 `EXPLAIN` is an estimate, produced without running anything. The `mariadb-explain`
 skill teaches the agent what the columns mean in MariaDB specifically. The
@@ -141,8 +142,9 @@ used", and it does not show up as an error.
 
 **Is an old `utf8` involved?** MariaDB's `utf8` is `utf8mb3`. A join between a
 `utf8mb3` column and a `utf8mb4` column converts on every row and cannot use the
-index. The `mariadb-create-table` skill flags this; `db.get_object_details` is
-where you see it.
+index. The `mariadb-create-table` skill flags this, and the table definitions
+you asked for at the start are where it shows up — another reason to start
+there.
 
 ## Write the finding down
 
@@ -154,7 +156,8 @@ the measured improvement.*
 
 <h2 class="no-step" id="what-you-built">What you learned</h2>
 
-- Schema first, plan second. `db.get_object_details` before `EXPLAIN`.
+- Schema first, plan second. Ask for the table definitions before you let any
+  index be proposed.
 - `EXPLAIN` is the intent, `ANALYZE` is the truth — and `r_rows` vs `rows`
   distinguishes a bad plan from bad statistics.
 - Index proposals get tested on a sandbox, not on production.

@@ -1,11 +1,11 @@
 ---
 order: 2
 slug: run-sql-and-scripts
-title: "Run SQL and SQL scripts with the db.* tools"
+title: "Run SQL and SQL scripts"
 description: >-
-  Open a connection, run a single statement, run a whole script, and read a
-  result set back. Covers the one distinction that causes most db.* surprises —
-  execute_sql runs on your session, execute_sql_script does not.
+  Ask the agent to run a statement, run a whole file, and read results back.
+  Covers the one behaviour that causes most surprises — a script does not run on
+  a single session, so anything stateful has to be asked for differently.
 level: beginner
 duration: "15 min"
 area: sql
@@ -17,16 +17,22 @@ prerequisites:
   - "A sandbox on port 3310 with the `notes_app` schema, if you want to follow along exactly."
 ---
 
-Six of the eight `db.*` tools exist to get SQL onto a server and results back.
-This tutorial is about picking the right one, because the difference between two
-of them is the single most common source of confusion — and it is not obvious
-from their names.
+Getting SQL onto a server is the most ordinary thing you will ask for, and it
+works well without you knowing anything about how. There is exactly one
+behaviour worth learning, because it decides whether a stateful request works at
+all — and it is not visible from the outside.
 
-## Find out what you are allowed to connect to
+## Ask what you are allowed to connect to
 
-The agent cannot invent a host. Every connection has to already be on the MCP
-server's allow-list, and the first call in almost every session is the one that
-asks what is on it:
+The agent cannot invent a host. Every server it can reach has to already be
+configured, and asking is the first move of almost every session:
+
+<div class="prompt" markdown="1">
+*Which database connections do you have available?*
+</div>
+
+The agent answers that with a tool call. You will see it in the transcript; it is
+not something you run:
 
 ```text
 db.list_connections()
@@ -34,58 +40,38 @@ db.list_connections()
 ```
 
 <div class="callout" markdown="1">
-This list is **derived from the shell's secret store**, not from a registry of
-its own — `db.list_connections` reports the connections whose passwords are
-stored. Two consequences worth knowing: a connection registered by
-`sandbox.deploy` shows up here without you configuring anything, and an
-unreadable secret store makes *every* connection look unconfigured, which reads
-like a broken install when it is really a credential-store problem.
+That list comes from the shell's **secret store** — it reports the connections
+whose passwords are stored, not a registry of its own. Two things follow: a
+sandbox you deployed shows up without you configuring anything, and if the
+secret store cannot be read then *every* connection looks unconfigured, which
+reads like a broken install when it is really a credentials problem.
 </div>
 
-## Open a connection
+## Name the server however is natural
 
-```text
-db.connect(uri="root@127.0.0.1:3310")
-  → connection_id
-```
+You do not have to quote the connection string exactly. Ask for
+`root@127.0.0.1:3310`, or `the sandbox on 3310`, or `mariadb://root@127.0.0.1:3310`
+— all of it resolves to the same stored connection. Two things are refused on
+purpose:
 
-The URI is matched against the allow-list after normalization, so you have some
-freedom in how you spell it. All of these open the same stored
-`root@127.0.0.1:3310`:
-
-| Spelling | Accepted |
+| How you name it in the prompt | Works? |
 | --- | --- |
 | `root@127.0.0.1:3310` | yes — the canonical form |
-| `mariadb://root@127.0.0.1:3310` | yes — the scheme is folded away |
-| `mysql://root@127.0.0.1:3310` | yes |
-| `root@127.0.0.1` | yes, if 3306 is the stored port |
-| `root:secret@127.0.0.1:3310` | yes — an inline password is ignored, the stored one is used |
-| `root@127.0.0.1:3310/notes_app` | **no** |
-| `root@127.0.0.1:3310?ssl-mode=REQUIRED` | **no** |
+| `mariadb://…` or `mysql://…` | yes — the scheme is folded away |
+| `root@127.0.0.1`, when 3306 is the stored port | yes |
+| with a password in it | yes, but pointless — the stored password is used, and you have leaked yours into the transcript |
+| with a default schema: `…:3310/notes_app` | **no** |
+| with a TLS requirement: `…?ssl-mode=REQUIRED` | **no** |
 
-The last two are refused **deliberately**. They ask for *more* than was
-configured — a default schema, a TLS requirement — and rather than silently
-handing back a connection that drops what you asked for, the server says no. If
-you want a default schema, issue a `USE` statement on the open connection.
+The last two ask for *more* than was configured, and rather than quietly hand
+back a connection that drops what you asked for, the server refuses. If you want
+a particular schema to be current, just say so in the prompt — the agent issues
+a `USE`.
 
-## Run one statement — `db.execute_sql`
+## Ask for results
 
-Use this for anything whose result you want, and anything that depends on
-session state.
-
-```text
-db.execute_sql(connection_id="…", sql="SELECT id, email FROM notes_app.`user` LIMIT 5")
-```
-
-Parameters are passed separately rather than formatted into the string, which is
-both safer and faster on repeated calls:
-
-```text
-db.execute_sql(
-  connection_id="…",
-  sql="SELECT * FROM notes_app.note WHERE user_id = ? AND created_at > ?",
-  params=["01920e5c-…", "2026-01-01"])
-```
+Anything where you want to see rows back, or where one statement depends on the
+last, runs as an individual statement on one open session:
 
 <div class="prompt" markdown="1">
 *Insert three users into `notes_app.user`, then show me every user with the
@@ -97,53 +83,51 @@ skills here. Watch for `GROUP_CONCAT` if you ask for the note titles as well —
 the skill knows it truncates silently at `group_concat_max_len`, which is the
 kind of detail that produces a bug report six months later.
 
-## Run a whole file — `db.execute_sql_script`
+Values you mention are sent to the server separately from the statement rather
+than pasted into it, so a name with an apostrophe in it cannot break the query
+or become an injection.
 
-Use this for create scripts, seed data, migrations — anything multi-statement
-where you do not need the results.
+## Ask for a whole file to be run
 
-```text
-db.execute_sql_script(connection_id="…", file_path="/abs/path/notes_app.sql")
-db.execute_sql_script(connection_id="…", sql_script="CREATE …; INSERT …; …")
-```
+Create scripts, seed data, migrations — anything multi-statement where you do
+not need the results back:
 
-Either a `file_path` or an inline `sql_script`. Two constraints:
+<div class="prompt" markdown="1">
+*Run `notes_app.sql` against the sandbox on 3310.*
+</div>
 
-- **`file_path` must be inside an allowed path.** Outside it, the call is
-  refused and the agent's natural fallback is to send the same SQL inline.
-- **Each statement runs in a fresh session.** This is the important one.
+The file has to be inside a directory the MCP server was given access to. If it
+is not, the agent's natural fallback is to send the same SQL inline, which works
+just as well — so this rarely stops anything, it just explains why the agent
+sometimes pastes a script instead of pointing at it.
 
 <div class="callout callout--warn" markdown="1">
-**The fresh-session rule, and what it breaks.**
-`db.execute_sql_script` does not run your statements on one continuous session.
-Anything that sets state in one statement and reads it in the next will not work:
+**Each statement in a script runs on its own fresh session.** That is invisible
+for an ordinary create script, and fatal for anything that sets something in one
+statement and reads it in the next:
 
 - `SET @my_var = …;` then `… WHERE id = @my_var;`
 - `USE notes_app;` then an unqualified `CREATE TABLE note …`
 - `START TRANSACTION;` … `COMMIT;` as separate statements
 - The MariaDB REST Service DDL, which is grammar-level session state
 
-For all of those, run the statements **individually with `db.execute_sql`** on one
-open connection. For an ordinary create script — fully qualified names, no session
-variables — the script tool is the right choice and much faster.
+If what you are running is in that list, say so, and the agent will run the
+statements one at a time on a single connection instead:
+
+*Run these statements one at a time on one connection — they depend on session
+state, so don't send them as a script.*
 </div>
 
-The safest habit, and the one the `mariadb-schema-create-script` skill enforces,
-is to fully qualify every object name in a script: `` `notes_app`.`note` ``
-rather than `note` after a `USE`. That makes the fresh-session behaviour a
-non-issue.
+The habit that makes the whole issue disappear is fully qualified names —
+`` `notes_app`.`note` `` rather than `note` after a `USE`. The
+`mariadb-schema-create-script` skill already writes scripts that way, so a
+script the agent authored is safe by construction.
 
 ## Transactions
 
 Because each script statement gets its own session, a transaction cannot span a
-script. Run the whole transaction through `db.execute_sql` on one connection:
-
-```text
-db.execute_sql(connection_id="…", sql="START TRANSACTION")
-db.execute_sql(connection_id="…", sql="UPDATE notes_app.note SET … WHERE …")
-db.execute_sql(connection_id="…", sql="DELETE FROM notes_app.note_tag WHERE …")
-db.execute_sql(connection_id="…", sql="COMMIT")
-```
+script. Ask for one explicitly and the agent will keep it on a single
+connection:
 
 <div class="prompt" markdown="1">
 *Move every note from the "Inbox" notebook to "Archive" and delete the Inbox
@@ -155,28 +139,26 @@ commits, which is what turns this from a two-line answer into a correct one:
 **DDL commits the open transaction**, so an `ALTER TABLE` in the middle of your
 transaction silently ends it.
 
-## Close what you opened
+## Closing up
 
-```text
-db.close(connection_id="…")
-```
-
-Connections are reaped automatically after an idle period, so forgetting this is
-not fatal. Closing explicitly is still worth doing on a long session, and is
-essential before deleting a sandbox — a server with an open connection will not
-stop cleanly.
+You do not have to ask for connections to be closed — they are reaped after an
+idle period. The one time it matters is before deleting a sandbox: a server with
+an open connection will not stop cleanly. Asking to "delete the sandbox when
+you're done" covers it, because the agent closes first.
 
 <h2 class="no-step" id="what-you-built">What you learned</h2>
 
-- `db.list_connections` first, always — the agent cannot invent a host.
-- `db.execute_sql` for results, parameters, session state and transactions.
-- `db.execute_sql_script` for multi-statement files, with **one fresh session per
-  statement** — so fully qualify names and never rely on `SET`, `USE` or an open
-  transaction carrying across.
+- Ask what connections exist first — the agent cannot invent a host, and it
+  cannot use a server nobody configured.
+- Name the server loosely; just do not try to bolt a default schema or a TLS
+  requirement onto it, and never put a password in the prompt.
+- **A script gives every statement a fresh session.** If your SQL depends on
+  `SET`, `USE`, or an open transaction carrying across, say so and ask for the
+  statements to be run one at a time.
 
 **Where to go next**
 
-- [Explore an existing database](../browse-schema-objects/) — the read-only half
-  of `db.*`, and how to get a schema summary without a hundred `SHOW` statements.
-- [Diagnose a slow query](../diagnose-a-slow-query/) — `EXPLAIN` through the same
-  `db.execute_sql` you just used.
+- [Explore an existing database](../browse-schema-objects/) — getting a schema
+  summary without a hundred `SHOW` statements.
+- [Diagnose a slow query](../diagnose-a-slow-query/) — reading a plan instead of
+  guessing at an index.

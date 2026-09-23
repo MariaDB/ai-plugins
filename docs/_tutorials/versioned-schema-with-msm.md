@@ -67,10 +67,10 @@ re-run, so they are version-guarded. Everything else is written with
 `CREATE OR REPLACE` / `DROP … IF EXISTS` and can safely run every time.
 
 <div class="callout callout--warn" markdown="1">
-**Never edit section banners by hand.** Sections are read and written with
-`msm.get_sql_content_from_section` and `msm.set_section_sql_content`, addressed
-by `file_path` + `section_id`. Hand-editing a banner corrupts the file in a way
-that only shows up at release time.
+**Never edit the section banners by hand.** The agent reads and writes sections
+through tools that address them by number; a banner edited in your editor
+corrupts the file in a way that only shows up at release time. Say which section
+you want something in and let the agent put it there.
 </div>
 
 ## Scaffold the project
@@ -81,15 +81,18 @@ versioned schema project. Create an MSM schema project for a schema named
 `notes_app` in the current directory.*
 </div>
 
+The scaffolding is a tool call the agent makes; this is what goes past in the
+transcript:
+
 ```text
-msm.create_project(schema_name="notes_app", target_path="/abs/path",
-                   copyright_holder="…")
+msm.create_project(schema_name="notes_app", target_path="/abs/path")
 ```
 
 <div class="callout" markdown="1">
-`license` takes the *name* of a license the shell knows, and an unrecognized one
-is rejected outright — `license="GPLv2"` fails, because there is no stored
-license by that name. Omit the parameter, or pass your own license text.
+**Mention a licence by name only if the shell already knows it.** An
+unrecognized name is rejected outright rather than guessed at, so *"licence it
+GPLv2"* fails. Say nothing and you get no licence header, or paste the licence
+text you want.
 </div>
 
 ## Author version 1.0.0 into the right sections
@@ -104,17 +107,10 @@ Put the tables in the non-idempotent create section and the view in the
 idempotent create section.*
 </div>
 
-```text
-msm.set_section_sql_content(
-  file_path=".../development/notes_app_next.sql",
-  section_id="140",
-  sql_content="CREATE TABLE `user` (…); CREATE TABLE `note` (…);")
-
-msm.set_section_sql_content(
-  file_path=".../development/notes_app_next.sql",
-  section_id="150",
-  sql_content="CREATE OR REPLACE VIEW `user_activity` AS SELECT …;")
-```
+Naming the sections in the prompt is what keeps the tables and the view apart.
+"Non-idempotent create section" and "idempotent create section" are enough — you
+do not have to remember that they are numbered 140 and 150, though saying the
+numbers works too.
 
 <div class="callout callout--warn" markdown="1">
 **The delimiter rule, and why it exists.** In the generated deployment script,
@@ -129,10 +125,9 @@ error that points at a line you did not write.
 
 Check what landed where before moving on:
 
-```text
-msm.get_sql_content_from_section(file_path="…", section_id="140")
-msm.get_sql_content_from_section(file_path="…", section_id="150")
-```
+<div class="prompt" markdown="1">
+*Read back sections 140 and 150 and show me exactly what is in each.*
+</div>
 
 ## Prepare the 1.0.0 release
 
@@ -140,16 +135,11 @@ msm.get_sql_content_from_section(file_path="…", section_id="150")
 *Prepare the 1.0.0 release and generate its deployment script.*
 </div>
 
-```text
-msm.prepare_release(version="1.0.0")
-msm.generate_deployment_script(version="1.0.0")
-```
-
-`prepare_release` snapshots `development/notes_app_next.sql` into
-`releases/versions/notes_app_1.0.0.sql`, bumps the development version, and —
-for a first release — there is no previous version to migrate from, so no update
-script is needed. `generate_deployment_script` then composes
-`releases/deployment/notes_app_deployment_1.0.0.sql`.
+Preparing a release snapshots `development/notes_app_next.sql` into
+`releases/versions/notes_app_1.0.0.sql` and bumps the development version. For a
+first release there is no previous version to migrate from, so no update script
+is needed — which is exactly what makes the *second* release the interesting one.
+Generating then composes `releases/deployment/notes_app_deployment_1.0.0.sql`.
 
 **That deployment script is the artifact you ship.** It is a create-or-upgrade
 script: given an empty server it creates the schema, given an older version it
@@ -157,48 +147,40 @@ migrates. It is generated, so never edit it — change the source and regenerate
 
 ## Deploy onto a live server
 
-`msm.deploy_schema` needs an open `db.connect` connection, so deploy a sandbox
-first if you do not have a target:
+Deploying needs a server to deploy onto, so ask for a sandbox in the same breath
+if you do not have a target:
 
 <div class="prompt" markdown="1">
-*Spin up a sandbox on port 3310 with root password `demo-pw`, connect to it, and
-deploy version 1.0.0 of the schema.*
+*Spin up a sandbox on port 3310, connect to it, and deploy version 1.0.0 of the
+schema.*
 </div>
 
-```text
-sandbox.deploy(port=3310, password="demo-pw")
-db.connect(uri="root@127.0.0.1:3310")
-msm.deploy_schema(connection_id="…", version="1.0.0")
-```
-
-`backup=True` with a `backup_directory` takes a backup before applying — worth
-it against anything you would miss.
+Against anything whose contents you would miss, ask for a backup first — *"take
+a backup into `./backups` before you deploy"* — and the deployment takes one on
+the way past. On an empty sandbox it does not matter; make it a habit anyway,
+because the prompt you reuse on a real server is the one you wrote here.
 
 ## Verify on the server, not in the transcript
 
-```text
-db.list_objects(connection_id="…", schema_name="notes_app", object_type="table")
-db.list_objects(connection_id="…", schema_name="notes_app", object_type="view")
-db.execute_sql(connection_id="…", sql="SELECT * FROM notes_app.msm_schema_version")
-```
+<div class="prompt" markdown="1">
+*Go and look at the server: which tables and views does `notes_app` actually
+have now, and what does `msm_schema_version` say?*
+</div>
 
-That last query is the point of the whole exercise: the schema now carries its
+That last question is the point of the whole exercise: the schema now carries its
 own version number, in a `msm_schema_version` view defined by section 910. A
 future deployment script reads it to decide whether to create or to upgrade, and
 from which version.
 
 ## Check the project state
 
-```text
-msm.get_project_information()
-msm.get_released_versions()        → ["1.0.0"]
-msm.get_last_released_version()    → "1.0.0"
-msm.get_deployment_script_versions()
-msm.get_last_deployment_version()
-```
+Months later, the thing you will not remember is what was *released* versus what
+was merely developed, and which deployment scripts exist for it. Ask:
 
-Useful on their own, and essential when you come back to a project months later
-and cannot remember what was released versus what was merely developed.
+<div class="prompt" markdown="1">
+*Give me the state of this MSM project: which versions have been released, which
+deployment scripts exist, and what is the development version sitting at?*
+</div>
 
 <h2 class="no-step" id="what-you-built">What you built</h2>
 

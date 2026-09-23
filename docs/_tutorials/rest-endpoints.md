@@ -17,6 +17,12 @@ prerequisites:
   - "A connection to a server where you may create schemas: `CONFIGURE REST METADATA` creates one."
 ---
 
+<div class="callout callout--warn" markdown="1">
+**The MariaDB REST Service is an upcoming feature.** While the REST services and
+endpoints can already be defined using the MariaDB Shell, the MariaDB REST Daemon
+that serves these endpoints is not yet available.
+</div>
+
 The MariaDB REST Service turns schema objects into REST endpoints that serve and
 accept JSON. It is administered **entirely through SQL DDL** — an extended
 `… REST …` grammar that `mariadb-shell` understands — which is what makes it a
@@ -55,16 +61,17 @@ not on the internet.
 This is the one piece of MCP mechanics that matters for this tutorial.
 
 <div class="callout callout--warn" markdown="1">
-**Run REST DDL through `db.execute_sql`, one statement at a time — not through
-`db.execute_sql_script`.**
-
-`db.execute_sql_script` runs each statement in a **fresh session**, and the REST
-grammar is session state: `USE REST SERVICE /notesApp` sets a context that the
-next `CREATE REST VIEW` depends on. In separate sessions, the `USE` is gone by
+**Say up front that the REST statements must run one at a time, on one
+connection.** Run as a script, each statement gets a **fresh session** — and the
+REST grammar is session state: `USE REST SERVICE /notesApp` sets a context that
+the next `CREATE REST VIEW` depends on. In separate sessions the `USE` is gone by
 the time the `CREATE` runs.
 
-A capable agent works this out on its own after the first failure, but telling it
-up front saves a round of confusion.
+A capable agent works this out after the first failure. Putting it in the prompt
+saves the round trip:
+
+*Run the REST DDL one statement at a time on a single connection — the grammar
+is session state, so don't send it as a script.*
 </div>
 
 ## Configure the metadata
@@ -220,8 +227,8 @@ that defines them.*
   flattened with `@UNNEST`, and per-field control over what is exposed.
 - `CONFIGURE` → `CREATE REST SERVICE` → `CREATE REST SCHEMA` → **one endpoint per
   object**, in that order, with nothing reachable until the last step.
-- REST DDL run through `db.execute_sql` on one connection, because the grammar is
-  session state and `db.execute_sql_script` gives each statement a new session.
+- REST DDL asked for one statement at a time on one connection, because the
+  grammar is session state and a script gives each statement a new session.
 
 **Where to go next**
 

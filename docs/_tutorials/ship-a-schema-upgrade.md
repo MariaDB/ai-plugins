@@ -23,34 +23,32 @@ with real data in it, and your job is to get it to 1.1.0 without dropping
 anything.
 
 <div class="callout callout--warn" markdown="1">
-**The one rule everyone gets wrong.** `msm.prepare_release` creates an **empty**
-update script. You must fill its migration sections **before** you generate the
-deployment script — because the deployment script *embeds* them.
+**The one rule everyone gets wrong.** Preparing a release creates an **empty**
+update script. It has to be filled in **before** the deployment script is
+generated, because the deployment script *embeds* it.
 
-Generate first and you get a script that creates the schema perfectly on an empty
+Ask for both in one breath — *"prepare the release and generate the deployment
+script"* — and you get a script that creates the schema perfectly on an empty
 server and **silently fails to upgrade** an existing install. It does not error.
-It just does not migrate. The order is:
+It just does not migrate.
 
-`prepare_release` → **fill the update script** → `generate_deployment_script`
+So ask for it in three steps, and stop after the first:
+
+**prepare the release** → **fill the update script** → **generate the deployment
+script**
 </div>
 
 ## Develop the next version
 
 The development script `development/notes_app_next.sql` is already on 1.1.0 —
-`prepare_release` bumped it when 1.0.0 was cut. Work in the same sections you
-used before: new tables in **140**, new and changed views in **150**.
+cutting the 1.0.0 release bumped it. Work in the same sections you used before:
+new tables in **140**, new and changed views in **150**.
 
 <div class="prompt" markdown="1">
 *Develop the next version of the schema on top of 1.0.0: add support for
 notebooks and tags with new `notebook` and `tag` tables, and add a view named
 `notes_details` that joins notes with their notebook and their tags.*
 </div>
-
-```text
-msm.get_sql_content_from_section(file_path=".../development/notes_app_next.sql", section_id="140")
-msm.set_section_sql_content(file_path="…", section_id="140", sql_content="<existing + notebook + tag>")
-msm.set_section_sql_content(file_path="…", section_id="150", sql_content="<existing views + notes_details>")
-```
 
 Note that section 140 gets the **whole** create story, old tables included. The
 version script is a full snapshot of how to build the schema from nothing; it is
@@ -60,18 +58,19 @@ not a diff. The diff lives in the update script, which is the next step.
 **When a section grows past comfortable, break it out.** MSM supports
 `SOURCE './sections/tables.sql'[53:];` inside a section — a **character-offset**
 slice, relative to `development/`, used to strip each file's own copyright header
-and footer. The files are inlined at `prepare_release`, so they are a development
-convenience and never appear in a release. The
+and footer. The files are inlined when the release is prepared, so they are a
+development convenience and never appear in a release. The
 `mariadb-schema-management-develop` skill has the offset conventions.
 </div>
 
 ## Prepare the release — and stop
 
-```text
-msm.prepare_release(version="1.1.0")
-```
+<div class="prompt" markdown="1">
+*Prepare the 1.1.0 release. Stop there — do not generate the deployment script
+yet.*
+</div>
 
-This does three things:
+That does three things:
 
 1. Snapshots the development script to `releases/versions/notes_app_1.1.0.sql`.
 2. Creates **`releases/updates/notes_app_1.0.0_to_1.1.0.sql`** — an empty
@@ -101,18 +100,6 @@ script has its own section numbering:
 in the idempotent update section.*
 </div>
 
-```text
-msm.set_section_sql_content(
-  file_path=".../releases/updates/notes_app_1.0.0_to_1.1.0.sql",
-  section_id="240",
-  sql_content="CREATE TABLE `notebook` (…); CREATE TABLE `tag` (…); ALTER TABLE `note` ADD COLUMN `notebook_id` UUID NULL; …")
-
-msm.set_section_sql_content(
-  file_path="…",
-  section_id="250",
-  sql_content="CREATE OR REPLACE VIEW `notes_details` AS SELECT …;")
-```
-
 Three things to get right in section 240, all of them MariaDB-specific and all
 of them taught by the `mariadb-alter-table` skill:
 
@@ -134,18 +121,19 @@ table change. Section 250 is for *re-creating* things idempotently; anything
 destructive is version-guarded state and belongs in 240.
 </div>
 
-Read it back and confirm it is not still the template. The generated template
-contains `ToDo` comments; a script that still has them is one nobody filled:
+Read it back and confirm it is not still the template — the generated template
+contains `ToDo` comments, and a script that still has them is one nobody filled:
 
-```text
-msm.get_sql_content_from_section(file_path=".../notes_app_1.0.0_to_1.1.0.sql", section_id="240")
-```
+<div class="prompt" markdown="1">
+*Show me section 240 of the update script as it stands. Are there any `ToDo`
+comments left in it?*
+</div>
 
 ## Now generate the deployment script
 
-```text
-msm.generate_deployment_script(version="1.1.0")
-```
+<div class="prompt" markdown="1">
+*The update script is filled in. Generate the 1.1.0 deployment script.*
+</div>
 
 The result, `releases/deployment/notes_app_deployment_1.1.0.sql`, contains
 **both** paths: the full create story for an empty server, and the embedded
@@ -165,17 +153,9 @@ first, so the upgrade has something to preserve:
 
 <div class="prompt" markdown="1">
 *Insert a few users and notes into the sandbox, then deploy version 1.1.0 onto
-it — take a backup first — and show me that the original rows survived and the
-new tables exist.*
+it — take a backup into `./backups` first — and show me that the original rows
+survived and the new tables exist.*
 </div>
-
-```text
-db.connect(uri="root@127.0.0.1:3310")
-msm.deploy_schema(connection_id="…", version="1.1.0",
-                  backup=True, backup_directory="/abs/path/backups")
-db.execute_sql(connection_id="…", sql="SELECT * FROM notes_app.msm_schema_version")
-db.execute_sql(connection_id="…", sql="SELECT COUNT(*) FROM notes_app.note")
-```
 
 `msm_schema_version` should now read 1.1.0, `notebook` and `tag` should exist,
 and the note count should be exactly what it was before. That last check is the
@@ -200,10 +180,10 @@ that is otherwise found in production.
 Two releases of one schema, and a deployment script that handles both a fresh
 install and an in-place upgrade — verified on two servers rather than asserted.
 
-The rule worth tattooing somewhere: **`prepare_release`, then fill the update
-script, then generate.** Getting that order wrong produces an artifact that
-passes every test you would think to run and fails on the only server that
-matters.
+The rule worth tattooing somewhere: **prepare the release, then fill the update
+script, then generate the deployment script** — three separate asks, never one.
+Getting that order wrong produces an artifact that passes every test you would
+think to run and fails on the only server that matters.
 
 **Where to go next**
 
