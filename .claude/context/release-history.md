@@ -2,7 +2,16 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
-## Landed on `main` (through PR #20)
+## Landed on `main` (through PR #25)
+
+**#25** `5d07abf` added the **`/release <version>` command**
+(`.claude/commands/release.md`): checks the version is the newest mariadb-shell
+release, runs the three scripts, CHANGELOG, static tests, checkpoint, PR; after
+the merge, tag + prereleases on both repos and a merge-based fork sync that
+keeps the fork's `docs/CNAME`. **Release 26.9.4 is in progress** on
+`wip/26.9.4` — its PR is the first cut with that command. **#24**/**#23**
+recorded the `.org` fork domain; **#22** rewrote the tutorials; **#21** was the
+26.9.3 checkpoint.
 
 **#20** `b6ed467` was release 26.9.3 (below). **#19** `1732462` split this context
 set out of a single 84KB `PROJECT_CONTEXT.md`
@@ -25,6 +34,16 @@ version-comparison tutorial), **#13** `c5759e5` (mariadb-migrator split into an
 overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-open
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
+
+## Release v26.9.4 (2026-09-24) — in progress
+
+- Branch `wip/26.9.4`: shell floor (33 files), plugin version (17 files), a
+  provenance-only re-vendor (docs `1a89bd3` → `bb6522c`, shell `291bf84` →
+  `8adaada`; counts 82 / 47 / 2), CHANGELOG `[26.9.4]` in all ten plugins.
+  Static tier green (667 per suite). mariadb-shell `v26.9.4` published
+  2026-09-23.
+- **Correction**: 26.9.3's shell-floor step touched 33 files, not the 31 its
+  commit message and the notes below say.
 
 ## Release v26.9.3 (2026-09-22)
 

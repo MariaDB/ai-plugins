@@ -4,6 +4,20 @@ All notable changes to the MariaDB SQL Claude Code plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [26.9.4] - 2026-09-24
+
+### Changed
+
+- `MARIADB_SHELL_VERSION`, the *minimum* `mariadb-shell` the launcher accepts,
+  now defaults to `26.9.4`, matching the published release series. An install
+  already at or above that version is still used as-is; only a machine below it
+  fetches anything.
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `bb6522c` (synced 2026-09-24). The upstream default branch moved on,
+  but nothing under `agent-skills/` did, so this plugin's 47 skills are
+  unchanged.
+- Version bumped to 26.9.4 to stay in lockstep with the other plugins.
+
 ## [26.9.3] - 2026-09-22
 
 ### Changed
