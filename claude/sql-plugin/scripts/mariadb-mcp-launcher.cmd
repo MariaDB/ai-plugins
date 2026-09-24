@@ -56,7 +56,7 @@ rem                             GITHUB_TOKEN are consulted too, then
 rem                             `gh auth token` -- install.ps1's own order.
 rem ============================================================================
 
-if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.9.3"
+if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.9.4"
 if not defined MARIADB_SHELL_REPO set "MARIADB_SHELL_REPO=mariadb-corporation/mariadb-shell"
 if not defined MARIADB_SHELL_BINDIR set "MARIADB_SHELL_BINDIR=%LOCALAPPDATA%\Programs\mariadb-shell\bin"
 

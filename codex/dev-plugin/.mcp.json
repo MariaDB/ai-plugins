@@ -5,7 +5,7 @@
       "cwd": ".",
       "args": [],
       "env": {
-        "MARIADB_SHELL_VERSION": "26.9.3"
+        "MARIADB_SHELL_VERSION": "26.9.4"
       }
     }
   }

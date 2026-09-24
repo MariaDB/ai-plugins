@@ -25,4 +25,4 @@
 - `docs/CNAME` -> `ai-plugins.mariadb.com`, the live host. Note `_config.yml`'s `url:` does not agree with it.
 - `docs/` -> the DevHub. `_config.yml` (only `url` + `baseurl` are environment-specific; `skill_count` is GENERATED), `_tutorials/` (the collection), `_data/{nav,paths,skills}.yml` (`skills.yml` GENERATED), `_layouts/{default,home,page,tutorial}.html`, `assets/css/style.css` (the whole design system: `--ch-*` tokens in two blocks, nothing else hardcodes a colour), `serve.sh`, `regenerate-skills-data.py`, and `README.md` for how to publish it and add a tutorial.
 - `package.json` (repo root) -> the pi manifest: `pi` field pointing into `pi/dev-plugin/` + `pi-mcp-adapter` dep. `pi/dev-plugin/{src/index.ts,scripts/setup-pi-mcp.sh}` -> the factory extension (`/mariadb-mcp-setup` + session hint) and the MCP-registration script. `pi/README.md` -> how pi loads the extensions.
-
+- `.claude/commands/release.md` -> `/release <version>`: the whole release flow, from the mariadb-shell version check to the fork sync. Keep it in step with the scripts and with `repo-conventions.md`'s fork-only files.
