@@ -12,16 +12,19 @@ folder.
 That is the whole setup. GitHub builds the site with its pinned `github-pages`
 bundle (Jekyll 3.x) on every push to `main`.
 
-Only two settings in [`_config.yml`](_config.yml) are environment-specific:
+The site is served from the custom domain in [`CNAME`](CNAME),
+`ai-plugins.mariadb.org`. Only two settings in [`_config.yml`](_config.yml) are
+environment-specific, and they must agree with it:
 
 ```yaml
-url: "https://mariadb.github.io"
-baseurl: "/ai-plugins"
+url: "https://ai-plugins.mariadb.org"
+baseurl: ""
 ```
 
 Every internal link goes through `relative_url` or is relative to the page, so
-moving the site to a custom domain is those two lines (`baseurl: ""`) and nothing
-else.
+moving the site is `CNAME` plus those two lines (serving from
+`<org>.github.io/ai-plugins/` instead needs `baseurl: "/ai-plugins"`) and
+nothing else.
 
 ## Previewing locally
 

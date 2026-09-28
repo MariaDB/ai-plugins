@@ -16,7 +16,7 @@ layout, the context-file table and the current git state.
 | --- | --- |
 | `claude/`, `codex/`, `opencode/`, `pi/` | One dir per coding agent, each with `dev` / `sql` / `contributor` plugin variants plus its `*-plugin-test*` suite |
 | `additional-skills/` | This repo's own skills, in `sql/` `rest/` `schema-management/` `migrator/` (+ `laravel/` on PR #28), plus the sources & licensing README |
-| `docs/` | The DevHub — Jekyll site served by GitHub Pages, live at https://ai-plugins.mariadb.com/ |
+| `docs/` | The DevHub — Jekyll site served by GitHub Pages, live at https://ai-plugins.mariadb.org/ (`.com` dropped on `wip/docs-uri-cleanup`) |
 | `scripts/` | `sync-skills.sh` (vendors skills), `set-plugin-version.sh`, `set-mariadb-shell-version.sh` |
 | `run_tests.py`, `pytest-coverage.ini` | Unified runner across every suite, one combined coverage report |
 | `package.json` | The pi manifest (`pi` field + `pi-mcp-adapter`) |

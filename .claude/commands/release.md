@@ -135,35 +135,27 @@ gh release create v$1 --repo <repo> --title v$1 --notes-file <scratch>/notes.md 
 
 for `<repo>` = `mariadb-corporation/ai-plugins` and `mariadb/ai-plugins`.
 
-## 10. Sync the fork — keeping its docs/CNAME
+## 10. Sync the fork
 
-The fork deliberately differs from `origin` in two files, and the sync must keep
-both:
-
-- `docs/CNAME` — fork: `ai-plugins.mariadb.org` (origin: `ai-plugins.mariadb.com`)
-- `docs/_config.yml` `url:` — fork: `https://ai-plugins.mariadb.org`
-
-Sync with a **merge** of `origin/main` into `fork/main`, never a reset or force
-push — the fork-only commits must survive:
+The fork's `main` carries the same tree as `origin/main`, `docs/CNAME`
+(`ai-plugins.mariadb.org`) included — the fork's Pages is what serves it. Sync with a **merge** of
+`origin/main` into `fork/main`, never a reset or force push (a fast-forward when
+the fork has no commits of its own):
 
 ```
 git fetch fork
 git switch -c sync/fork-$1 fork/main
-git merge --no-ff origin/main -m "Sync with mariadb-corporation/ai-plugins main (#<PR>)" -m "Keeps the fork-only docs/CNAME (ai-plugins.mariadb.org) and _config.yml url:."
+git merge origin/main -m "Sync with mariadb-corporation/ai-plugins main (#<PR>)"
 ```
 
-(add the commit attribution line to the message.) If `docs/CNAME` or
-`docs/_config.yml` conflicts, resolve it by keeping the fork's domain values and
-taking everything else from `origin` — `_config.yml`'s `shell_floor` must end up
-at $1.
+(add the commit attribution line to the message if a merge commit is made.) A
+conflict means someone committed to the fork directly — stop and show it.
 
 Before pushing, verify:
 
-- `cat docs/CNAME` prints `ai-plugins.mariadb.org`.
-- `git diff origin/main HEAD --stat` shows **only** `docs/CNAME` and
-  `docs/_config.yml`, and the `_config.yml` diff is only the `url:` lines.
+- `git diff origin/main HEAD` is empty.
 
-If either check fails, stop and show it. Otherwise push with
+If it is not, stop and show it. Otherwise push with
 `git push fork HEAD:main` (a fast-forward of the fork's `main`; it will be
 refused if the fork moved meanwhile — then fetch and merge again, don't force).
 Return to `main` and delete the local `wip/$1` and `sync/fork-$1` branches, and
@@ -176,7 +168,7 @@ Tell the user the release is published, with:
 - the merged PR and its squash commit
 - the tag `v$1` and its tag object
 - both release URLs
-- that the fork is synced, with `docs/CNAME` still `ai-plugins.mariadb.org`
+- that the fork is synced and its tree matches `origin/main`
 - anything that did not go as expected
 
 Then record the finished release with `/checkpoint .` and open a small PR for it,
