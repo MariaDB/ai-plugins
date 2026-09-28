@@ -27,15 +27,15 @@ History, in case it comes back: both repos serve the DevHub from GitHub Pages
 `origin` held `.com`, the fork had to carry its own CNAME, or it was ignored
 (`cname: null`) and the site fell back to `mariadb.github.io/ai-plugins/`, where
 `baseurl: ""` 404s every asset. **Only the fork's Pages can serve `.org`** (DNS
-points at `mariadb.github.io`), so `origin`'s Pages has to give up the domain,
-either disabled or with its custom domain cleared.
+points at `mariadb.github.io`), so `origin`'s GitHub Pages was **turned off**
+(2026-09-28) and the `ai-plugins.mariadb.com` DNS record removed.
 
 **`https://ai-plugins.mariadb.org/` is LIVE** (verified 2026-09-23), served by
 the fork's Pages: DNS is a CNAME to `mariadb.github.io` (it used to point at
 `websites.mariadb.org`, which 301-redirected to `.com`), the fork's Pages
 `cname` is `ai-plugins.mariadb.org` with an approved certificate, the canonical
 tag names `.org`, and `mariadb.github.io/ai-plugins/` 301s to it. **"Enforce
-HTTPS" is still off on both repos' Pages settings**, so that 301 lands on
+HTTPS" is still off on the fork's Pages settings**, so that 301 lands on
 `http://` and plain-http visits aren't upgraded.
 
 Housekeeping rule that keeps applying: delete a merged branch by **comparing its
