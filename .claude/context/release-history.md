@@ -2,7 +2,11 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
-## Landed on `main` (through PR #30)
+## Landed on `main` (through PR #33)
+
+**#33** `c084a21` rebuilt the DevHub header and footer on mariadb.org's;
+**#32** `81f72fa` moved the DevHub palette to mariadb.org's blues with its
+space banner; **#31** `25d19ad` was the 26.9.5 checkpoint.
 
 **#30** `dec6f52` was release 26.9.5 (below); **#29** `2e83366` made the
 DevHub `.org`-only; **#28** `9eb9119` added the Laravel skills.
