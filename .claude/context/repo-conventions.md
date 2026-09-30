@@ -22,6 +22,16 @@ opened on `origin`.
 carry (fork PR #3, `6682ff1`). A fork sync is a plain merge whose result must
 diff empty against `origin/main`.
 
+**Since release 26.9.5 the fork's `main` is the same commit as `origin/main`**
+(`dec6f52`). The 26.9.5 sync merge conflicted in three `.claude/` files, because
+the previous sync had cherry-picked #29 onto the fork, leaving out #28, and
+`1dedde5` then edited the same lines on `origin`. The fork's tree held nothing
+`origin` lacked (only stale 26.9.4 values), so at the user's call `fork/main`
+was **force-pushed** to `origin/main` (`--force-with-lease` on `ebb12e6`),
+dropping the fork's own sync/cherry-pick history. Future syncs should be pure
+fast-forwards. Avoid cherry-pick syncs: they are what make the next merge
+conflict.
+
 History, in case it comes back: both repos serve the DevHub from GitHub Pages
 (`main` + `/docs`), and a custom domain can only be claimed by one repo. While
 `origin` held `.com`, the fork had to carry its own CNAME, or it was ignored

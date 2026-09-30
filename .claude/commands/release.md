@@ -22,10 +22,11 @@ remote has gone missing before. If either is missing, stop and report it.
 ## 1. Preconditions
 
 - `git status --short` must be clean and the current branch must be `main`,
-  level with `origin/main` after `git fetch origin fork --tags`. If not, stop
+  level with `origin/main` after `git fetch --multiple --tags origin fork`. If not, stop
   and report rather than stashing or resetting anything.
 - `v$1` must not already exist as a tag locally or on either remote
-  (`git ls-remote --tags origin fork`). If it does, stop.
+  (`git ls-remote --tags <remote>`, once per remote — `ls-remote` takes one
+  remote and would read `fork` as a pattern). If it does, stop.
 
 ## 2. Check $1 is the latest mariadb-shell release
 
@@ -122,7 +123,7 @@ with `gh release view v26.9.3 --repo mariadb-corporation/ai-plugins`), ending wi
 "See each plugin's CHANGELOG.md [$1] section for details."
 
 Push the **same tag object** to both remotes (`git push origin v$1` and
-`git push fork v$1`) and verify with `git ls-remote --tags origin fork` that both
+`git push fork v$1`) and verify with `git ls-remote --tags <remote> v$1`, once per remote, that both
 point at the same object.
 
 Publish a **prerelease** on both repos. `gh` refuses `--notes-from-tag` together
@@ -140,7 +141,8 @@ for `<repo>` = `mariadb-corporation/ai-plugins` and `mariadb/ai-plugins`.
 The fork's `main` carries the same tree as `origin/main`, `docs/CNAME`
 (`ai-plugins.mariadb.org`) included — the fork's Pages is what serves it. Sync with a **merge** of
 `origin/main` into `fork/main`, never a reset or force push (a fast-forward when
-the fork has no commits of its own):
+the fork has no commits of its own). Since 26.9.5 the fork's `main` *is*
+`origin/main` (same commit), so this is expected to be a plain fast-forward:
 
 ```
 git fetch fork

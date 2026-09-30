@@ -2,7 +2,10 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
-## Landed on `main` (through PR #26)
+## Landed on `main` (through PR #30)
+
+**#30** `dec6f52` was release 26.9.5 (below); **#29** `2e83366` made the
+DevHub `.org`-only; **#28** `9eb9119` added the Laravel skills.
 
 **#25** `5d07abf` added the **`/release <version>` command**
 (`.claude/commands/release.md`): checks the version is the newest mariadb-shell
@@ -35,10 +38,16 @@ overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-op
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
 
-## Release v26.9.5 (2026-09-30) — in progress
+## Release v26.9.5 (2026-09-30)
 
-- Branch `wip/26.9.5`, PR about to open on `origin`. mariadb-shell `v26.9.5`
-  published 2026-09-29 and is the newest release.
+- **Merged as `dec6f52` (#30), tagged `v26.9.5`** (annotated object `c2aa50f`),
+  pushed to both remotes as the same object, **prerelease on both repos**;
+  bodies sha256-identical to the annotation (trailing whitespace stripped).
+  mariadb-shell `v26.9.5` published 2026-09-29.
+- **Fork sync was a force push, not a merge**: the merge conflicted in three
+  `.claude/` files (fallout of the previous cherry-pick sync), so `fork/main`
+  was reset to `dec6f52` with `--force-with-lease` at the user's call. See
+  [repo conventions](repo-conventions.md).
 - Contents: shell floor (33 files), plugin version (17 files), a re-vendor that
   **did ship content** — docs `878595f` → `3a0974f` (`mariadb-explain` sample
   output fixed, dev + sql), shell `8adaada` → `938d473` (new contributor skill
