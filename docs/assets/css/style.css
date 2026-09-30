@@ -21,48 +21,53 @@
    ========================================================================== */
 
 /* --- Tokens: light --------------------------------------------------------
-   The palette is taken verbatim from the reference design at
-   devhub.gridgain.com — same hex values, same clamps, same shadows. Only the
-   handful of tokens that design does not define are ours, and they are marked.
+   The palette follows mariadb.org (the twentynineteen-child theme's
+   style.css). Taken from it verbatim: the primary #4e629a (links, footer, the
+   under-menu bar), its light #94adf3 (link hovers on dark, <pre> borders),
+   #7d94d5 (button hover), #1f305f (the featured-post panels), #1a2546 and
+   #445380 (schedule text), #dce0eb (form borders), the #f5f7ff / #eef3ff / #c4d3ff
+   tints, and the #5e7aca / #7d94d5 button blues. The rest are ours, derived
+   from those, and marked where they are not obvious. The spacing, radius,
+   shadow and transition scales predate the re-style and are unchanged.
    -------------------------------------------------------------------------- */
 :root {
-  --ch-primary: #3a7882;
-  --ch-primary-hover: #2d5e67;
-  --ch-primary-light: #7fb4bb;
+  --ch-primary: #4e629a;
+  --ch-primary-hover: #445380;
+  --ch-primary-light: #94adf3;
 
-  --ch-bg: #f1f9f7;
+  --ch-bg: #f5f7ff;
   --ch-bg-surface: #fff;
   --ch-bg-elevated: #fff;
   --ch-callout-bg: #fff;
-  --ch-feedback-bg: #fdf8f3;
+  --ch-feedback-bg: #f7f9ff;
 
-  --ch-border: #e3e3e3;
-  --ch-highlight-bg: #f4ebd6;
-  --ch-highlight-border: #e6d5ac;
-  --ch-highlight-link: #2d5e67;
+  --ch-border: #dce0eb;
+  --ch-highlight-bg: #eef3ff;
+  --ch-highlight-border: #c4d3ff;
+  --ch-highlight-link: #445380;
 
   --ch-on-primary: #fff;
-  --ch-brand-action: #be2026;
-  --ch-brand-action-hover: #9e1b20;
+  /* The "action" colour: the prompt block's label and the outline button.
+     mariadb.org has no red call-to-action, so this is its primary blue too. */
+  --ch-brand-action: #4e629a;
+  --ch-brand-action-hover: #445380;
   --ch-accent-btn: var(--ch-brand-action);
   --ch-accent-btn-hover: var(--ch-brand-action-hover);
-  --ch-action-outline: #be2026;
-  --ch-action-outline-text: #be2026;
+  --ch-action-outline: var(--ch-brand-action);
+  --ch-action-outline-text: var(--ch-brand-action);
 
-  /* mariadb.com's "deep ocean" button colours (.btn-deep-ocean in
-     app.beedb9.css), the fill the sublime gradient is ringed around. Shared by
-     both themes, like the brand action red above. The focus RGB is the
-     reference's --bs-btn-focus-shadow-rgb for that variant. Its darker hover
-     and active FILLS (#0b1e26 / #0b2029) are deliberately not carried over:
-     combined with the gradient outline they are painted as a background COLOUR
-     underneath an opaque gradient background IMAGE, so they never show. */
-  --ch-deep-ocean: #0e2833;
-  --ch-deep-ocean-focus-rgb: 50, 72, 82;
+  /* mariadb.org's filled button, in its own blues: #7d94d5 (its button hover)
+     into #5e7aca (its newsletter headings), with the primary as the hover. Its
+     lighter #869ef5 → #718cf0 gradient is not used: the white label is only
+     2.6:1 at the top of it. This one keeps 3:1 or better everywhere. */
+  --ch-btn-fill: linear-gradient(180deg, #7d94d5 0%, #5e7aca 100%);
+  --ch-btn-fill-hover: #4e629a;
+  --ch-btn-focus-rgb: 148, 173, 243;
 
-  --ch-text: #36414e;
-  --ch-text-heading: #16263b;
-  --ch-text-muted: #54616e;
-  --ch-text-faint: #636e7a;
+  --ch-text: #3c4560;
+  --ch-text-heading: #1a2546;
+  --ch-text-muted: #525b75;
+  --ch-text-faint: #626a82;
 
   --ch-amber: #c9a227;
   --ch-amber-ink: #8c6c08;
@@ -71,12 +76,13 @@
   --ch-yellow: #916b0c;
   --ch-green: #6a780d;
   --ch-aqua: #287f5e;
-  --ch-blue: #2e78a0;
+  --ch-blue: #496bd2;
   --ch-purple: #7b5ea7;
 
-  --ch-footer-bg: #013d4f;
-  --ch-footer-link: #a8d5db;
-  --ch-footer-text: #d4d4d4;
+  --ch-footer-bg: #4e629a;
+  --ch-footer-link: #fff;
+  --ch-footer-link-hover: #94adf3;
+  --ch-footer-text: #eef1fa;
 
   --ch-spacing-xs: clamp(.5rem, .4rem + .3vw, 1rem);
   --ch-spacing-sm: clamp(1rem, .8rem + .5vw, 1.5rem);
@@ -98,27 +104,30 @@
   --ch-radius-xl: 1.5rem;
   --ch-radius-full: 9999px;
 
-  --ch-shadow-sm: 0 1px 3px rgba(0, 0, 0, .06);
-  --ch-shadow-md: 0 4px 12px rgba(0, 0, 0, .08);
-  --ch-shadow-lg: 0 8px 24px rgba(0, 0, 0, .1);
+  --ch-shadow-sm: 0 1px 3px rgba(26, 37, 70, .06);
+  --ch-shadow-md: 0 4px 12px rgba(26, 37, 70, .08);
+  --ch-shadow-lg: 0 8px 24px rgba(26, 37, 70, .1);
 
   --ch-transition-fast: .15s ease;
   --ch-transition-normal: .25s ease;
 
-  --ch-hero-gradient: linear-gradient(135deg, #082a34 0%, #0c4a5e 100%);
-  --ch-hero-texture-rgb: 127, 180, 187;
-  --ch-hero-text: #eaf1f2;
-  --ch-hero-muted: #c7e4e8;
-  --ch-hero-accent: #a8d5db;
-  --ch-hero-badge-bg: rgba(127, 180, 187, .14);
-  --ch-hero-badge-border: rgba(127, 180, 187, .28);
+  /* The hero is mariadb.org's own "space" banner (the one its home page puts in
+     .image-banner-picture), under a scrim that darkens the left, where the
+     text sits. The gradient underneath is what shows while the image loads,
+     and matches its darkest corners. */
+  --ch-hero-image: url("../img/Banner_BG_space_2_3200.webp");
+  --ch-hero-gradient: linear-gradient(135deg, #0b1230 0%, #1f305f 100%);
+  --ch-hero-scrim: linear-gradient(90deg, rgba(8, 11, 32, .72) 0%, rgba(8, 11, 32, .45) 55%, rgba(8, 11, 32, .2) 100%);
+  --ch-hero-text: #fff;
+  --ch-hero-muted: #d3dbf5;
+  --ch-hero-accent: #b4c6f7;
+  --ch-hero-badge-bg: rgba(16, 22, 52, .6);
+  --ch-hero-badge-border: rgba(148, 173, 243, .38);
 
-  /* MariaDB's "sublime" gradient, copied from mariadb.com's app.beedb9.css
-     (--btn-sublime-gradient). The bare 25% and 75% entries are colour
-     interpolation hints, not stops — they move the midpoint of each transition
-     rather than adding a colour. */
-  --btn-sublime-gradient: linear-gradient(90deg, #51d9f7 0%, 25%, #8ce786 50%, 75%, #cdf70a);
-  --ch-bg-dim: #0a2026;
+  /* Ours: the headline's accent text, the banner image's own three hues —
+     its blue nodes on the left, violet in the middle, orange on the right. */
+  --ch-hero-text-gradient: linear-gradient(90deg, #94adf3 0%, #c49af7 50%, #ffa25e 100%);
+  --ch-bg-dim: #e8ecf8;
 
   /* Ours: code. The reference renders code BLOCKS with the One Dark prism
      theme in both site themes, so --ch-code-* is identical in the dark block.
@@ -126,45 +135,54 @@
   --ch-code-bg: hsl(220, 13%, 18%);
   --ch-code-text: hsl(220, 14%, 71%);
   --ch-code-border: hsl(220, 13%, 26%);
-  --ch-inline-code-bg: #f6f7f8;
-  --ch-inline-code-border: rgba(0, 0, 0, .1);
+  --ch-inline-code-bg: #f3f5fb;
+  --ch-inline-code-border: rgba(26, 37, 70, .1);
 
   /* Ours: layout constants the reference has no token for. */
   --ch-wave-h: clamp(48px, 5vw, 80px);
-  --ch-navbar-h: 60px;
+  /* The navbar's full height, including the 10px band along its bottom —
+     mariadb.org's .under-menu-nav colour, a step darker in dark mode. */
+  --ch-navbar-h: 70px;
+  --ch-navbar-bar-h: 10px;
+  --ch-navbar-bar: #4e629a;
+  --ch-navbar-link: #1f305f;
   --ch-maxw: 1200px;
 }
 
 /* --- Tokens: dark ---------------------------------------------------------
-   Also verbatim from the reference. Note what it does NOT override: the brand
-   action red, the hero gradient and the code colours are shared with light.
+   mariadb.org has no dark theme, so this one is ours: the same navy family as
+   its #1f305f / #1a2546 panels, with #94adf3 standing in as the primary. The
+   hero, the filled button and the code colours are shared with light.
    -------------------------------------------------------------------------- */
 html[data-theme="dark"] {
-  --ch-primary: #7fb4bb;
-  --ch-primary-hover: #52909a;
-  --ch-on-primary: #0a2026;
+  --ch-primary: #94adf3;
+  --ch-primary-hover: #b4c6f7;
+  --ch-primary-light: #5e7aca;
+  --ch-on-primary: #111830;
 
+  --ch-brand-action: #94adf3;
+  --ch-brand-action-hover: #b4c6f7;
   --ch-accent-btn: var(--ch-brand-action);
   --ch-accent-btn-hover: var(--ch-brand-action-hover);
-  --ch-action-outline: #e5484d;
-  --ch-action-outline-text: #eaf1f2;
+  --ch-action-outline: var(--ch-brand-action);
+  --ch-action-outline-text: #eef1fa;
 
-  --ch-bg: #0f2a31;
-  --ch-bg-dim: #0a2026;
-  --ch-bg-surface: #163840;
-  --ch-bg-elevated: #1c434c;
-  --ch-callout-bg: #163840;
-  --ch-feedback-bg: #14333b;
+  --ch-bg: #111830;
+  --ch-bg-dim: #0b1024;
+  --ch-bg-surface: #18213d;
+  --ch-bg-elevated: #1f2a4a;
+  --ch-callout-bg: #18213d;
+  --ch-feedback-bg: #161f3a;
 
-  --ch-border: #2a4e58;
-  --ch-highlight-bg: #2b281f;
-  --ch-highlight-border: #46412f;
-  --ch-highlight-link: #7fb4bb;
+  --ch-border: #2e3b63;
+  --ch-highlight-bg: #1c2647;
+  --ch-highlight-border: #34467a;
+  --ch-highlight-link: #94adf3;
 
-  --ch-text: #d4d4d4;
-  --ch-text-heading: #e8eef0;
-  --ch-text-muted: #aeb7bf;
-  --ch-text-faint: #949da5;
+  --ch-text: #d6dbe8;
+  --ch-text-heading: #eef1fa;
+  --ch-text-muted: #aab3c9;
+  --ch-text-faint: #959eb6;
 
   --ch-red: #e98e90;
   --ch-orange: #e69875;
@@ -172,19 +190,25 @@ html[data-theme="dark"] {
   --ch-amber-ink: #d9b860;
   --ch-green: #a7c080;
   --ch-aqua: #83c092;
-  --ch-blue: #7fbbb3;
+  --ch-blue: #94adf3;
   --ch-purple: #c0a8d6;
 
+  /* mariadb.org's #1f305f navy would vanish on the dark navbar. */
+  --ch-navbar-link: var(--ch-text-muted);
+  /* The band's #4e629a, a step darker so it does not glare on the dark page. */
+  --ch-navbar-bar: #283558;
+
   --ch-footer-bg: var(--ch-bg-dim);
-  --ch-footer-link: #a8d5db;
+  --ch-footer-link: #d6dbe8;
+  --ch-footer-link-hover: #94adf3;
   --ch-footer-text: var(--ch-text);
 
-  --ch-shadow-sm: 0 1px 3px rgba(0, 0, 0, .2);
-  --ch-shadow-md: 0 4px 12px rgba(0, 0, 0, .3);
-  --ch-shadow-lg: 0 8px 24px rgba(0, 0, 0, .4);
+  --ch-shadow-sm: 0 1px 3px rgba(0, 0, 0, .25);
+  --ch-shadow-md: 0 4px 12px rgba(0, 0, 0, .35);
+  --ch-shadow-lg: 0 8px 24px rgba(0, 0, 0, .45);
 
   /* Ours: inline code only — the code blocks stay One Dark in both themes. */
-  --ch-inline-code-bg: rgba(255, 255, 255, .1);
+  --ch-inline-code-bg: rgba(255, 255, 255, .08);
   --ch-inline-code-border: rgba(255, 255, 255, .12);
 }
 
@@ -229,7 +253,7 @@ hr { border: 0; border-top: 1px solid var(--ch-border); margin: 2rem 0; }
 
 .skip-link {
   position: absolute; left: -9999px; top: 0; z-index: 100;
-  background: var(--ch-primary); color: #fff; padding: .6rem 1rem;
+  background: var(--ch-primary); color: var(--ch-on-primary); padding: .6rem 1rem;
 }
 .skip-link:focus { left: 0; }
 
@@ -238,13 +262,13 @@ hr { border: 0; border-top: 1px solid var(--ch-border); margin: 2rem 0; }
   position: sticky; top: 0; z-index: 50;
   height: var(--ch-navbar-h);
   background: var(--ch-bg-surface);
-  border-bottom: 1px solid var(--ch-border);
   box-shadow: var(--ch-shadow-sm);
 }
 .navbar__inner {
   max-width: var(--ch-maxw); margin: 0 auto; padding: 0 1.5rem;
-  height: 100%; display: flex; align-items: center; gap: 1.75rem;
+  height: calc(100% - var(--ch-navbar-bar-h)); display: flex; align-items: center; gap: 1.75rem;
 }
+.navbar__bar { height: var(--ch-navbar-bar-h); background: var(--ch-navbar-bar); }
 .navbar__brand { display: flex; align-items: center; flex-shrink: 0; }
 .navbar__brand:hover { text-decoration: none; }
 /* The wordmark files carry no intrinsic size, so the height is set here and the
@@ -254,7 +278,7 @@ html[data-theme="dark"] .navbar__logo--light { display: none; }
 html:not([data-theme="dark"]) .navbar__logo--dark { display: none; }
 .navbar__links { display: flex; gap: 1.4rem; align-items: center; }
 .navbar__link {
-  color: var(--ch-text-muted); font-size: .9rem; font-weight: 600;
+  color: var(--ch-navbar-link); font-size: .9rem; font-weight: 600;
   padding: .25rem 0; border-bottom: 2px solid transparent;
 }
 .navbar__link:hover { color: var(--ch-primary); text-decoration: none; }
@@ -299,21 +323,17 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
 
 /* --- Hero ---------------------------------------------------------------- */
 .hero { position: relative; padding: var(--ch-section-sm) 0 0; }
+/* The banner photo, as mariadb.org's .image-banner-picture sets it: pinned to
+   all four edges and cropped to cover. It runs on under the wave, which is why
+   the bottom inset is negative. The scrim is a second layer on top of it, not a
+   pseudo-element, so the photo and its darkening can never drift apart. */
 .hero__bg {
-  position: absolute; inset: 0 0 calc(-1 * var(--ch-wave-h));
-  background: var(--ch-hero-gradient); z-index: 0;
-}
-.hero__bg::before {
-  content: ""; position: absolute; inset: 0; z-index: 1;
-  background-image:
-    radial-gradient(ellipse 600px 300px at 20% 50%, rgba(var(--ch-hero-texture-rgb), .16) 0%, transparent 70%),
-    radial-gradient(ellipse 400px 400px at 80% 30%, rgba(var(--ch-hero-texture-rgb), .12) 0%, transparent 70%);
-}
-.hero__bg::after {
-  content: ""; position: absolute; inset: 0; z-index: 1;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(var(--ch-hero-texture-rgb), .10) 39px, rgba(var(--ch-hero-texture-rgb), .10) 40px),
-    repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(var(--ch-hero-texture-rgb), .07) 59px, rgba(var(--ch-hero-texture-rgb), .07) 60px);
+  position: absolute; inset: 0 0 calc(-1 * var(--ch-wave-h)); z-index: 0;
+  background-color: #0b1230;
+  background-image: var(--ch-hero-scrim), var(--ch-hero-image), var(--ch-hero-gradient);
+  background-size: cover, cover, cover;
+  background-position: center, center, center;
+  background-repeat: no-repeat;
 }
 .hero__inner {
   position: relative; z-index: 2; max-width: var(--ch-maxw); margin: 0 auto;
@@ -325,13 +345,12 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
   color: var(--ch-hero-text); margin: 0 0 1.25rem;
   font-size: clamp(1.65rem, 1.2rem + 1.8vw, 2.4rem); line-height: 1.2;
 }
-/* Copied from mariadb.com, where it paints text with the sublime gradient.
-   Guarded: without background-clip support the transparent fill leaves the text
+/* Paints the headline's last line in the banner's own hues. Guarded: without background-clip support the transparent fill leaves the text
    invisible rather than merely flat, which is a much worse failure. */
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
-  .text-sublime-gradient {
+  .text-hero-gradient {
     display: inline-block;
-    background-image: var(--btn-sublime-gradient);
+    background-image: var(--ch-hero-text-gradient);
     -webkit-background-clip: text;
             background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -349,17 +368,19 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
   font-size: .75rem; font-weight: 600;
   color: var(--ch-hero-accent);
   border: 1px solid var(--ch-hero-badge-border);
-  background: rgba(39, 46, 51, .75);
+  background: var(--ch-hero-badge-bg);
   backdrop-filter: blur(4px);
 }
 /* The hero card: a dark panel with a lit gradient edge, dark in both themes
    because it always sits on the dark hero. Every colour is a local custom
    property so the whole treatment retunes from this one block. */
 .hero__card {
-  --card-edge: linear-gradient(125deg, #22d3ee 0%, #3b82f6 36%, #a855f7 66%, #e879f9 100%);
-  --card-bg: #0d1524;
+  --card-edge: linear-gradient(125deg, #5e9bff 0%, #7d6cf5 36%, #b25ef0 66%, #ff8a3d 100%);
+  --card-bg: #1a2349;
   --card-line: rgba(255, 255, 255, .09);
-  --card-fill: rgba(255, 255, 255, .045);
+  /* The panels sit darker than the card, not lighter, so they read as insets. */
+  --card-fill: rgba(8, 11, 32, .58);
+  --card-inset: rgba(8, 11, 32, .46);
 
   position: relative;
   padding: 1.15rem 1.1rem 1.35rem;
@@ -383,7 +404,7 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
   opacity: .75;
 }
 /* The inner bloom: the same gradient bleeding in from the edges, so the card is
-   lit cyan on the left and violet on the right with a dark middle.
+   lit blue on the left and orange on the right with a dark middle.
    The mask does two jobs — it fades the glow out towards the centre, and
    (being no-repeat and exactly box-sized) it clips the blur that would
    otherwise spill back outside the card. Gated on mask support, because an
@@ -428,7 +449,7 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
 .hero-panel__body {
   position: relative;
   margin: .9rem 1.5rem 0;
-  background: rgba(255, 255, 255, .028);
+  background: var(--card-inset);
   border: 1px solid var(--card-line);
   border-radius: .7rem;
   padding: .95rem 1.1rem;
@@ -510,59 +531,39 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
 .btn:hover { text-decoration: none; transform: translateY(-1px); }
 .btn svg { width: 16px; height: 16px; }
 
-/* Ported from mariadb.com's primary call to action, which is
-   `btn btn-deep-ocean btn-outline-gradient`: a deep-ocean fill sitting inside a
-   3px ring of the sublime gradient, that on hover/focus floods the whole button
-   and flips the label to deep ocean. Only the colours, the gradient and the
-   hover/focus/active behaviour come across — the radius, padding, type and the
-   1px lift stay ours (the reference is a pill). The padding gives back exactly
-   the 3px the ring costs, so the button still measures what it did before.
-
-   How the ring works: the gradient covers the whole border box and never moves;
-   a ::before overlay of deep ocean covers just the padding box, leaving the
-   gradient visible only through the transparent border. Fading that overlay out
-   floods the button. The reference swaps two background LAYERS instead, which
-   is the same picture but snaps, because background-image cannot be animated —
-   an overlay can, so this one crossfades with the rest of the site's hovers.
-
-   The overlay sits at z-index -1, which paints above the button's own
-   background but below its label; `isolation` keeps that negative index from
-   escaping into whatever stacking context the button happens to land in. */
+/* mariadb.org's filled button (.button-item / the newsletter submit): a soft
+   blue gradient, a white label and a small lift of shadow. Its 60px height,
+   fixed width and 10px radius stay ours. A background-image cannot be
+   animated, so the hover colour is laid over it by a ::before overlay that
+   fades in; `isolation` keeps the overlay's negative z-index between the
+   button's own background and its label. */
 .btn--primary {
   position: relative;
   isolation: isolate;
   color: #fff;
-  background-color: transparent;
-  background-image: var(--btn-sublime-gradient);
-  background-origin: border-box;
-  background-clip: border-box;
-  border: 3px solid transparent;
-  padding: calc(.55rem - 3px) calc(1.25rem - 3px);
+  background-color: #5e7aca;
+  background-image: var(--ch-btn-fill);
+  box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, .15);
 }
 .btn--primary::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
-  /* The containing block is the padding box, so `inset: 0` already stops at the
-     ring; the radius has to be the outer one less the border to match it. */
-  border-radius: calc(var(--ch-radius-sm) - 3px);
-  background: var(--ch-deep-ocean);
+  border-radius: inherit;
+  background: var(--ch-btn-fill-hover);
+  opacity: 0;
   transition: opacity var(--ch-transition-fast);
 }
 .btn--primary:hover,
 .btn--primary:focus-visible,
-.btn--primary:active {
-  color: var(--ch-deep-ocean);
-  border-color: transparent;
-}
+.btn--primary:active { color: #fff; }
 .btn--primary:hover::before,
 .btn--primary:focus-visible::before,
-.btn--primary:active::before { opacity: 0; }
-/* The reference's focus ring and pressed-in shadow, both from .btn-deep-ocean. */
+.btn--primary:active::before { opacity: 1; }
 .btn--primary:focus-visible {
   outline: 0;
-  box-shadow: 0 0 0 .25rem rgba(var(--ch-deep-ocean-focus-rgb), .5);
+  box-shadow: 0 0 0 .25rem rgba(var(--ch-btn-focus-rgb), .5);
 }
 .btn--primary:active { box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125); }
 
@@ -570,7 +571,7 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
   background: transparent; color: var(--ch-action-outline-text);
   border: 1.5px solid var(--ch-action-outline);
 }
-.btn--outline:hover { background: var(--ch-accent-btn); border-color: var(--ch-accent-btn); color: #fff; }
+.btn--outline:hover { background: var(--ch-accent-btn); border-color: var(--ch-accent-btn); color: var(--ch-on-primary); }
 
 .btn--ghost {
   background: transparent; color: var(--ch-hero-accent);
@@ -786,11 +787,6 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
 }
 .prompt::after  { content: "PROMPT"; top: .7rem; font-size: .7rem; letter-spacing: .08em; }
 .prompt::before { content: "›"; top: 1.7rem; font-size: 1.3rem; }
-/* The action red is only 2.4:1 on the dark prompt background — fine nowhere, and
-   the small label is the case that exposed it. The dark theme's own softened
-   red is 6.1:1. Applies to the chevron too, which was below AA large here. */
-html[data-theme="dark"] .prompt::before,
-html[data-theme="dark"] .prompt::after { color: var(--ch-red); }
 .prompt p { margin: 0 0 .6rem; }
 .prompt p:last-child { margin-bottom: 0; }
 .prompt em { font-style: italic; }
@@ -969,8 +965,12 @@ pre code { background: none; border: 0; padding: 0; font-size: inherit; color: i
 }
 
 /* --- CTA band ------------------------------------------------------------ */
+/* The hero's banner again, scrim and all, so the page closes as it opened. */
 .cta {
-  background: var(--ch-hero-gradient); color: var(--ch-hero-text);
+  background-color: #0b1230;
+  background-image: var(--ch-hero-scrim), var(--ch-hero-image), var(--ch-hero-gradient);
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+  color: var(--ch-hero-text);
   padding: var(--ch-section-sm) 0; text-align: center;
 }
 .cta h2 { color: var(--ch-hero-text); font-size: 1.4rem; margin: 0 0 .75rem; }
@@ -1001,7 +1001,7 @@ pre code { background: none; border: 0; padding: 0; font-size: inherit; color: i
 .footer ul { list-style: none; margin: 0; padding: 0; }
 .footer li { margin-bottom: .4rem; }
 .footer a { color: var(--ch-footer-link); font-size: .85rem; }
-.footer a:hover { color: #fff; }
+.footer a:hover { color: var(--ch-footer-link-hover); }
 .footer__bottom {
   margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, .12);
   font-size: .78rem; color: var(--ch-footer-text); opacity: .75;
