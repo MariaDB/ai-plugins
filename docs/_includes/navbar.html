@@ -5,7 +5,7 @@
   row and a full-screen menu), swapped at mariadb.org's own 1112px breakpoint.
   The site's social icons and search become the theme toggle and the GitHub
   link. The header takes mariadb.org's colours in light mode and the old navbar's in
-  dark; each logo ships a `-dark.svg` twin for it.
+  dark, where a drop-shadow keeps the logos readable on the navy.
 {%- endcomment -%}
 {%- assign u = page.url -%}
 {%- capture nav_items -%}
@@ -42,12 +42,10 @@
     <div class="top-header-column column-1">
       <div class="featured-header-image">
         <a href="https://mariadb.org/" rel="noopener">
-          <img class="header-logo--light" src="{{ '/assets/img/mariadb_org_rgb_h.svg' | relative_url }}" width="194" height="68" alt="MariaDB Foundation">
-          <img class="header-logo--dark" src="{{ '/assets/img/mariadb_org_rgb_h-dark.svg' | relative_url }}" width="194" height="68" alt="MariaDB Foundation">
+          <img class="header-logo" src="{{ '/assets/img/mariadb_org_rgb_h.svg' | relative_url }}" width="194" height="68" alt="MariaDB Foundation">
         </a>
         <a href="https://mariadb.org/" rel="noopener">
-          <img class="header-logo--light" src="{{ '/assets/img/logo_seal.svg' | relative_url }}" width="93" height="68" alt="MariaDB Foundation">
-          <img class="header-logo--dark" src="{{ '/assets/img/logo_seal-dark.svg' | relative_url }}" width="93" height="68" alt="MariaDB Foundation">
+          <img class="header-logo" src="{{ '/assets/img/logo_seal.svg' | relative_url }}" width="93" height="68" alt="MariaDB Foundation">
         </a>
       </div>
       <div class="under-header-image"></div>
@@ -82,8 +80,7 @@
       <div class="top-header-row row-1">
         <div class="mobile-featured-image">
           <a href="https://mariadb.org/" rel="noopener">
-            <img class="header-logo--light" src="{{ '/assets/img/mariadb_org_rgb_h.svg' | relative_url }}" width="194" height="68" alt="MariaDB Foundation">
-          <img class="header-logo--dark" src="{{ '/assets/img/mariadb_org_rgb_h-dark.svg' | relative_url }}" width="194" height="68" alt="MariaDB Foundation">
+            <img class="header-logo" src="{{ '/assets/img/mariadb_org_rgb_h.svg' | relative_url }}" width="194" height="68" alt="MariaDB Foundation">
           </a>
         </div>
       </div>

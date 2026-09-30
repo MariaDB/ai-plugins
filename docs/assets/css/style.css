@@ -292,9 +292,9 @@ hr { border: 0; border-top: 1px solid var(--ch-border); margin: 2rem 0; }
 .top-header-column.column-4 { flex: 0 auto; }
 .top-header-column.column-5 { flex: 0 auto; background-color: var(--ch-header-band); }
 
-/* One file per theme, swapped with `display` as the old wordmark was. */
-html[data-theme="dark"] .header-logo--light { display: none; }
-html:not([data-theme="dark"]) .header-logo--dark { display: none; }
+/* One logo file for both themes; in dark mode drop-shadow traces its shape,
+   so the blue lifts off the dark band. */
+html[data-theme="dark"] .header-logo { filter: drop-shadow(0 0 2px rgba(0, 0, 0, .45)) drop-shadow(0 0 15px rgba(0, 0, 0, .2)); }
 .featured-header-image a:first-child { display: block; }
 .featured-header-image a:last-child { display: none; }
 .featured-header-image img { display: block; height: 68px; width: auto; margin: 5px 0; }
