@@ -35,6 +35,17 @@ overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-op
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
 
+## Release v26.9.5 (2026-09-30) — in progress
+
+- Branch `wip/26.9.5`, PR about to open on `origin`. mariadb-shell `v26.9.5`
+  published 2026-09-29 and is the newest release.
+- Contents: shell floor (33 files), plugin version (17 files), a re-vendor that
+  **did ship content** — docs `878595f` → `3a0974f` (`mariadb-explain` sample
+  output fixed, dev + sql), shell `8adaada` → `938d473` (new contributor skill
+  `split-scripted-test`); counts 85 / 47 / 3. First release to carry the
+  Laravel skills (#28, `9eb9119`, dev 82 → 85) and the `.org`-only DevHub (#29).
+  CHANGELOG `[26.9.5]` in all ten plugins. Static tier green (691 per suite).
+
 ## Release v26.9.4 (2026-09-24)
 
 - **Merged as `2bbdb2a` (#26), tagged `v26.9.4`** (annotated object `f0e1c3c`),

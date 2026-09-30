@@ -4,6 +4,31 @@ All notable changes to the MariaDB plugin for Pi are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [26.9.5] - 2026-09-30
+
+### Added
+
+- Three Laravel skills, contributed by @Rhaima96: `mariadb-laravel-connector`
+  (connecting a Laravel application to MariaDB — PDO requirements, the dedicated
+  `mariadb` driver, version support and Docker/Sail setup),
+  `mariadb-laravel-vector` (vector columns, `VECTOR INDEX`, the `AsVector`
+  Eloquent cast and similarity search with the query builder) and
+  `mariadb-laravel-ai-sdk` (MariaDB Vector as the store behind Laravel's AI SDK).
+  Brings the plugin to 85 skills.
+
+### Changed
+
+- `MARIADB_SHELL_VERSION`, the *minimum* `mariadb-shell` the launcher accepts,
+  now defaults to `26.9.5`, matching the published release series. An install
+  already at or above that version is still used as-is; only a machine below it
+  fetches anything.
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `3a0974f` (synced 2026-09-30): `mariadb-explain`'s sample `EXPLAIN` and
+  `ANALYZE` output is corrected (`rows` column alignment, `r_rows` shown as
+  `181.00`). No upstream skill was added or removed, so the skill count moved
+  only by the three added above.
+- Version bumped to 26.9.5 to stay in lockstep with the other plugins.
+
 ## [26.9.4] - 2026-09-24
 
 ### Changed

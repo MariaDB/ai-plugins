@@ -15,6 +15,11 @@
           "name": "review-shell-change",
           "path": "review-shell-change/SKILL.md",
           "status": "contributor"
+        },
+        {
+          "name": "split-scripted-test",
+          "path": "split-scripted-test/SKILL.md",
+          "status": "contributor"
         }
       ]
     }

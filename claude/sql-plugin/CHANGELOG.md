@@ -4,6 +4,20 @@ All notable changes to the MariaDB SQL Claude Code plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [26.9.5] - 2026-09-30
+
+### Changed
+
+- `MARIADB_SHELL_VERSION`, the *minimum* `mariadb-shell` the launcher accepts,
+  now defaults to `26.9.5`, matching the published release series. An install
+  already at or above that version is still used as-is; only a machine below it
+  fetches anything.
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `3a0974f` (synced 2026-09-30): `mariadb-explain`'s sample `EXPLAIN` and
+  `ANALYZE` output is corrected (`rows` column alignment, `r_rows` shown as
+  `181.00`). No skill was added or removed, so this plugin stays at 47 skills.
+- Version bumped to 26.9.5 to stay in lockstep with the other plugins.
+
 ## [26.9.4] - 2026-09-24
 
 ### Changed

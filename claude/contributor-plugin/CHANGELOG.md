@@ -4,6 +4,23 @@ All notable changes to the MariaDB contributor Claude Code plugin are documented
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [26.9.5] - 2026-09-30
+
+### Added
+
+- `split-scripted-test` skill: splitting a long scripted test
+  (`unittest/scripts/auto/*/scripts/*_norecord.py`) into parallel chunk groups
+  for `run_unit_tests.py`, or rebalancing the groups of a test that is already
+  split so every group takes about the same time. Vendored from
+  `mariadb-corporation/mariadb-shell` `.claude/skills/` at commit `938d473`
+  (synced 2026-09-30); brings the plugin to 3 skills.
+
+### Changed
+
+- Version bumped to 26.9.5 to stay in lockstep with the other plugins. This
+  plugin ships skills only and no MCP server, so the `MARIADB_SHELL_VERSION`
+  floor the others moved to 26.9.5 does not apply here.
+
 ## [26.9.4] - 2026-09-24
 
 ### Changed
