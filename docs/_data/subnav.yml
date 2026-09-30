@@ -1,0 +1,6 @@
+# The header's second row (mariadb.org's .under-menu-nav) — external links, so
+# `url` is absolute and is not passed through relative_url.
+- title: MariaDB Shell
+  url: https://github.com/mariadb-corporation/mariadb-shell#mariadb-shell
+- title: MCP Server Plugin
+  url: https://github.com/mariadb-corporation/mariadb-shell-plugins/blob/main/mcp_plugin/README.md

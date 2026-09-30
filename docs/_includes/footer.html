@@ -1,4 +1,4 @@
-<footer class="footer">
+<div class="footer">
   <div class="footer__inner">
     <div class="footer__grid">
       <div>
@@ -36,9 +36,55 @@
         </ul>
       </div>
     </div>
-    <div class="footer__bottom">
-      <span>&copy; {{ 'now' | date: "%Y" }} MariaDB plc. Plugin code is GPL-2.0; bundled skills keep their original licenses.</span>
-      <span>Skills baseline: MariaDB {{ site.mariadb_baseline }}</span>
+  </div>
+</div>
+
+{%- comment -%}
+  mariadb.org's own footer (#colophon), rebuilt with its markup and its
+  twentynineteen-child rules: the Contact row, the footer menu, and the sponsor
+  banner (from _data/sponsors.yml). Every image is
+  hot-linked from mariadb.org, none is copied into this repo.
+{%- endcomment -%}
+<footer class="site-footer">
+  <div class="site-info">
+    <div class="footer-social-links-container">
+      <span class="footer-social-links-title">Contact</span>
+      <nav class="footer-social-navigation" aria-label="Social links">
+        <ul class="social-links-menu">
+          <li><a href="https://www.youtube.com/c/MariaDBFoundation" rel="noopener"><span class="screen-reader-text">YouTube</span><span class="social-media-icon youtube"></span></a></li>
+          <li><a href="https://twitter.com/mariadb_org" rel="noopener"><span class="screen-reader-text">Twitter</span><span class="social-media-icon twitter"></span></a></li>
+          <li><a href="https://www.linkedin.com/company/mariadb-foundation" rel="noopener"><span class="screen-reader-text">LinkedIn</span><span class="social-media-icon linkedin"></span></a></li>
+          <li><a href="https://www.reddit.com/r/mariadb/" rel="noopener"><span class="screen-reader-text">Reddit</span><span class="social-media-icon reddit"></span></a></li>
+          <li><a href="https://fosstodon.org/@mariadb_org" rel="noopener"><span class="screen-reader-text">Mastodon</span><span class="social-media-icon mastodon"></span></a></li>
+        </ul>
+      </nav>
+    </div>
+    <nav class="footer-navigation" aria-label="Footer menu">
+      <ul class="footer-menu">
+        <li><a href="https://mariadb.org/governance/" rel="noopener">Governance Overview</a></li>
+        <li><a href="https://mariadb.org/about/maintenance-policy/" rel="noopener">Maintenance policy</a></li>
+        <li><a href="https://mariadb.org/governance/governance-security-policy/" rel="noopener">Security Policy</a></li>
+        <li><a href="https://mariadb.org/privacy-policy/" rel="noopener">Privacy policy</a></li>
+        <li><a href="https://mariadb.org/about/logos/" rel="noopener">Logos and badges</a></li>
+        <li><a href="https://mariadb.org/about/statistics/" rel="noopener">Usage statistics</a></li>
+      </ul>
+    </nav>
+    <div class="footer-sponsor-banner">
+      {%- for row in site.data.sponsors.rows %}
+      <div class="wp-block-spacer" style="height:{{ row.before }}px" aria-hidden="true"></div>
+      <div class="wp-block-columns">
+        {%- for logo in row.logos %}
+        <div class="wp-block-column{% if logo.align == 'bottom' %} is-vertically-aligned-bottom{% endif %}">
+          <figure class="wp-block-image{% if logo.class %} {{ logo.class }}{% endif %}">
+            <a href="{{ logo.url }}" target="_blank" rel="noopener noreferrer">
+              <img src="{{ logo.src }}" alt="{{ logo.name }}" style="{{ logo.style }}" loading="lazy" decoding="async">
+            </a>
+          </figure>
+        </div>
+        {%- endfor %}
+      </div>
+      {%- endfor %}
+      <div class="wp-block-spacer" style="height:{{ site.data.sponsors.after }}px" aria-hidden="true"></div>
     </div>
   </div>
 </footer>

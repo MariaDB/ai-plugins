@@ -1,0 +1,66 @@
+# mariadb.org's footer sponsor banner, row by row, as its home page had it on
+# 2026-09-30. Images are hot-linked from mariadb.org, never copied here.
+# `before` is the spacer above a row, `after` the one below the last; `style` is the logo's own inline size;
+# `align: bottom` marks the columns mariadb.org bottom-aligns.
+after: 30
+rows:
+  - before: 20
+    logos:
+      - { name: "amazon.com", url: "https://www.amazon.com/", src: "https://mariadb.org/wp-content/uploads/2023/10/amazon-1.png", style: "width:100px", class: "sponsor-footer-amazon" }
+      - { name: "dbs.com", url: "https://www.dbs.com/", src: "https://mariadb.org/wp-content/uploads/2019/12/DBS_logo.svg", style: "width:68px;height:20px" }
+      - { name: "mariadb.com", url: "https://mariadb.com/", src: "https://mariadb.org/wp-content/uploads/2019/10/mariadb_logo.svg", style: "width:125px;height:32px" }
+      - { name: "ibm.com", url: "https://www.ibm.com/", src: "https://mariadb.org/wp-content/uploads/2019/12/IBM_logo.svg", style: "width:58px;height:24px" }
+  - before: 30
+    logos:
+      - { name: "Aqtra", url: "https://aqtra.io/", src: "https://mariadb.org/wp-content/uploads/2026/08/logo_aqtra-150x150.png", style: "width:40px;height:40px" }
+      - { name: "hetzner.com", url: "https://www.hetzner.com/", src: "https://mariadb.org/wp-content/uploads/2025/06/Hetzner-Logo-slogan_white_space-red-300x115.jpg", style: "width:100px" }
+      - { name: "ionos.com", url: "https://www.ionos.com/", src: "https://mariadb.org/wp-content/uploads/2023/03/LOGO_IONOS_Blue_RGB-1-300x88.png", style: "width:70px;height:20px" }
+      - { name: "ScalaHosting", url: "https://www.scalahosting.com/", src: "https://mariadb.org/wp-content/uploads/2026/08/logo_scalahosting-150x150.jpg", style: "width:40px;height:40px" }
+  - before: 30
+    logos:
+      - { name: "about.scarf.sh", url: "https://about.scarf.sh/", src: "https://mariadb.org/wp-content/uploads/2025/06/scarf-logo.svg", style: "width:103px" }
+      - { name: "arbaudie.it", url: "https://arbaudie.it/", src: "https://mariadb.org/wp-content/uploads/2025/06/Frame-765-2-150x150.png", style: "width:65px;height:65px" }
+      - { name: "auree.com", url: "https://www.auree.com/", src: "https://mariadb.org/wp-content/uploads/2026/08/logo_auree.svg", style: "width:170px;height:30px" }
+      - { name: "automattic.com", url: "https://automattic.com/", src: "https://mariadb.org/wp-content/uploads/2019/12/automattic.svg", style: "width:170px;height:30px" }
+  - before: 12
+    logos:
+      - { name: "Continuent", url: "https://www.continuent.com/", src: "https://mariadb.org/wp-content/uploads/2026/08/logo_continuent-300x101.png", style: "width:120px;height:40px" }
+      - { name: "crestsolution.com", url: "https://crestsolution.com/", src: "https://mariadb.org/wp-content/uploads/2025/05/Crest-Logo-PNG-1-300x227.png", style: "width:80px" }
+      - { name: "Datography", url: "https://www.datography.net/", src: "https://mariadb.org/wp-content/uploads/2026/08/logo_datography.jpg", style: "width:120px;height:120px" }
+      - { name: "dbaasnow.com", url: "https://dbaasnow.com/", src: "https://mariadb.org/wp-content/uploads/2026/03/DBaasNow_logo-1-300x78.png", style: "width:128px" }
+  - before: 12
+    logos:
+      - { name: "dbvis.com", url: "https://www.dbvis.com/", src: "https://mariadb.org/wp-content/uploads/2025/10/logo_DbVisualizer-300x150.png", style: "width:150px" }
+      - { name: "diegesis.co.uk", url: "https://diegesis.co.uk/", src: "https://mariadb.org/wp-content/uploads/2025/11/Diegesis_logo.svg", style: "width:120px;height:22px" }
+      - { name: "epsio.io", url: "https://www.epsio.io/", src: "https://mariadb.org/wp-content/uploads/2026/02/Logo_Epsio.svg", style: "width:65px;height:30px" }
+      - { name: "hammerdb.com", url: "https://www.hammerdb.com/", src: "https://mariadb.org/wp-content/uploads/2026/04/hammerDB-logo.svg", style: "width:120px" }
+  - before: 30
+    logos:
+      - { name: "mydbops.com", url: "https://www.mydbops.com/", src: "https://mariadb.org/wp-content/uploads/2025/08/Mydbops_logo.svg", style: "width:110px" }
+      - { name: "nexedi.com", url: "https://www.nexedi.com/", src: "https://mariadb.org/wp-content/uploads/2025/05/NXD-Media.Logo_.Nexedi-300x136.png", style: "width:130px" }
+      - { name: "nextcloud.com", url: "https://nextcloud.com/", src: "https://mariadb.org/wp-content/uploads/2025/06/Nextcloud_Logo.svg", style: "width:70px" }
+      - { name: "passbolt.com", url: "https://www.passbolt.com/", src: "https://mariadb.org/wp-content/uploads/2025/08/passbolt-logo-300x53.png", style: "width:110px" }
+  - before: 30
+    logos:
+      - { name: "ProxySQL", url: "https://proxysql.com/", src: "https://mariadb.org/wp-content/uploads/2026/05/ProxySQL.resized-150x150.png", style: "width:40px;height:40px" }
+      - { name: "quape.com", url: "https://www.quape.com/", src: "https://mariadb.org/wp-content/uploads/2025/11/Quape_logo.svg", style: "width:70px;height:37px" }
+      - { name: "ravatar.com", url: "https://ravatar.com/", src: "https://mariadb.org/wp-content/uploads/2025/04/RAVATAR_black-300x104.png", style: "width:148px" }
+      - { name: "red-gate.com", url: "https://www.red-gate.com/", src: "https://mariadb.org/wp-content/uploads/2025/11/redgate-logo-color-rgb.svg", style: "width:98px" }
+  - before: 30
+    logos:
+      - { name: "releem.com", url: "https://releem.com/", src: "https://mariadb.org/wp-content/uploads/2025/06/Releem-Logo-300x93.png", style: "width:112px" }
+      - { name: "rumahweb.com", url: "https://www.rumahweb.com/", src: "https://mariadb.org/wp-content/uploads/2025/07/Logo_horizontal-1.svg", style: "width:140px" }
+      - { name: "senticore.com", url: "https://www.senticore.com/", src: "https://mariadb.org/wp-content/uploads/2025/08/Senticore_logo.svg", style: "width:140px" }
+      - { name: "seravo.com", url: "https://seravo.com/", src: "https://mariadb.org/wp-content/uploads/2026/08/logo_seravo.svg", style: "width:100px" }
+  - before: 30
+    logos:
+      - { name: "tempesta-tech.com", url: "https://tempesta-tech.com/", src: "https://mariadb.org/wp-content/uploads/2025/04/tempesta_technologies_logo.svg", style: "width:140px" }
+      - { name: "tidesdb.com", url: "https://tidesdb.com/", src: "https://mariadb.org/wp-content/uploads/2026/02/Logo_TidesDB.svg", style: "width:80px;height:55px" }
+      - { name: "vettabase.com", url: "https://vettabase.com/", src: "https://mariadb.org/wp-content/uploads/2021/02/Vettabase-300x300.jpg", style: "width:90px" }
+      - { name: "virtuozzo.com", url: "https://www.virtuozzo.com/", src: "https://mariadb.org/wp-content/uploads/2025/08/Virtuozzo_logo.svg", style: "width:120px" }
+  - before: 13
+    logos:
+      - { name: "wikimedia.org", url: "https://www.wikimedia.org/", src: "https://mariadb.org/wp-content/uploads/2023/09/wikimedia.svg", style: "width:60px", align: bottom }
+      - { name: "Wirekite", url: "https://wirekite.io/", src: "https://mariadb.org/wp-content/uploads/2026/08/logo_wirekite.png", style: "width:50px", align: bottom }
+      - { name: "intelligentwolf.com", url: "https://intelligentwolf.com", src: "https://mariadb.org/wp-content/uploads/2025/10/logo_Wolf-300x150.png", style: "width:100px", align: bottom }
+      - { name: "zencoder.ai", url: "https://zencoder.ai/", src: "https://mariadb.org/wp-content/uploads/2025/10/Logo-Full-Color-Dark.svg", style: "width:150px;height:42px" }

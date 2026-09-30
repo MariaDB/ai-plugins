@@ -73,13 +73,15 @@ than producing a half-built site.
 docs/
 ├── _config.yml               # site config; `url` + `baseurl` are the only env-specific bits
 ├── _data/
-│   ├── nav.yml               # the navbar
+│   ├── nav.yml               # the header's top-row links
+│   ├── subnav.yml            # the header's second-row links (external, absolute urls)
+│   ├── sponsors.yml          # mariadb.org's footer sponsor banner (images hot-linked, never copied)
 │   ├── paths.yml             # learning paths (each `steps` entry is a tutorial `slug`)
 │   └── skills.yml            # GENERATED — see below
 ├── _includes/                # navbar, footer, hero wave, the two card partials
 ├── _layouts/                 # default → home | page | tutorial
 ├── _tutorials/               # the tutorial collection, one file per tutorial
-├── assets/{css,js,img}/      # one stylesheet, one script, the wordmarks + favicon
+├── assets/{css,js,img}/      # one stylesheet, one script, the header artwork + favicon
 ├── serve.sh                  # local preview (npm run docs)
 ├── index.html                # home
 ├── get-started.md            # install + MCP setup + the working example

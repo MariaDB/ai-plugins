@@ -1,42 +1,110 @@
+{%- comment -%}
+  mariadb.org's masthead, rebuilt: its `.top-header-container.desktop-version`
+  (five columns, two 44px rows, the waves between them) and its
+  `.top-header-container.mobile-version` (the rounded logo cap, a page-title
+  row and a full-screen menu), swapped at mariadb.org's own 1112px breakpoint.
+  The site's social icons and search become the theme toggle and the GitHub
+  link. The header takes mariadb.org's colours in light mode and the old navbar's in
+  dark; each logo ships a `-dark.svg` twin for it.
+{%- endcomment -%}
 {%- assign u = page.url -%}
-<nav class="navbar">
-  <div class="navbar__inner">
-    <button class="icon-btn navbar__toggle" id="nav-toggle" aria-label="Toggle navigation"
-            aria-expanded="false" aria-controls="nav-links">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M4 7h16M4 12h16M4 17h16"/>
-      </svg>
-    </button>
-
-    <a class="navbar__brand" href="{{ '/' | relative_url }}">
-      {% include logo.html %}
-    </a>
-
-    <div class="navbar__links" id="nav-links" hidden>
-      {%- for item in site.data.nav -%}
-        {%- assign active = false -%}
-        {%- if item.match and u contains item.match -%}{%- assign active = true -%}{%- endif -%}
-        {%- if u == item.url -%}{%- assign active = true -%}{%- endif -%}
-        <a class="navbar__link{% if active %} navbar__link--active{% endif %}"
-           href="{{ item.url | relative_url }}">{{ item.title }}</a>
-      {%- endfor -%}
+{%- capture nav_items -%}
+  {%- for item in site.data.nav -%}
+    {%- assign active = false -%}
+    {%- if item.match and u contains item.match -%}{%- assign active = true -%}{%- endif -%}
+    {%- if u == item.url -%}{%- assign active = true -%}{%- endif -%}
+    <li><a href="{{ item.url | relative_url }}"{% if active %} aria-current="page"{% endif %}>{{ item.title }}</a></li>{{ ' ' }}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- capture sub_items -%}
+  {%- for item in site.data.subnav -%}
+    {%- unless forloop.first %} • {% endunless -%}
+    <a href="{{ item.url }}" rel="noopener">{{ item.title }}</a>
+  {%- endfor -%}
+{%- endcapture -%}
+{%- capture header_icons -%}
+  <button class="header-icon" type="button" data-theme-toggle aria-label="Switch between light and dark theme">
+    <svg class="theme-icon--light" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1zm0 18a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1zM2 12a1 1 0 011-1h2a1 1 0 110 2H3a1 1 0 01-1-1zm17 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zM4.9 4.9a1 1 0 011.4 0l1.4 1.4a1 1 0 01-1.4 1.4L4.9 6.3a1 1 0 010-1.4zm11.4 11.4a1 1 0 011.4 0l1.4 1.4a1 1 0 01-1.4 1.4l-1.4-1.4a1 1 0 010-1.4zM19.1 4.9a1 1 0 010 1.4l-1.4 1.4a1 1 0 01-1.4-1.4l1.4-1.4a1 1 0 011.4 0zM7.7 16.3a1 1 0 010 1.4l-1.4 1.4a1 1 0 01-1.4-1.4l1.4-1.4a1 1 0 011.4 0z"/>
+    </svg>
+    <svg class="theme-icon--dark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M9.37 5.51A7.4 7.4 0 0016.5 14.9c.68 0 1.35-.09 1.99-.27A7.99 7.99 0 0112 19a7 7 0 01-2.63-13.49zM12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.4 5.4 0 01-7.54-7.54A9.3 9.3 0 0012 3z"/>
+    </svg>
+  </button>
+  <a class="header-icon" href="{{ site.repo }}" aria-label="GitHub repository" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 .3a12 12 0 00-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17.3 4.9 18.3 5.2 18.3 5.2c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0012 .3z"/>
+    </svg>
+  </a>
+{%- endcapture -%}
+<header class="masthead">
+  <div class="top-header-container desktop-version">
+    <div class="top-header-column column-1">
+      <div class="featured-header-image">
+        <a href="https://mariadb.org/" rel="noopener">
+          <img class="header-logo--light" src="{{ '/assets/img/mariadb_org_rgb_h.svg' | relative_url }}" width="194" height="68" alt="MariaDB Foundation">
+          <img class="header-logo--dark" src="{{ '/assets/img/mariadb_org_rgb_h-dark.svg' | relative_url }}" width="194" height="68" alt="MariaDB Foundation">
+        </a>
+        <a href="https://mariadb.org/" rel="noopener">
+          <img class="header-logo--light" src="{{ '/assets/img/logo_seal.svg' | relative_url }}" width="93" height="68" alt="MariaDB Foundation">
+          <img class="header-logo--dark" src="{{ '/assets/img/logo_seal-dark.svg' | relative_url }}" width="93" height="68" alt="MariaDB Foundation">
+        </a>
+      </div>
+      <div class="under-header-image"></div>
     </div>
 
-    <div class="navbar__right">
-      <button class="icon-btn" id="theme-toggle" aria-label="Switch between light and dark theme">
-        <svg class="theme-icon--light" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1zm0 18a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1zM2 12a1 1 0 011-1h2a1 1 0 110 2H3a1 1 0 01-1-1zm17 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zM4.9 4.9a1 1 0 011.4 0l1.4 1.4a1 1 0 01-1.4 1.4L4.9 6.3a1 1 0 010-1.4zm11.4 11.4a1 1 0 011.4 0l1.4 1.4a1 1 0 01-1.4 1.4l-1.4-1.4a1 1 0 010-1.4zM19.1 4.9a1 1 0 010 1.4l-1.4 1.4a1 1 0 01-1.4-1.4l1.4-1.4a1 1 0 011.4 0zM7.7 16.3a1 1 0 010 1.4l-1.4 1.4a1 1 0 01-1.4-1.4l1.4-1.4a1 1 0 011.4 0z"/>
-        </svg>
-        <svg class="theme-icon--dark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M9.37 5.51A7.4 7.4 0 0016.5 14.9c.68 0 1.35-.09 1.99-.27A7.99 7.99 0 0112 19a7 7 0 01-2.63-13.49zM12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.4 5.4 0 01-7.54-7.54A9.3 9.3 0 0012 3z"/>
-        </svg>
-      </button>
-      <a class="icon-btn" href="{{ site.repo }}" aria-label="GitHub repository" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 .3a12 12 0 00-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17.3 4.9 18.3 5.2 18.3 5.2c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0012 .3z"/>
-        </svg>
-      </a>
+    <div class="top-header-column column-2">
+      <div class="wavy-line-1"></div>
+      <div class="under-wavy-line-1"></div>
+    </div>
+
+    <div class="top-header-column column-3">
+      <nav class="navigation-menu-item" aria-label="Top menu">
+        <ul class="header-navigation-menu">{{ nav_items }}</ul>
+      </nav>
+      <div class="under-menu-nav"><p>{{ sub_items }}</p></div>
+    </div>
+
+    <div class="top-header-column column-4">
+      <div class="wavy-line-2"></div>
+      {%- comment -%} Holds the icons once column 5 folds away (below 1292px). {%- endcomment -%}
+      <div class="under-wavy-line-2">{{ header_icons }}</div>
+    </div>
+
+    <div class="top-header-column column-5">
+      <div class="header-social-links">{{ header_icons }}</div>
+      <div class="under-social-nav"></div>
     </div>
   </div>
-  <div class="navbar__bar" aria-hidden="true"></div>
-</nav>
+
+  <div class="top-header-container mobile-version">
+    <div class="mobile-menu">
+      <div class="top-header-row row-1">
+        <div class="mobile-featured-image">
+          <a href="https://mariadb.org/" rel="noopener">
+            <img class="header-logo--light" src="{{ '/assets/img/mariadb_org_rgb_h.svg' | relative_url }}" width="194" height="68" alt="MariaDB Foundation">
+          <img class="header-logo--dark" src="{{ '/assets/img/mariadb_org_rgb_h-dark.svg' | relative_url }}" width="194" height="68" alt="MariaDB Foundation">
+          </a>
+        </div>
+      </div>
+      <div class="top-header-row row-2">
+        <span class="nav-menu-title">{% if u != '/' %}{{ page.title }}{% endif %}</span>
+      </div>
+      <button class="hamburger-menu-icon" type="button" id="nav-toggle" aria-label="Toggle navigation"
+              aria-expanded="false" aria-controls="nav-links">
+        {%- comment -%} mariadb.org's Hamburger.svg, inline so the CSS can recolour it per theme. {%- endcomment -%}
+        <svg viewBox="0 0 41.464 41.464" aria-hidden="true">
+          <circle cx="20.732" cy="20.732" r="19.232" stroke-width="3"/>
+          <path d="M9.367 14.998h22.525M9.572 20.732h22.525M9.572 26.465h22.525" fill="none" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="mobile-navigation" id="nav-links" hidden>
+      <nav class="main-navigation" aria-label="Top menu">
+        <ul class="mobile-navigation-menu">{{ nav_items }}</ul>
+        <p class="mobile-sub-menu">{{ sub_items }}</p>
+      </nav>
+      <div class="mobile-header-social-links">{{ header_icons }}</div>
+    </div>
+  </div>
+</header>

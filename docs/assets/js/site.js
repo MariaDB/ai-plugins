@@ -19,14 +19,14 @@
   'use strict';
 
   /* --- Theme toggle ------------------------------------------------------ */
-  var toggle = document.getElementById('theme-toggle');
-  if (toggle) {
+  /* One per header layout (desktop, its narrow fallback, the mobile menu). */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), function (toggle) {
     toggle.addEventListener('click', function () {
       var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       try { localStorage.setItem('mdb-theme', next); } catch (e) { /* private mode */ }
     });
-  }
+  });
 
   /* --- Mobile nav -------------------------------------------------------- */
   var navToggle = document.getElementById('nav-toggle');
