@@ -1,0 +1,812 @@
+/* Copyright (c) 2026, MariaDB plc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2.0,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+ * the GNU General Public License, version 2.0, for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+/*
+ * The mariadb.com/docs GitBook theme, approximated on Docusaurus.
+ *
+ * Colour scales are copied from the live site's CSS custom properties
+ * (`--primary-*`, `--tint-*`, `--warning-*`, … as "r g b" triplets), in both
+ * colour schemes, so the preview matches what GitBook will render. Fonts are
+ * the site's own: Lato for text, IBM Plex Mono for code.
+ */
+
+/* --------------------------------------------------------------------------
+   Tokens
+   -------------------------------------------------------------------------- */
+
+:root {
+  --gb-primary-3: 242 249 253;
+  --gb-primary-4: 234 244 250;
+  --gb-primary-9: 14 100 136;
+  --gb-primary-10: 55 130 168;
+  --gb-primary-11: 89 114 129;
+  --gb-on-primary: 255 255 255;
+
+  --gb-tint-1: 255 255 255;
+  --gb-tint-2: 249 250 250;
+  --gb-tint-3: 246 248 248;
+  --gb-tint-4: 240 243 243;
+  --gb-tint-5: 234 238 238;
+  --gb-tint-6: 226 230 231;
+  --gb-tint-7: 213 218 219;
+  --gb-tint-9: 120 136 138;
+  --gb-tint-11: 105 112 112;
+  --gb-tint-12: 28 29 29;
+
+  --gb-warning-3: 250 247 242;
+  --gb-warning-9: 156 128 85;
+  --gb-danger-3: 252 246 245;
+  --gb-danger-9: 169 118 113;
+  --gb-success-3: 247 248 245;
+  --gb-success-9: 130 137 109;
+
+  --gb-header-height: 80px;
+  --gb-tabs-height: 48px;
+
+  /* Infima (Docusaurus) mapped onto the GitBook scales. */
+  --ifm-color-primary: rgb(var(--gb-primary-9));
+  --ifm-color-primary-dark: rgb(12 90 122);
+  --ifm-color-primary-darker: rgb(11 85 116);
+  --ifm-color-primary-darkest: rgb(9 70 95);
+  --ifm-color-primary-light: rgb(var(--gb-primary-10));
+  --ifm-color-primary-lighter: rgb(70 140 175);
+  --ifm-color-primary-lightest: rgb(100 160 190);
+
+  --ifm-background-color: rgb(var(--gb-tint-1));
+  --ifm-background-surface-color: rgb(var(--gb-tint-1));
+  --ifm-font-color-base: rgb(var(--gb-tint-12));
+  --ifm-heading-color: rgb(var(--gb-tint-12));
+  --ifm-color-emphasis-300: rgb(var(--gb-tint-6));
+  --ifm-toc-border-color: rgb(var(--gb-tint-6));
+  --ifm-hr-background-color: rgb(var(--gb-tint-6));
+  --ifm-table-border-color: rgb(var(--gb-tint-6));
+
+  --ifm-font-family-base: 'Lato', 'Lato Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ifm-font-family-monospace: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.625;
+  --ifm-heading-font-weight: 600;
+  --ifm-h1-font-size: 36px;
+  --ifm-h2-font-size: 30px;
+  --ifm-h3-font-size: 24px;
+  --ifm-h4-font-size: 20px;
+
+  --ifm-link-color: rgb(var(--gb-primary-9));
+  --ifm-link-hover-color: rgb(var(--gb-primary-10));
+  --ifm-link-decoration: underline;
+
+  --ifm-code-font-size: 87.5%;
+  --ifm-code-background: rgb(var(--gb-tint-4));
+  --ifm-code-border-radius: 4px;
+  --ifm-pre-background: rgb(var(--gb-tint-3));
+  --ifm-pre-border-radius: 12px;
+
+  --ifm-navbar-background-color: rgb(var(--gb-tint-1));
+  --ifm-navbar-shadow: none;
+  --ifm-navbar-height: var(--gb-header-height);
+  --ifm-navbar-link-color: rgb(var(--gb-tint-12));
+  --ifm-navbar-link-hover-color: rgb(var(--gb-primary-9));
+
+  --ifm-menu-color: rgb(var(--gb-tint-11));
+  --ifm-menu-color-active: rgb(var(--gb-primary-9));
+  --ifm-menu-color-background-active: transparent;
+  --ifm-menu-color-background-hover: rgb(var(--gb-tint-5));
+
+  --doc-sidebar-width: 300px;
+  --docusaurus-announcement-bar-height: auto;
+  --ifm-container-width-xl: 1440px;
+}
+
+[data-theme='dark'] {
+  --gb-primary-3: 40 45 44;
+  --gb-primary-4: 42 50 48;
+  --gb-primary-9: 150 221 207;
+  --gb-primary-10: 89 159 147;
+  --gb-primary-11: 173 199 193;
+  --gb-on-primary: 29 29 29;
+
+  --gb-tint-1: 0 4 6;
+  --gb-tint-2: 3 11 14;
+  --gb-tint-3: 15 27 30;
+  --gb-tint-4: 22 33 37;
+  --gb-tint-5: 32 44 48;
+  --gb-tint-6: 39 51 55;
+  --gb-tint-7: 57 69 73;
+  --gb-tint-9: 180 195 200;
+  --gb-tint-11: 177 183 185;
+  --gb-tint-12: 254 255 255;
+
+  --gb-warning-3: 45 40 31;
+  --gb-warning-9: 244 230 171;
+  --gb-danger-3: 52 30 30;
+  --gb-danger-9: 251 120 120;
+  --gb-success-3: 37 40 32;
+  --gb-success-9: 234 242 211;
+
+  --ifm-color-primary: rgb(var(--gb-primary-9));
+  --ifm-color-primary-dark: rgb(120 205 190);
+  --ifm-color-primary-darker: rgb(105 195 180);
+  --ifm-color-primary-darkest: rgb(89 159 147);
+  --ifm-color-primary-light: rgb(170 230 218);
+  --ifm-color-primary-lighter: rgb(185 235 225);
+  --ifm-color-primary-lightest: rgb(205 242 235);
+  --ifm-code-background: rgb(var(--gb-tint-4));
+  --ifm-pre-background: rgb(var(--gb-tint-3));
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+
+html {
+  background: rgb(var(--gb-tint-1));
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: rgb(var(--gb-tint-1));
+  color: rgb(var(--gb-tint-12));
+}
+
+a {
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+.navbar a,
+.menu a,
+.table-of-contents a,
+.breadcrumbs a,
+.pagination-nav a,
+.space-tabs a,
+.gb-content-ref a {
+  text-decoration: none;
+}
+
+/* --------------------------------------------------------------------------
+   Announcement bar — GitBook's rounded site banner
+   -------------------------------------------------------------------------- */
+
+div[class*='announcementBar_'] {
+  width: auto;
+  margin: 16px 32px 0;
+  border-radius: 12px;
+  border: 0;
+  background: rgb(var(--gb-tint-4));
+  color: rgb(var(--gb-tint-12));
+  font-size: 14px;
+  line-height: 20px;
+  min-height: 44px;
+}
+
+div[class*='announcementBarContent_'] {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+div[class*='announcementBar_'] a {
+  color: rgb(var(--gb-primary-9));
+}
+
+/* --------------------------------------------------------------------------
+   Header: logo row + space tabs row, sticky together
+   -------------------------------------------------------------------------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--ifm-z-index-fixed);
+  background: rgb(var(--gb-tint-1));
+  border-bottom: 1px solid rgb(var(--gb-tint-6));
+}
+
+.site-header .navbar {
+  position: relative;
+  height: var(--gb-header-height);
+  padding: 0 32px;
+  border: 0;
+}
+
+.navbar__logo {
+  height: 32px;
+  margin-right: 0;
+}
+
+.navbar__logo img {
+  height: 32px;
+}
+
+.navbar__item.navbar__link {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 400;
+  padding: 0 0.75rem;
+}
+
+.navbar-cta {
+  background: rgb(var(--gb-primary-9));
+  color: rgb(var(--gb-on-primary)) !important;
+  border-radius: 8px;
+  padding: 0.55rem 1.05rem !important;
+  margin-right: 0.75rem;
+}
+
+.navbar-cta:hover {
+  background: rgb(var(--gb-primary-10));
+}
+
+/* External-link icons do not appear in the GitBook header. */
+.navbar svg[class*='iconExternalLink'] {
+  display: none;
+}
+
+.space-tabs {
+  height: var(--gb-tabs-height);
+  padding: 0 32px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.space-tabs__list {
+  display: flex;
+  gap: 2rem;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.space-tabs__tab {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  font-size: 14px;
+  line-height: 21px;
+  color: rgb(var(--gb-tint-12));
+  border-bottom: 2px solid transparent;
+}
+
+.space-tabs__tab:hover {
+  color: rgb(var(--gb-primary-9));
+}
+
+.space-tabs__tab--active {
+  font-weight: 500;
+  color: rgb(var(--gb-primary-9));
+  border-bottom-color: rgb(var(--gb-primary-9));
+}
+
+@media (min-width: 997px) {
+  :root {
+    --ifm-navbar-height: calc(var(--gb-header-height) + var(--gb-tabs-height) + 1px);
+  }
+}
+
+@media (max-width: 996px) {
+  :root {
+    --gb-header-height: 60px;
+  }
+
+  .site-header .navbar {
+    padding: 0 16px;
+  }
+
+  .space-tabs {
+    display: none;
+  }
+
+  div[class*='announcementBar_'] {
+    margin: 8px 16px 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar — GitBook's rounded table-of-contents panel
+   -------------------------------------------------------------------------- */
+
+.theme-doc-sidebar-container {
+  border-right: 0 !important;
+}
+
+.theme-doc-sidebar-container nav.menu {
+  margin: 24px 12px 24px 12px;
+  padding: 12px 8px;
+  border-radius: 16px;
+  background: rgb(var(--gb-tint-3));
+  scrollbar-width: thin;
+}
+
+.menu__link {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  padding: 7px 12px;
+  border-radius: 8px;
+  color: rgb(var(--gb-tint-11));
+}
+
+.menu__link:hover {
+  color: rgb(var(--gb-tint-12));
+}
+
+.menu__link--active:not(.menu__link--sublist),
+.menu__list-item-collapsible--active > .menu__link,
+.menu__link--active.menu__link--sublist {
+  color: rgb(var(--gb-primary-9));
+  font-weight: 600;
+}
+
+.menu__list-item-collapsible--active {
+  background: transparent;
+}
+
+/* Nested levels hang off a thin rule, as on GitBook. */
+.menu__list .menu__list {
+  margin-left: 16px;
+  padding-left: 0;
+  border-left: 1px solid rgb(var(--gb-tint-6));
+}
+
+.menu__list .menu__list .menu__link {
+  border-radius: 0 8px 8px 0;
+  margin-left: -1px;
+  border-left: 1px solid transparent;
+}
+
+.menu__list .menu__list .menu__link--active:not(.menu__link--sublist) {
+  border-left-color: rgb(var(--gb-primary-9));
+  background: rgb(var(--gb-primary-4));
+}
+
+.menu__caret::before,
+.menu__link--sublist-caret::after {
+  background-size: 1.6rem 1.6rem;
+  opacity: 0.55;
+}
+
+.sidebar-part {
+  margin: 1.25rem 12px 0.35rem;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--gb-tint-9));
+}
+
+/* --------------------------------------------------------------------------
+   Page body
+   -------------------------------------------------------------------------- */
+
+main[class*='docMainContainer'] .container {
+  padding-top: 2rem;
+  max-width: 1180px;
+}
+
+.theme-doc-markdown {
+  max-width: 768px;
+}
+
+/* Type scale measured from mariadb.com/docs (computed styles, 1440px wide).
+   Sizes are set on the elements, not through Infima's variables, because
+   Infima raises `.markdown h1:first-child` to 3rem and `.markdown > h2` to
+   2rem. */
+.theme-doc-markdown.markdown h1,
+.theme-doc-markdown.markdown h1:first-child {
+  font-size: 36px;
+  line-height: 45px;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.theme-doc-markdown.markdown h2,
+.theme-doc-markdown.markdown > h2 {
+  font-size: 30px;
+  line-height: 37.5px;
+  font-weight: 600;
+  margin-top: 3rem;
+}
+
+.theme-doc-markdown.markdown h3,
+.theme-doc-markdown.markdown > h3 {
+  font-size: 24px;
+  line-height: 33px;
+  font-weight: 600;
+  margin-top: 2.25rem;
+}
+
+.theme-doc-markdown.markdown h4 {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+}
+
+.theme-doc-markdown li,
+.theme-doc-markdown li > p {
+  line-height: 24px;
+}
+
+.gb-page-description {
+  margin: 0 0 2.5rem;
+  font-size: 18px;
+  line-height: 28px;
+  color: rgb(var(--gb-tint-11));
+}
+
+/* Breadcrumbs: small and primary, without pills. GitBook lists only the
+   ancestors, so the current page's own crumb is hidden. */
+.theme-doc-breadcrumbs {
+  margin-bottom: 0.5rem;
+}
+
+.breadcrumbs__item--active {
+  display: none;
+}
+
+.breadcrumbs__link {
+  padding: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: rgb(var(--gb-primary-9));
+  background: none !important;
+}
+
+.breadcrumbs__item:not(:last-child)::after {
+  content: '›';
+  background: none;
+  margin: 0 0.5rem;
+  font-size: 12px;
+  color: rgb(var(--gb-tint-9));
+  opacity: 1;
+  filter: none;
+  width: auto;
+  height: auto;
+}
+
+.breadcrumbs__item:has(+ .breadcrumbs__item--active)::after {
+  display: none;
+}
+
+/* Inline code and code blocks */
+.theme-doc-markdown code {
+  border: 1px solid rgb(var(--gb-tint-6));
+  padding: 0.1em 0.35em;
+  vertical-align: baseline;
+}
+
+.theme-doc-markdown pre code,
+.theme-code-block code {
+  font-size: 14px;
+  line-height: 20px;
+  border: 0;
+  padding: var(--ifm-pre-padding);
+}
+
+.theme-code-block {
+  border: 1px solid rgb(var(--gb-tint-6));
+  border-radius: 12px;
+  box-shadow: none !important;
+}
+
+.theme-code-block pre {
+  background: rgb(var(--gb-tint-3)) !important;
+}
+
+/* Tables */
+.theme-doc-markdown table {
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* Full width like GitBook on wide screens; on narrow ones Infima's
+   display: block keeps a wide table scrolling inside itself. */
+@media (min-width: 997px) {
+  .theme-doc-markdown table {
+    display: table;
+    width: 100%;
+  }
+}
+
+.theme-doc-markdown table thead {
+  background: transparent;
+}
+
+.theme-doc-markdown table thead tr {
+  border-bottom: 1px solid rgb(var(--gb-tint-7));
+}
+
+.theme-doc-markdown table tr {
+  background: transparent !important;
+  border-top: 0;
+  border-bottom: 1px solid rgb(var(--gb-tint-6));
+}
+
+.theme-doc-markdown table th,
+.theme-doc-markdown table td {
+  border: 0;
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.theme-doc-markdown table th {
+  font-weight: 500;
+}
+
+/* Identifiers in a table's first column (skill and tool names) stay whole. */
+.theme-doc-markdown table td:first-child code {
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   GitBook blocks
+   -------------------------------------------------------------------------- */
+
+/* Hints (rendered by the plugin as Docusaurus admonitions): an icon and the
+   text, on a soft panel — no title, no border. */
+.theme-admonition {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 1rem 1.25rem;
+  border: 0;
+  border-radius: 12px;
+  background: rgb(var(--gb-tint-4));
+  color: rgb(var(--gb-tint-12));
+  box-shadow: none;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.theme-admonition p {
+  line-height: 20px;
+}
+
+.theme-admonition div[class*='admonitionHeading'] {
+  margin: 0;
+  font-size: 0;
+  line-height: 0;
+  flex: none;
+}
+
+.theme-admonition span[class*='admonitionIcon'] {
+  margin: 0.15rem 0 0;
+}
+
+.theme-admonition span[class*='admonitionIcon'] svg {
+  width: 18px;
+  height: 18px;
+  fill: rgb(var(--gb-tint-9));
+}
+
+.theme-admonition div[class*='admonitionContent'] {
+  flex: 1;
+  min-width: 0;
+}
+
+.theme-admonition a {
+  color: rgb(var(--gb-primary-9));
+  text-decoration-color: currentColor;
+}
+
+.theme-admonition code {
+  background: rgb(var(--gb-tint-1));
+}
+
+.theme-admonition.alert--warning {
+  background: rgb(var(--gb-warning-3));
+}
+
+.theme-admonition.alert--warning svg {
+  fill: rgb(var(--gb-warning-9)) !important;
+}
+
+.theme-admonition.alert--danger {
+  background: rgb(var(--gb-danger-3));
+}
+
+.theme-admonition.alert--danger svg {
+  fill: rgb(var(--gb-danger-9)) !important;
+}
+
+.theme-admonition.alert--success {
+  background: rgb(var(--gb-success-3));
+}
+
+.theme-admonition.alert--success svg {
+  fill: rgb(var(--gb-success-9)) !important;
+}
+
+/* content-ref: a bordered link card with the target's title and a chevron. */
+.gb-content-ref {
+  margin: 1rem 0;
+}
+
+.gb-content-ref p {
+  margin: 0;
+}
+
+.gb-content-ref a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1.25rem;
+  border: 1px solid rgb(var(--gb-tint-6));
+  border-radius: 8px;
+  color: rgb(var(--gb-tint-12));
+  font-size: 16px;
+  line-height: 24px;
+  transition: border-color 0.15s ease;
+}
+
+.gb-content-ref a::after {
+  content: '';
+  margin-left: auto;
+  width: 7px;
+  height: 7px;
+  border-top: 1.5px solid rgb(var(--gb-tint-9));
+  border-right: 1.5px solid rgb(var(--gb-tint-9));
+  transform: rotate(45deg);
+  flex: none;
+}
+
+.gb-content-ref a:hover {
+  border-color: rgb(var(--gb-primary-9));
+  color: rgb(var(--gb-primary-9));
+}
+
+.gb-content-ref__icon {
+  width: 1.25rem;
+  text-align: center;
+  color: rgb(var(--gb-tint-9));
+}
+
+/* Columns hold a card on the left and its summary on the right. */
+.theme-doc-markdown div[class*='columns_'] {
+  gap: 2rem;
+  margin: 1.25rem 0;
+  align-items: flex-start;
+}
+
+.theme-doc-markdown div[class*='columns_'] > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.theme-doc-markdown div[class*='columns_'] p:first-child {
+  margin-top: 0;
+}
+
+.theme-doc-markdown div[class*='columns_'] .gb-content-ref {
+  margin-top: 0;
+}
+
+/* Tabs */
+.theme-doc-markdown div[class*='tabs_'] {
+  border: 1px solid rgb(var(--gb-tint-6));
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 1.25rem 0;
+}
+
+.theme-doc-markdown div[class*='tabList_'] {
+  background: rgb(var(--gb-tint-3));
+  border-bottom: 1px solid rgb(var(--gb-tint-6));
+  padding: 0 0.5rem;
+}
+
+.theme-doc-markdown button[class*='tab_'] {
+  font-family: var(--ifm-font-family-base);
+  font-size: 14px;
+}
+
+.theme-doc-markdown div[class*='tabPanels_'] {
+  padding: 0 1.25rem;
+}
+
+/* Stepper */
+.theme-doc-markdown div[class*='stepper_'] {
+  margin: 1.5rem 0;
+}
+
+/* --------------------------------------------------------------------------
+   Right-hand table of contents
+   -------------------------------------------------------------------------- */
+
+.table-of-contents {
+  font-size: 14px;
+  line-height: 20px;
+  border-left: 0;
+  padding-left: 0;
+}
+
+.table-of-contents::before {
+  content: 'On this page';
+  display: block;
+  margin: 0 0 0.75rem 0.75rem;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--gb-tint-11));
+}
+
+.table-of-contents__link {
+  color: rgb(var(--gb-tint-11));
+}
+
+.table-of-contents__link:hover,
+.table-of-contents__link--active {
+  color: rgb(var(--gb-primary-9));
+}
+
+.table-of-contents__link--active {
+  font-weight: 600;
+}
+
+.table-of-contents ul {
+  border-left: 1px solid rgb(var(--gb-tint-6));
+  padding-left: 0.75rem;
+  margin-left: 0.75rem;
+}
+
+.table-of-contents > li {
+  margin: 0.6rem 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   Page footer: edit link and previous / next
+   -------------------------------------------------------------------------- */
+
+.theme-doc-footer {
+  margin-top: 3rem;
+}
+
+.theme-edit-this-page {
+  font-size: 14px;
+  color: rgb(var(--gb-tint-11));
+}
+
+.pagination-nav__link {
+  border: 1px solid rgb(var(--gb-tint-6));
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+.pagination-nav__link:hover {
+  border-color: rgb(var(--gb-primary-9));
+}
+
+.pagination-nav__sublabel {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: rgb(var(--gb-tint-11));
+}
+
+.pagination-nav__label {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 400;
+  color: rgb(var(--gb-tint-12));
+}
+
+.footer {
+  display: none;
+}

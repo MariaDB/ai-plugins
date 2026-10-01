@@ -34,11 +34,19 @@
         "devhub",
         "webrick",
         "backdrop",
-        "srgb"
+        "srgb",
+        "docusaurus",
+        "gitbook",
+        "contentref",
+        "mdast",
+        "rehype"
     ],
     "ignorePaths": [
         ".venv",
         "docs/_site",
-        "docs/.jekyll-cache"
+        "docs/.jekyll-cache",
+        "docs-ref/build",
+        "docs-ref/.docusaurus",
+        "docs-ref/node_modules"
     ]
 }

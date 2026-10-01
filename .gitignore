@@ -27,3 +27,9 @@ docs/vendor/
 
 # macOS Finder
 .DS_Store
+
+# Docusaurus preview of the reference docs (docs-ref/) — build output and cache.
+# Its lockfile is kept, unlike the pi package's above, for reproducible builds.
+docs-ref/build/
+docs-ref/.docusaurus/
+!docs-ref/package-lock.json

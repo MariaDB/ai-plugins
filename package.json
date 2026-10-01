@@ -17,7 +17,11 @@
     "docs": "./docs/serve.sh",
     "docs:open": "./docs/serve.sh --open",
     "docs:build": "./docs/serve.sh --build",
-    "docs:skills": "python3 docs/regenerate-skills-data.py"
+    "docs:skills": "python3 docs/regenerate-skills-data.py",
+    "docs-ref": "npm --prefix docs-ref start",
+    "docs-ref:build": "npm --prefix docs-ref run build",
+    "docs-ref:serve": "npm --prefix docs-ref run serve",
+    "docs-ref:skills": "python3 docs-ref/scripts/generate-skill-pages.py"
   },
   "keywords": ["mariadb", "sql", "database", "mcp", "mariadb-shell", "pi-package"],
   "dependencies": {
