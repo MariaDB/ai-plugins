@@ -4,8 +4,8 @@ slug: run-sql-and-scripts
 title: "Run SQL and SQL scripts"
 description: >-
   Ask the agent to run a statement, run a whole file, and read results back.
-  Covers the one behaviour that causes most surprises — a script does not run on
-  a single session, so anything stateful has to be asked for differently.
+  Covers the one behaviour that causes most surprises — a script is not a
+  transaction, so a failure halfway leaves the first half in place.
 level: beginner
 duration: "15 min"
 area: sql
@@ -19,8 +19,8 @@ prerequisites:
 
 Getting SQL onto a server is the most ordinary thing you will ask for, and it
 works well without you knowing anything about how. There is exactly one
-behaviour worth learning, because it decides whether a stateful request works at
-all — and it is not visible from the outside.
+behaviour worth learning, because it decides what a half-finished script leaves
+behind — and it is not visible from the outside.
 
 ## Ask what you are allowed to connect to
 
@@ -102,32 +102,38 @@ just as well — so this rarely stops anything, it just explains why the agent
 sometimes pastes a script instead of pointing at it.
 
 <div class="callout callout--warn" markdown="1">
-**Each statement in a script runs on its own fresh session.** That is invisible
-for an ordinary create script, and fatal for anything that sets something in one
-statement and reads it in the next:
+**A script runs on one session, but it is not a transaction.** The statements
+run in order on the connection's session, so whatever one of them sets is there
+for the next — `SET @my_var`, a `USE notes_app`, the REST Service's
+`USE REST SERVICE`. What a script does not do is undo itself: if statement five
+fails, the script stops there, statements one to four have already taken effect,
+and nothing is rolled back.
 
-- `SET @my_var = …;` then `… WHERE id = @my_var;`
-- `USE notes_app;` then an unqualified `CREATE TABLE note …`
-- `START TRANSACTION;` … `COMMIT;` as separate statements
-- The MariaDB REST Service DDL, which is grammar-level session state
+The tool does not raise on a failed statement either. It reports the failure in
+its results, and the agent checks every entry before it tells you the script
+ran. If you want that spelled out, ask for it:
 
-If what you are running is in that list, say so, and the agent will run the
-statements one at a time on a single connection instead:
-
-*Run these statements one at a time on one connection — they depend on session
-state, so don't send them as a script.*
+*Run `notes_app.sql` against the sandbox on 3310, and tell me which statements
+failed, if any.*
 </div>
 
-The habit that makes the whole issue disappear is fully qualified names —
-`` `notes_app`.`note` `` rather than `note` after a `USE`. The
-`mariadb-schema-create-script` skill already writes scripts that way, so a
-script the agent authored is safe by construction.
+The one case where state does get lost is a connection that sat idle long enough
+to be closed: it is reopened before the next call, and whatever the old session
+held — variables, the current schema, an open transaction — is gone. Keep the
+state a request depends on within that request, rather than spread across
+prompts with a long pause in between.
+
+Fully qualified names — `` `notes_app`.`note` `` rather than `note` after a
+`USE` — are a good habit for the same reason: a script that names its schema
+everywhere does the same thing whichever schema the session happens to be in.
 
 ## Transactions
 
-Because each script statement gets its own session, a transaction cannot span a
-script. Ask for one explicitly and the agent will keep it on a single
-connection:
+A script can hold a transaction — `START TRANSACTION` … `COMMIT` works inside
+one, because every statement runs on the same session. But if a statement fails
+partway, the script stops before the `COMMIT`, and the transaction stays open on
+the session until the agent rolls it back. So when the work has to be
+all-or-nothing, say so, and let the agent decide how to run it:
 
 <div class="prompt" markdown="1">
 *Move every note from the "Inbox" notebook to "Archive" and delete the Inbox
@@ -152,9 +158,10 @@ you're done" covers it, because the agent closes first.
   cannot use a server nobody configured.
 - Name the server loosely; just do not try to bolt a default schema or a TLS
   requirement onto it, and never put a password in the prompt.
-- **A script gives every statement a fresh session.** If your SQL depends on
-  `SET`, `USE`, or an open transaction carrying across, say so and ask for the
-  statements to be run one at a time.
+- **A script runs on one session, but it is not a transaction.** State carries
+  from one statement to the next; a failure stops the script and leaves
+  everything before it in place. Ask for a transaction when you need
+  all-or-nothing.
 
 **Where to go next**
 

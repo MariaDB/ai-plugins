@@ -178,12 +178,11 @@ Two behaviours here explain most of the surprises people hit later:
   If your working directory was never allowed, the agent simply sends the same
   SQL inline instead — which works just as well, and is why you will sometimes
   see it paste a script rather than point at one.
-- **Each statement in a script runs on its own fresh session.** Invisible for an
-  ordinary create script; fatal for anything that sets something in one
-  statement and reads it in the next. When that is what you need, say so and ask
-  for the statements to be run one at a time on a single connection. The MariaDB
-  REST Service grammar is the usual case — that is
-  [Tutorial 8](../rest-endpoints/).
+- **A script is not a transaction.** The statements run in order on one
+  session, so the settings block at the top really does apply to everything
+  below it — but a failure stops the script and leaves whatever already ran in
+  place. The agent reports which statement failed;
+  [Tutorial 2](../run-sql-and-scripts/) covers what to do about it.
 
 ## Read the result back
 

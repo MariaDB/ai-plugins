@@ -9,7 +9,7 @@ description: >-
 level: intermediate
 duration: "40 min"
 area: rest
-tools: ["db.connect", "db.execute_sql", "sandbox.deploy"]
+tools: ["db.connect", "db.execute_sql", "db.execute_sql_script", "sandbox.deploy"]
 skills: ["mariadb-rest-service-create", "mariadb-rest-service-update-endpoints", "mariadb-rest-service-authorization", "mariadb-rest-service-show"]
 path_label: "Build an API, Step 1"
 prerequisites:
@@ -56,22 +56,25 @@ adds an endpoint for it. This is deliberate — the default is that your data is
 not on the internet.
 </div>
 
-## The session rule that decides how it runs
+## How the statements run
 
-This is the one piece of MCP mechanics that matters for this tutorial.
+The REST grammar carries state: `USE REST SERVICE /notesApp` sets the service
+that the following `CREATE REST SCHEMA` and `CREATE REST VIEW` statements belong
+to, and `USE REST SCHEMA` does the same for the schema. That works whichever way
+the agent sends the statements — as one script with `db.execute_sql_script`, or
+one at a time with `db.execute_sql` — because both run on the same session of
+the connection.
 
 <div class="callout callout--warn" markdown="1">
-**Say up front that the REST statements must run one at a time, on one
-connection.** Run as a script, each statement gets a **fresh session** — and the
-REST grammar is session state: `USE REST SERVICE /notesApp` sets a context that
-the next `CREATE REST VIEW` depends on. In separate sessions the `USE` is gone by
-the time the `CREATE` runs.
+**A script is not a transaction.** If the `CREATE REST VIEW` for the third table
+fails, the service, the REST schema and the first two views already exist. Ask
+the agent to look before it re-runs anything:
 
-A capable agent works this out after the first failure. Putting it in the prompt
-saves the round trip:
+*Show me the REST services, schemas and views that exist now, then fix what
+failed without recreating the rest.*
 
-*Run the REST DDL one statement at a time on a single connection — the grammar
-is session state, so don't send it as a script.*
+The agent answers that with `SHOW REST SERVICES` and its siblings, which the
+`mariadb-rest-service-show` skill covers.
 </div>
 
 ## Configure the metadata
@@ -227,8 +230,8 @@ that defines them.*
   flattened with `@UNNEST`, and per-field control over what is exposed.
 - `CONFIGURE` → `CREATE REST SERVICE` → `CREATE REST SCHEMA` → **one endpoint per
   object**, in that order, with nothing reachable until the last step.
-- REST DDL asked for one statement at a time on one connection, because the
-  grammar is session state and a script gives each statement a new session.
+- REST DDL run on the connection's session, as a script or statement by
+  statement — `USE REST SERVICE` and `USE REST SCHEMA` carry over either way.
 
 **Where to go next**
 

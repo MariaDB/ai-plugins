@@ -39,20 +39,27 @@ allowed-paths list — see [How It Works]({{ '/how-it-works/#paths' | relative_u
 | `db.list_schemas` | `connection_id` | Schemas visible to the account. A missing schema is usually privileges. |
 | `db.list_objects` | `connection_id`, `schema_name`, `object_type="table"` | `table`, `view`, `procedure`, `function`, `trigger`, `event`. |
 | `db.get_object_details` | `connection_id`, `schema_name`, `object_name`, `object_type="table"` | Structured detail — columns, keys, indexes, constraints — not a `CREATE` string. Call this before proposing any schema change. |
-| `db.execute_sql` | `connection_id`, `sql`, `params=None` | One statement, on **your** session. Use for results, parameters, session state and transactions. |
-| `db.execute_sql_script` | `connection_id`, `sql_script=None`, `file_path=None` | Multi-statement. **Each statement runs in a fresh session** — see the warning below. |
+| `db.execute_sql` | `connection_id`, `sql`, `params=None` | One statement. Use it when you want rows back or need parameters. |
+| `db.execute_sql_script` | `connection_id`, `sql_script=None`, `file_path=None`, `stop_on_error=True`, `limit=None`, `column_metadata=False` | Multi-statement, in order, on the connection's session. **Not a transaction, and a failed statement does not raise** — see the warning below. |
 | `db.close` | `connection_id` | Closes it. Idle connections are reaped anyway, but close before deleting a sandbox. |
 
 </div>
 
 <div class="callout callout--warn" markdown="1">
-**`db.execute_sql_script` gives each statement its own session.** Anything that
-sets state in one statement and reads it in the next will not work: `SET @var`,
-`USE`, a `START TRANSACTION` / `COMMIT` pair, or the MariaDB REST Service
-grammar. Run those individually with `db.execute_sql` on one connection.
+**`db.execute_sql_script` runs the whole script on the connection's session,
+but it is not a transaction.** State carries from one statement to the next —
+`SET @var`, `USE`, a `START TRANSACTION` / `COMMIT` pair, the MariaDB REST
+Service's `USE REST SERVICE` — just as it would typed into a client.
 
-For an ordinary create script with fully qualified object names it is the right
-tool and much faster.
+What it does not do is undo itself or raise. A failed statement comes back as an
+entry with an `error` key, the script stops there (`stop_on_error=True`), and
+everything before it has already taken effect. Check every entry before calling
+a script done.
+
+State is lost in one case only: a connection that sat idle long enough to be
+closed is reopened before the script runs, and the first entry then carries
+`session_restarted: true`. Whatever earlier calls left in the session —
+variables, the current schema, an open transaction — is gone.
 </div>
 
 ## `msm.*` — schema management
