@@ -2,7 +2,11 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
-## Landed on `main` (through PR #33)
+## Landed on `main` (through PR #35)
+
+**#35** `17bce4b` added `docs-ref/`, the GitBook reference docs with an offline Docusaurus
+preview (see [reference docs](docs-ref.md)); **#34** `4e2e6d5` corrected the DevHub's claim that
+`db.execute_sql_script` gives each statement a fresh session, and updated the favicons.
 
 **#33** `c084a21` rebuilt the DevHub header and footer on mariadb.org's;
 **#32** `81f72fa` moved the DevHub palette to mariadb.org's blues with its
