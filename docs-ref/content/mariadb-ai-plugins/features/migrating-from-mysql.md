@@ -11,7 +11,11 @@ MariaDB AI Plugins support a migration from MySQL to MariaDB in two ways. The sk
 ## Requirements
 
 * For compatibility guidance, the `dev` or `sql` plugin. Both include the `mysql-to-mariadb` skill.
-* For the database migration, the `dev` plugin and the migration tooling, which you install on Linux or macOS with `mariadb-shell -- mcp setup --installMigrator`.
+* For the database migration, the `dev` plugin and the migration tooling, which you install on Linux or macOS with this command:
+
+  ```bash
+  mariadb-shell -- mcp setup --installMigrator
+  ```
 * Connections to both the MySQL source and the MariaDB target, configured with `mcp setup`.
 
 ## Skills and Tools

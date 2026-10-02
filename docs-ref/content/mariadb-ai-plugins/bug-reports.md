@@ -12,7 +12,11 @@ Report bugs and request features in the [MariaDB AI Plugins issue tracker on Git
 
 * The harness and its version, for example Claude Code or Codex.
 * The plugin variant and version.
-* The MariaDB Shell version, from `mariadb-shell --version`.
+* The MariaDB Shell version, which this command prints:
+
+  ```bash
+  mariadb-shell --version
+  ```
 * Your operating system.
 * The request you gave the agent, and the tool call or error message that went wrong.
 

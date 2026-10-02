@@ -21,7 +21,7 @@ You request a tunnel with the `mariadb+ssh://` scheme in the connection URI. Eve
 
 In a `mariadb+ssh://` URI, the user, host, and port always describe the database: the database account, and the database server with its port. The `ssh-*` options in the query string describe how the server is reached. There are two cases:
 
-```
+```text
 mariadb+ssh://dba@remote-host.com:3306
 mariadb+ssh://dba@db-01.internal:3306?ssh-host=bastion.example.com
 ```
@@ -37,7 +37,7 @@ The options `ssh-user`, `ssh-port`, `ssh-config-file`, and `ssh-identity-file` c
 
 The following URI uses the most common options:
 
-```
+```text
 mariadb+ssh://mcp@db.internal:3306?ssh-host=bastion.example.com&ssh-user=tunnel
 ```
 
@@ -57,19 +57,19 @@ If you omit the database port, `3306` is used. The `ssh-*` options are only vali
 
 A database server in a private network, reached through a bastion host, with a dedicated key:
 
-```
+```text
 mariadb+ssh://mcp@db.internal:3306?ssh-host=bastion.example.com&ssh-user=tunnel&ssh-identity-file=/home/dev/.ssh/mcp_tunnel
 ```
 
 A database server that only listens on its loopback interface, reached by SSH on the server itself:
 
-```
+```text
 mariadb+ssh://mcp@db1.example.com?ssh-user=tunnel
 ```
 
 An SSH host defined in your OpenSSH configuration, which also provides the user, port, and key:
 
-```
+```text
 mariadb+ssh://mcp@db.internal?ssh-host=bastion&ssh-config-file=/home/dev/.ssh/config
 ```
 
@@ -86,7 +86,13 @@ The MCP server runs without a terminal and can't prompt for anything. It tries t
 In practice, use one of these options:
 
 * **A dedicated key without a passphrase**, used only for the tunnel, and referenced with `ssh-identity-file`. Protect the key file with file permissions, and restrict what the key can do on the SSH host, as described in [Restrict the Tunnel Key](#restrict-the-tunnel-key).
-* **A key in the SSH agent**, on Linux and macOS. Load the key with `ssh-add` before you start the harness. The MCP server runs as a child process of the harness, so the harness must have access to the agent, typically through the `SSH_AUTH_SOCK` environment variable.
+* **A key in the SSH agent**, on Linux and macOS. Load the key into the agent before you start the harness, for example:
+
+  ```bash
+  ssh-add ~/.ssh/id_ed25519
+  ```
+
+  The MCP server runs as a child process of the harness, so the harness must have access to the agent, typically through the `SSH_AUTH_SOCK` environment variable.
 
 {% hint style="warning" %}
 A key protected by a passphrase only works through the SSH agent. The MCP server can't ask for the passphrase, and a URI can't contain it.
@@ -96,15 +102,23 @@ A key protected by a passphrase only works through the SSH agent. The MCP server
 
 Before it opens a tunnel, MariaDB Shell checks the host key of the SSH host against your known-hosts file, `~/.ssh/known_hosts`. Because the MCP server can't ask you to confirm an unknown host key, it refuses the connection in this case:
 
-```
+```text
 The authenticity of host 'bastion.example.com' can't be established.
 ```
 
 Add the host key before the agent uses the connection. `mcp setup` does this for you: when you add a `mariadb+ssh://` connection, the setup opens the tunnel to verify the connection, shows the fingerprint of an unknown host key, and asks you to confirm it. If you confirm, it stores the key in the known-hosts file. Compare the fingerprint with the one your administrator provides before you confirm.
 
-Alternatively, connect to the SSH host once with `ssh`, and accept the host key there.
+Alternatively, connect to the SSH host once with `ssh`, and accept the host key there:
 
-If the host key changes later, MariaDB Shell always refuses the connection with `Invalid fingerprint detected`, because a changed key can mean that the connection is being intercepted. Check with your administrator whether the key was changed, then remove the old entry with `ssh-keygen -R bastion.example.com` and accept the new key.
+```bash
+ssh tunnel@bastion.example.com
+```
+
+If the host key changes later, MariaDB Shell always refuses the connection with `Invalid fingerprint detected`, because a changed key can mean that the connection is being intercepted. Check with your administrator whether the key was changed, then remove the old entry and accept the new key:
+
+```bash
+ssh-keygen -R bastion.example.com
+```
 
 ## Add the Connection
 
@@ -136,7 +150,7 @@ The scheme is part of the connection. A `mariadb://` URI with the same user and 
 An SSH key that can open a tunnel can usually also open a shell on the SSH host. If the key is only used for the tunnel, restrict it in the `~/.ssh/authorized_keys` file of the tunnel user on the SSH host:
 
 {% code title="~/.ssh/authorized_keys" %}
-```
+```text
 restrict,port-forwarding,permitopen="db.internal:3306" ssh-ed25519 AAAA... mcp-tunnel
 ```
 {% endcode %}

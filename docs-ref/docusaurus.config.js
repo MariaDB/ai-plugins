@@ -184,7 +184,7 @@ const config = {
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.vsDark,
-        additionalLanguages: ['bash', 'powershell', 'json', 'sql', 'toml', 'yaml', 'ini'],
+        additionalLanguages: ['bash', 'batch', 'powershell', 'json', 'sql', 'toml', 'yaml', 'ini'],
       },
     }),
 };

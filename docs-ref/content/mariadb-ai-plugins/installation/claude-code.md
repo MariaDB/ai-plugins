@@ -10,7 +10,7 @@ description: >-
 
 Add the MariaDB marketplace and install the `dev` plugin from inside Claude Code:
 
-```
+```text
 /plugin marketplace add mariadb/ai-plugins
 /plugin install dev@mariadb
 ```
@@ -23,7 +23,17 @@ The `dev` and `sql` plugins register the MCP server with Claude Code automatical
 
 ## Verify the Installation
 
-Run `/plugin` to list the installed plugins, and `/mcp` to check that the `mariadb` MCP server is connected.
+To list the installed plugins, run:
+
+```text
+/plugin
+```
+
+To check that the `mariadb` MCP server is connected, run:
+
+```text
+/mcp
+```
 
 ## Update or Remove the Plugin
 

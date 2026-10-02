@@ -12,7 +12,17 @@ After installation, the MCP server has no access to any database or directory. Y
 mariadb-shell -- mcp setup
 ```
 
-From an interactive MariaDB Shell session, run `mcp.setup()` instead.
+From an interactive MariaDB Shell session, you can run the setup function instead. MariaDB Shell starts in SQL mode, so switch to Python mode first:
+
+```text
+\py
+```
+
+Then run the setup function:
+
+```python
+mcp.setup()
+```
 
 {% hint style="info" %}
 The MCP server is implemented as a MariaDB Shell plugin. This way, it can use the database connections, credential management, sandbox handling, and schema management of MariaDB Shell.
@@ -30,7 +40,7 @@ If `mariadb-shell` isn't on your `PATH`, use the copy the plugin's launcher inst
 {% endtab %}
 
 {% tab title="Windows" %}
-```
+```batch
 %LOCALAPPDATA%\Programs\mariadb-shell\bin\mariadb-shell.cmd -- mcp setup
 ```
 {% endtab %}
@@ -74,7 +84,13 @@ For all options and their rules, see [Command Line Configuration](command-line-c
 
 ## Change the Configuration
 
-Run `mariadb-shell -- mcp setup` again at any time to add or remove connections and paths. To see the current configuration, run `mariadb-shell -- mcp setup --show`. For the complete option reference, see the [MCP server documentation](https://github.com/mariadb-corporation/mariadb-shell-plugins/blob/main/mcp_plugin/README.md#configuration-mcpsetup).
+Run `mariadb-shell -- mcp setup` again at any time to add or remove connections and paths. To see the current configuration, run:
+
+```bash
+mariadb-shell -- mcp setup --show
+```
+
+For the complete option reference, see the [MCP server documentation](https://github.com/mariadb-corporation/mariadb-shell-plugins/blob/main/mcp_plugin/README.md#configuration-mcpsetup).
 
 ## Related Topics
 

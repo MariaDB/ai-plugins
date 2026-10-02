@@ -14,7 +14,7 @@ The agent can only connect to the servers in the list of configured connections.
 
 When the MCP server compares a URI with the configured connections, it treats equivalent forms as equal, such as a `mariadb://` or `mysql://` scheme, a different capitalization of the host name, an explicit default port, or a password in the URI. It rejects a URI that requests more than the configured connection, for example a default schema or an additional option:
 
-```
+```text
 root@127.0.0.1:3310/notes_app         → refused (a default schema)
 root@127.0.0.1:3310?ssl-mode=REQUIRED → refused (an option)
 ```
@@ -32,7 +32,11 @@ All tools that access files are restricted to the directories in the allowed-pat
 * The `msm.*` tools fail.
 * `sandbox.deploy` stops responding.
 
-In both cases, add the directory with `mcp setup`.
+In both cases, add the directory with `mcp setup`, for example:
+
+```bash
+mariadb-shell -- mcp setup --addPaths=/home/dev/projects
+```
 
 ## Connections Created by Sandboxes
 

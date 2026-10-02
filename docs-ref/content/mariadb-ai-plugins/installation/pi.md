@@ -30,19 +30,33 @@ Alternatively, from a local checkout of the repository, run this at the reposito
 pi install .
 ```
 
-Restart Pi, or run `/reload`, to load the skills and the extension.
+To load the skills and the extension, restart Pi, or run the following in Pi:
+
+```text
+/reload
+```
 
 ## Register the MCP Server
 
 Register the MariaDB MCP server with the adapter from inside Pi:
 
-```
+```text
 /mariadb-mcp-setup
 ```
 
-This writes the global `~/.config/mcp/mcp.json`. To register the server for the current project only, in `./.mcp.json`, add `--project`.
+This writes the global `~/.config/mcp/mcp.json`. To register the server for the current project only, in `./.mcp.json`, add `--project`:
 
-Then run `/mcp reconnect mariadb`, or restart Pi. While the server isn't registered, the extension prints a reminder at the start of each session.
+```text
+/mariadb-mcp-setup --project
+```
+
+Then restart Pi, or reconnect the server:
+
+```text
+/mcp reconnect mariadb
+```
+
+While the server isn't registered, the extension prints a reminder at the start of each session.
 
 ## Configure the MCP Server
 

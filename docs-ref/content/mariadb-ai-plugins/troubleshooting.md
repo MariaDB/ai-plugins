@@ -20,8 +20,16 @@ description: >-
 
 Check that the harness loaded the plugin:
 
-* Claude Code: run `/plugin`.
-* Codex: run `/plugins`.
+* Claude Code: run the following command:
+
+  ```text
+  /plugin
+  ```
+* Codex: run the following command:
+
+  ```text
+  /plugins
+  ```
 * Pi: a project-local package must be approved at run time with `--approve`, or it is configured but never loaded.
 
 ## The MCP Server Doesn't Start

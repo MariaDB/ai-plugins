@@ -33,18 +33,30 @@ If the MCP server doesn't start, register it with the script included in the plu
 codex/dev-plugin/scripts/setup-codex-mcp.sh
 ```
 
-To unregister the server, add `--remove`.
+To unregister the server, add `--remove`:
+
+```bash
+codex/dev-plugin/scripts/setup-codex-mcp.sh --remove
+```
 {% endtab %}
 
 {% tab title="Windows" %}
-```
+```batch
 codex\dev-plugin\scripts\setup-codex-mcp.cmd
 ```
 
-To unregister the server, add `--remove`.
+To unregister the server, add `--remove`:
+
+```batch
+codex\dev-plugin\scripts\setup-codex-mcp.cmd --remove
+```
 {% endtab %}
 {% endtabs %}
 
 ## Verify the Installation
 
-Run `/plugins` in Codex to check that the plugin is enabled.
+To check that the plugin is enabled, run the following in Codex:
+
+```text
+/plugins
+```

@@ -90,4 +90,10 @@ The account in the example can connect from any host (`'%'`). If the MCP server 
 
 ## Configure the Connection
 
-Add the account as a connection with `mcp setup`, for example as `mcp@db.example.com:3306`. The setup prompts for the password, verifies it, and stores it in the MariaDB Shell secret store. See [Configuring the MCP Server](README.md).
+Add the account as a connection with `mcp setup`, for example:
+
+```bash
+mariadb-shell -- mcp setup --addConnection='mariadb://mcp@db.example.com:3306'
+```
+
+The setup prompts for the password, verifies it, and stores it in the MariaDB Shell secret store. See [Configuring the MCP Server](README.md).

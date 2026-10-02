@@ -12,7 +12,7 @@ The MCP server can deploy MariaDB Server instances on your local machine for dev
 
 To deploy a sandbox, ask the agent, for example:
 
-```
+```text
 Deploy a MariaDB sandbox on port 3310.
 ```
 
@@ -28,7 +28,7 @@ You don't need to install MariaDB Server. To find a server binary, `sandbox.depl
 
 You can request a specific version with a full or partial version number, such as `11.8.9`, `11.8`, or `11`. For a partial version number, the sandbox uses the latest matching release. To list the versions available for your platform, ask:
 
-```
+```text
 Which MariaDB server versions can you deploy?
 ```
 

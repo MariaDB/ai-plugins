@@ -39,7 +39,7 @@ Use a dedicated MariaDB account with limited privileges for each connection, as 
 
 A connection URI has the following format. The parts in square brackets are optional:
 
-```
+```text
 [scheme://][user@]<host[:port]|socket>[/schema][?option=value&option=value...]
 ```
 
@@ -57,25 +57,25 @@ A connection URI has the following format. The parts in square brackets are opti
 
 A server on the local network:
 
-```
+```text
 mariadb://mcp@db.example.com:3306
 ```
 
 A server addressed by its IPv6 address:
 
-```
+```text
 mariadb://mcp@[2001:db8::10]:3306
 ```
 
 A server that requires TLS and a verified server certificate:
 
-```
+```text
 mariadb://mcp@db.example.com:3306?ssl-mode=VERIFY_IDENTITY&ssl-ca=/etc/ssl/certs/db-ca.pem
 ```
 
 A server with a connection timeout of five seconds:
 
-```
+```text
 mariadb://mcp@db.example.com?connect-timeout=5000
 ```
 
@@ -83,18 +83,22 @@ mariadb://mcp@db.example.com?connect-timeout=5000
 
 To connect to a server on the same machine through its Unix socket file, give the path of the socket instead of host and port. Either enclose the path in parentheses, or encode each `/` as `%2F`:
 
-```
+```text
 mariadb://mcp@(/run/mysqld/mysqld.sock)
 mariadb://mcp@%2Frun%2Fmysqld%2Fmysqld.sock
 ```
 
-On Windows, you can connect to a server through a named pipe in the same way, for example `mariadb://mcp@(\\.\MySQL)`, where `MySQL` is the default pipe name.
+On Windows, you can connect to a server through a named pipe in the same way. `MySQL` is the default pipe name:
+
+```text
+mariadb://mcp@(\\.\MySQL)
+```
 
 ### Special Characters
 
 Apart from letters and digits, the user name, host, and option values can only contain the characters `-._~!$'()*+;` directly. Encode any other character as `%` followed by its hexadecimal ASCII code. For example, write the user name `app@eu` as `app%40eu`:
 
-```
+```text
 mariadb://app%40eu@db.example.com
 ```
 
@@ -135,7 +139,13 @@ In most cases, leave the schema out of the URI. The agent can then work with eve
 
 ## Change or Remove a Connection
 
-Run `mariadb-shell -- mcp setup` again to remove a connection or to add it with a new password. Adding a connection that already exists updates its password.
+To remove a connection or to add it with a new password, run the setup again:
+
+```bash
+mariadb-shell -- mcp setup
+```
+
+Adding a connection that already exists updates its password.
 
 Removing a connection revokes the agent's access to it. The MCP server checks the configured connections each time it opens a session, so it refuses the next session for the removed connection. A session that is in continuous use can stay open until it reaches its maximum lifetime of 12 hours. If the removal must take effect immediately, restart the MCP server.
 
@@ -143,7 +153,7 @@ Removing a connection revokes the agent's access to it. The MCP server checks th
 
 If the setup can't connect, it reports the error of the server or the client and doesn't store the connection:
 
-```
+```text
 Could not connect to 'mariadb://mcp@db.example.com:3306': MySQL Error (1045): Access denied for user 'mcp'@'10.0.0.5' (using password: YES)
 The connection was not stored.
 ```

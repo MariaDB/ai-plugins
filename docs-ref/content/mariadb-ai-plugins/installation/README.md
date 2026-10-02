@@ -46,7 +46,7 @@ You don't need a MariaDB Server installation. If you don't have a server, the MC
 
 To check that the skills are loaded, ask the agent a question that requires MariaDB-specific knowledge, for example:
 
-```
+```text
 Write a CREATE TABLE for a product catalog, MariaDB style.
 ```
 

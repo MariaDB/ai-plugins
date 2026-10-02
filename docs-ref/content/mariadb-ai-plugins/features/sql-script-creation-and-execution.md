@@ -27,7 +27,7 @@ This page describes the three steps of this workflow: creating the script, runni
 
 Start the agent in your working folder, and describe the schema and the name of the script file:
 
-```
+```text
 Create a MariaDB database schema named notes_app for a note-taking app and
 store it in a notes_app.sql file.
 ```
@@ -52,7 +52,7 @@ If you plan to run the script on a server where the schema has a different name,
 
 To run the script, the agent needs a MariaDB server. For development and testing, a sandbox instance on your machine is a good choice:
 
-```
+```text
 Spin up a MariaDB sandbox instance on port 3310, connect to it, and run
 notes_app.sql against it.
 ```
@@ -71,7 +71,7 @@ If the working folder isn't on the allowed-paths list, `db.execute_sql_script` c
 
 Ask the agent to check the result on the server rather than to summarize what it ran:
 
-```
+```text
 Read the result back from the server. Which schemas exist, which tables are
 in notes_app, and what are the columns of the note table?
 ```
@@ -88,7 +88,7 @@ To test the schema with data, ask the agent to insert sample rows and run a quer
 
 When you no longer need the sandbox, ask the agent to remove it:
 
-```
+```text
 Close the connection, then stop and delete the sandbox on port 3310.
 ```
 
@@ -98,7 +98,7 @@ The agent calls `db.close`, `sandbox.stop`, and `sandbox.delete`, in this order.
 
 Once you're familiar with the steps, you can combine them in a single request:
 
-```
+```text
 Work in the current folder and complete these steps in order:
 1. Create a MariaDB database schema named notes_app for a note-taking app
    and store it in notes_app.sql.
@@ -111,9 +111,15 @@ Work in the current folder and complete these steps in order:
 
 ## Run Scripts on Development and Production Servers
 
-Besides sandbox instances, the agent can run queries and scripts on your existing development and production servers. To give the agent access to a server, add a connection for it with `mariadb-shell -- mcp setup`, as described in [Configuring the MCP Server](../configuring-the-mcp-server/README.md). If a server is only reachable through an SSH host, configure the connection with a `mariadb+ssh://` URI, as described in [Tunnel Database Connections via SSH](../configuring-the-mcp-server/tunnel-database-connections-via-ssh.md). The agent finds the configured connections with `db.list_connections`, and you refer to a connection in your request, for example:
+Besides sandbox instances, the agent can run queries and scripts on your existing development and production servers. To give the agent access to a server, add a connection for it, as described in [Configuring the MCP Server](../configuring-the-mcp-server/README.md):
 
+```bash
+mariadb-shell -- mcp setup
 ```
+
+If a server is only reachable through an SSH host, configure the connection with a `mariadb+ssh://` URI, as described in [Tunnel Database Connections via SSH](../configuring-the-mcp-server/tunnel-database-connections-via-ssh.md). The agent finds the configured connections with `db.list_connections`, and you refer to a connection in your request, for example:
+
+```text
 Run notes_app.sql on the development server mcp@dev-db.example.com:3306.
 ```
 
