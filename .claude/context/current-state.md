@@ -3,6 +3,7 @@
 [← Project Context](../PROJECT_CONTEXT.md)
 
 - **Done & working:**
+  - **Pi 1.0 MCP — merged as PR #37** (`5711b11`, 2026-10-02): the pi extension registers `mariadb` with Pi's built-in MCP; `pi-mcp-adapter`, `/mariadb-mcp-setup` and `setup-pi-mcp.sh` removed; all Pi docs (READMEs, CONTRIBUTING, DevHub get-started/how-it-works, docs-ref installation/pi, architecture, configuration reference, troubleshooting) rewritten with a migration section. Verified with Pi 1.0.0 + local model: pi static **691 passed**, e2e **5 passed in 66 s**. See [architecture](architecture.md) and [gotchas](gotchas.md).
   - 5 REST skills in `additional-skills/rest/`: `mariadb-rest-service-{create,update-endpoints,authorization,show,drop}`.
   - MSM skills in `additional-skills/schema-management/`: overview `mariadb-schema-management` + `mariadb-schema-management-{create,develop,release,deploy}`. `mariadb-schema-create-script` moved to `additional-skills/sql/`.
   - `additional-skills/` reorganized into `sql/`/`rest/`/`schema-management/`; `sync-skills.sh` updated for per-subfolder selection and re-run. Counts (**76** dev skills as of 26.9.1; additional=12: 5 rest + 5 MSM + schema-create-script + `mariadb-migrator` in its own `migrator/` subfolder); sql = 47 (additional=1: only schema-create-script). Manifests match disk. **Upstream split each connector skill in two** — `mariadb-connector-<x>-install` + `-usage` for c/cpp/j/nodejs/odbc/python/r2dbc (7 → 14, hence 68 → 75); dev-only, so `sql` is unchanged.

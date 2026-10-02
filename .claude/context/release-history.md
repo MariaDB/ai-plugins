@@ -2,7 +2,12 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
-## Landed on `main` (through PR #36)
+## Landed on `main` (through PR #37)
+
+**#37** `5711b11` moved the Pi plugin to Pi 1.0's built-in MCP: the extension registers the
+`mariadb` server itself (`pi.registerMcpServer`), `pi-mcp-adapter` and the setup script/command are
+gone, docs carry a migration section, and the pi e2e makes a real MCP call. Unreleased — the
+Pi CHANGELOG has it under `[Unreleased]`.
 
 **#36** `0d77b1e` put everything the reader types in `docs-ref/content/` into code fences
 with a language (reviewer feedback), and fixed the `mcp.setup()` note (SQL-mode start, `\py`, no
