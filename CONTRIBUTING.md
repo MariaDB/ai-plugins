@@ -36,9 +36,9 @@ Everything below is for people working **on** the plugins rather than with them.
    (`%LOCALAPPDATA%\Programs\mariadb-shell\bin` on Windows) — and otherwise runs
    the shell's own `install.sh` / `install.ps1` to put the newest release there
    first. Either way it execs that binary as the MCP server over stdio, and later
-   runs reuse the install. Pi uses the same launcher, registered with
-   `pi-mcp-adapter` by
-   [pi/dev-plugin/scripts/setup-pi-mcp.sh](pi/dev-plugin/scripts/setup-pi-mcp.sh).
+   runs reuse the install. Pi uses the same launcher, which its extension
+   [pi/dev-plugin/src/index.ts](pi/dev-plugin/src/index.ts) registers with Pi's
+   built-in MCP support (`pi.registerMcpServer`).
 
 ### Repository layout
 
@@ -66,9 +66,9 @@ ai-plugins/
 │   ├── contributor-plugin/
 │   └── dev-plugin-test/
 ├── pi/                                # Pi (pi.dev) extension sources — dev only for now
-│   ├── dev-plugin/                    # src/index.ts extension, scripts/ (setup-pi-mcp + launchers), skills/
+│   ├── dev-plugin/                    # src/index.ts extension (registers the MCP server), scripts/ (launchers), skills/
 │   └── dev-plugin-tests/              # its pytest suite (static + db + e2e; no eval tier)
-├── package.json                       # repo-root pi manifest (`pi` field → pi/dev-plugin/); pi-mcp-adapter dep + test scripts
+├── package.json                       # repo-root pi manifest (`pi` field → pi/dev-plugin/) + test scripts
 ├── run_tests.py                        # runs every suite with the mariadb-shell Python + coverage
 ├── pytest-coverage.ini                 # shared pytest config used by run_tests.py
 ├── .coveragerc                         # coverage config (reports in test-results/ + htmlcov/)
@@ -146,9 +146,10 @@ because what there is to drive differs:
   as a project-local pi package (`pi install -l`, which pi honours only when the
   run passes `--approve`), checks that the vendored skills reached the model and
   that the generated schema script carries the Start Block its skill mandates, and
-  verifies `setup-pi-mcp.sh` registers the MariaDB server with `pi-mcp-adapter`
-  idempotently. There are no MCP tool-call assertions: pi has no built-in MCP, and
-  the adapter that provides it is installed separately from this package.
+  that a codemode script reaches a tool of the `mariadb` MCP server the extension
+  registers. Both runs use a throwaway `PI_CODING_AGENT_DIR` with only the
+  provider setup copied in, so the user's own packages (a global `pi-mcp-adapter`
+  would replace the built-in MCP) stay out of the way.
 
 The `e2e` tiers self-skip rather than fail when their toolchain is absent — no
 CLI, no authenticated provider, or no resolvable `mariadb-shell`.

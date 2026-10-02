@@ -227,19 +227,30 @@ def test_skills_root_holds_only_skills_and_its_manifests():
     )
 
 
-def test_pi_mcp_adapter_is_declared_as_a_dependency():
-    """pi has no built-in MCP; the adapter is what reaches the mariadb server.
+def test_pi_mcp_adapter_is_not_a_dependency():
+    """Pi 1.0 has built-in MCP; pi-mcp-adapter would replace it, not add to it.
 
-    It is a plain dependency, not a bundled one: pi loads resources only from
-    packages listed in its settings, so the adapter is installed alongside this
-    package rather than pulled in by it. The declaration still pins the version
-    the setup script expects.
+    An extension that registers `/mcp` (as the adapter does) switches off the
+    built-in MCP support, and with it the server this package registers. Declaring
+    the adapter again would tell users to install the one thing that breaks us.
     """
     deps = _manifest().get("dependencies", {})
-    assert "pi-mcp-adapter" in deps, (
-        "pi-mcp-adapter is missing from dependencies; scripts/setup-pi-mcp.sh registers the "
-        "mariadb server in that adapter's config"
+    assert "pi-mcp-adapter" not in deps, (
+        "pi-mcp-adapter is back in dependencies; it replaces Pi's built-in MCP, so the "
+        "mariadb server the extension registers would never connect"
     )
+
+
+def test_extension_registers_the_mcp_server():
+    """The extension hands the launcher to Pi's built-in MCP as the `mariadb` server."""
+    src = (skills.PLUGIN_ROOT / "src" / "index.ts").read_text(encoding="utf-8")
+    assert "registerMcpServer(" in src, (
+        "src/index.ts no longer calls pi.registerMcpServer; installing the package "
+        "would give pi the skills but no mariadb server"
+    )
+    assert 'MCP_SERVER_NAME = "mariadb"' in src, "the registered server is not named 'mariadb'"
+    for launcher in ("mariadb-mcp-launcher.sh", "mariadb-mcp-launcher.cmd"):
+        assert launcher in src, f"src/index.ts does not point at scripts/{launcher}"
 
 
 def test_extension_is_a_default_export_factory():
@@ -252,7 +263,7 @@ def test_extension_is_a_default_export_factory():
 
 @pytest.mark.parametrize(
     "script",
-    ["setup-pi-mcp.sh", "mariadb-mcp-launcher.sh", "mariadb-mcp-launcher.cmd"],
+    ["mariadb-mcp-launcher.sh", "mariadb-mcp-launcher.cmd"],
 )
 def test_shipped_scripts_are_present(script: str):
     path = skills.PLUGIN_ROOT / "scripts" / script

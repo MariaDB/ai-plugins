@@ -37,7 +37,7 @@ The coding agent downloads the plugin from the [MariaDB AI Plugins repository](h
 * The skills, which the agent reads when a request concerns MariaDB.
 * The configuration of the `mariadb-shell` MCP server, which tells the coding agent how to start it.
 * The launcher scripts, which find or install MariaDB Shell before they start the MCP server.
-* For Pi, an extension that registers the MCP server with the `pi-mcp-adapter` package.
+* For Pi, an extension that registers the MCP server with the built-in MCP support of Pi.
 
 The plugin itself contains no binaries. It consists of text files only, so the same plugin works on every operating system.
 
@@ -94,7 +94,7 @@ All harnesses get the same skills and the same MCP server, but the plugins are p
 
 * **Claude Code** and **Codex** read a marketplace manifest and install a plugin directory.
 * **OpenCode** has no marketplace. You merge an `mcp` block into your configuration, set an environment variable, and link the skills directory.
-* **Pi** has neither a marketplace nor built-in MCP support. The repository-root `package.json` is the Pi package manifest, and MCP support comes from the separately installed `pi-mcp-adapter` package.
+* **Pi** has no marketplace. The repository-root `package.json` is the Pi package manifest, and the extension in the package registers the MCP server with Pi 1.0 or later.
 
 ## Vendored Skills
 

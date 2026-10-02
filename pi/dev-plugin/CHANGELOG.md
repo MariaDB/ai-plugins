@@ -4,6 +4,21 @@ All notable changes to the MariaDB plugin for Pi are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- Requires Pi 1.0 or later. The extension now registers the `mariadb` MCP server
+  with Pi's built-in MCP support (`pi.registerMcpServer`), so installing the
+  package is all it takes. Pi exposes the tools through codemode by default.
+
+### Removed
+
+- The `pi-mcp-adapter` dependency, the `/mariadb-mcp-setup` command, the
+  session-start reminder and `scripts/setup-pi-mcp.sh`. The adapter replaces Pi
+  1.0's built-in MCP support, so remove it with `pi remove npm:pi-mcp-adapter`
+  and turn the built-in `mcp` back on in `pi config`.
+
 ## [26.9.5] - 2026-09-30
 
 ### Added

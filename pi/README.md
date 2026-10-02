@@ -14,20 +14,21 @@ pi package straight from Git.
 
 | Plugin | Path | Provides |
 | ------ | ---- | -------- |
-| `dev`  | [`dev-plugin/`](dev-plugin) | Full MariaDB skill set + the native `mariadb-shell` MCP server (via `pi-mcp-adapter`) |
+| `dev`  | [`dev-plugin/`](dev-plugin) | Full MariaDB skill set + the native `mariadb-shell` MCP server (registered with Pi's built-in MCP) |
 
 ## Loading them
 
+Requires **Pi 1.0 or later**, which has MCP support built in.
+
 ```sh
-pi install npm:pi-mcp-adapter                          # once — connects pi to MCP servers
-pi install git:github.com/mariadb/ai-plugins   # this repo (skills + extension)
+pi install git:github.com/mariadb/ai-plugins   # this repo (skills + extension + MCP server)
 # …or from a local checkout, at the repo root: pi install .
 ```
 
-Pi discovers the skills and the extension from each package's `pi` manifest field.
-The MCP server still has to be registered with `pi-mcp-adapter` once — run
-`/mariadb-mcp-setup` inside pi, or `dev-plugin/scripts/setup-pi-mcp.sh`. See
-[dev-plugin/README.md](dev-plugin/README.md) for the full walkthrough.
+Pi discovers the skills and the extension from each package's `pi` manifest field,
+and the extension registers the `mariadb` MCP server when it loads. See
+[dev-plugin/README.md](dev-plugin/README.md) for the full walkthrough, including
+moving off `pi-mcp-adapter`.
 
 Skills are **vendored** into each plugin's `skills/` dir by the repo-root
 [scripts/sync-skills.sh](../scripts/sync-skills.sh) — never hand-edited here.

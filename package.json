@@ -24,9 +24,6 @@
     "docs-ref:skills": "python3 docs-ref/scripts/generate-skill-pages.py"
   },
   "keywords": ["mariadb", "sql", "database", "mcp", "mariadb-shell", "pi-package"],
-  "dependencies": {
-    "pi-mcp-adapter": "^2.15.0"
-  },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*"
   },

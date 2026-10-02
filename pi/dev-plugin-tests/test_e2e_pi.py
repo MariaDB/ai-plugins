@@ -25,12 +25,17 @@ fixture; each side effect is its own `test_stepN_*`:
   3. it opens with the *Start Block* the `mariadb-schema-create-script` skill
      mandates → a skill was not merely visible but followed.
 
-Two deliberate differences from the Claude and Codex tiers:
+A second run, in the `mcp_run` fixture, checks the MCP wiring: the extension
+registers the `mariadb` server with Pi's built-in MCP (Pi 1.0+), and a codemode
+script calls one of its tools. The assertion is on Pi's own tool event naming the
+server, not on what the model says about it.
 
-* **No MCP tool-call assertions.** pi has no built-in MCP; the mariadb server is
-  reached through the community `pi-mcp-adapter`, installed separately from this
-  package (see `pi/README.md`). What this repo *does* control is the registration,
-  and `test_setup_script_registers_the_mcp_server` covers it without a model.
+Both runs use a throwaway `PI_CODING_AGENT_DIR` holding only the user's provider
+setup, so a globally installed `pi-mcp-adapter` (which replaces the built-in MCP)
+cannot hide the server, and nothing is written to the user's pi config.
+
+One deliberate difference from the Claude and Codex tiers:
+
 * **No fixed model.** pi runs whatever provider it is configured for, which may be
   a local one; the run records which model answered, so a failure can be read in
   that light rather than blamed on the plugin.
@@ -44,7 +49,6 @@ Knobs (all optional): PI_BIN, E2E_TIMEOUT.
 
 from __future__ import annotations
 
-import json
 import os
 import re
 
@@ -63,34 +67,54 @@ START_BLOCK_MARKERS = ("@OLD_UNIQUE_CHECKS", "SET NAMES utf8mb4")
 
 
 def _build_prompt() -> str:
+    # The scope is pinned (two tables, nothing else, one write, a one-line reply)
+    # because an open-ended "schema for a note-taking app" let a slow local model
+    # keep adding views, history and seed data past the timeout. The skill is
+    # described, never named, so a skill name in the reply still has to come
+    # from the installed package.
     return (
-        "Work in the current directory and do both of the following.\n\n"
-        "1. Name the MariaDB skills you are using for this task.\n"
-        f"2. Create a MariaDB database schema named notes-app for a note-taking "
-        f"app and write it to a file named {SCHEMA_SQL} in the current directory. "
-        "Follow the MariaDB schema create script conventions from your skills "
-        "exactly, including the mandated start block."
+        f"Write a MariaDB schema create script to the file {SCHEMA_SQL} in the "
+        "current directory, for a schema named notes_app with exactly two tables: "
+        "notebook (id, name) and note (id, notebook_id referencing notebook, title, "
+        "body). No views, no seed data and no other objects. Follow the MariaDB "
+        "schema create script conventions from your skills, including the mandated "
+        "start block.\n\n"
+        # Pi 1.0 gives this run the mariadb MCP server, which reaches the user's
+        # saved connections. A model left to it test-runs the script against a
+        # real server; the MCP wiring has its own test.
+        "Write the file once. Do not connect to a database or run the script. "
+        "Then reply with one line naming the MariaDB skills you used, and stop."
     )
 
 
 @pytest.fixture(scope="module")
-def workflow(tmp_path_factory):
+def pi_env(tmp_path_factory):
+    """Environment for every pi call here: an isolated agent dir, provider checked."""
     reason = pi_cli.missing_prerequisite()
     if reason:
         pytest.skip(reason)
-    reason = pi_cli.provider_ready()
+    agent_dir = pi_cli.isolated_agent_dir(tmp_path_factory.mktemp("pi_agent"))
+    env = {**os.environ, "PI_CODING_AGENT_DIR": str(agent_dir)}
+    reason = pi_cli.provider_ready(env=env)
     if reason:
         pytest.skip(reason)
+    return env
 
-    project = tmp_path_factory.mktemp("pi_e2e") / "project"
+
+def _installed_project(tmp_path_factory, name: str, env: dict):
+    project = tmp_path_factory.mktemp(name) / "project"
     project.mkdir()
-
-    installed = pi_cli.install_package(project)
+    installed = pi_cli.install_package(project, env=env)
     assert installed.returncode == 0, (
         f"pi install -l failed:\n{installed.stdout}\n{installed.stderr}"
     )
+    return project
 
-    run = pi_cli.run_pi(_build_prompt(), project=project, timeout=TIMEOUT)
+
+@pytest.fixture(scope="module")
+def workflow(tmp_path_factory, pi_env):
+    project = _installed_project(tmp_path_factory, "pi_e2e", pi_env)
+    run = pi_cli.run_pi(_build_prompt(), project=project, timeout=TIMEOUT, extra_env=pi_env)
     print(f"pi e2e ran against model: {run.model()}")
     yield {"project": project, "run": run}
 
@@ -152,56 +176,36 @@ def test_step3_start_block_from_the_skill(workflow):
 
 
 # --------------------------------------------------------------------------- #
-# MCP registration, without a model.
+# MCP: the server the extension registers answers a tool call.
 #
-# pi cannot start an MCP server by itself, so the plugin's contribution is the
-# entry it writes into pi-mcp-adapter's config. That is checkable directly, and
-# unlike the model steps above it is deterministic.
+# The prompt hands the model the exact codemode script, so the run tests the
+# wiring rather than the model's skill at writing codemode. `db.list_connections`
+# needs no arguments and no server, and succeeds with an empty list.
 # --------------------------------------------------------------------------- #
-def test_setup_script_registers_the_mcp_server(tmp_path):
-    reason = pi_cli.missing_prerequisite()
-    if reason:
-        pytest.skip(reason)
-
-    config = tmp_path / "mcp.json"
-    result = pi_cli.run_setup_script(config)
-    assert result.returncode == 0, (
-        f"setup-pi-mcp.sh failed:\n{result.stdout}\n{result.stderr}"
-    )
-    assert config.is_file(), f"the script wrote no config at {config}"
-
-    entry = (json.loads(config.read_text(encoding="utf-8")).get("mcpServers") or {}).get(
-        pi_cli.SERVER_NAME
-    )
-    assert entry, f"no {pi_cli.SERVER_NAME!r} server in {config}"
-    assert entry.get("command") == str(pi_cli.LAUNCHER), (
-        f"registered command {entry.get('command')!r} is not this plugin's launcher "
-        f"({pi_cli.LAUNCHER})"
-    )
-    # `lazy` is what keeps mariadb-shell from being spawned until a MariaDB tool
-    # is first used; dropping it would start a shell for every pi session.
-    assert entry.get("lifecycle") == "lazy", (
-        f"expected lifecycle 'lazy', got {entry.get('lifecycle')!r}"
-    )
+MCP_SCRIPT = (
+    "const r = await tools.mcp__mariadb__db_list_connections({}); "
+    "console.log(JSON.stringify(r));"
+)
 
 
-def test_setup_script_is_idempotent_and_preserves_other_servers(tmp_path):
-    """Re-running must update our entry in place and leave other servers alone."""
-    reason = pi_cli.missing_prerequisite()
-    if reason:
-        pytest.skip(reason)
-
-    config = tmp_path / "mcp.json"
-    config.write_text(
-        json.dumps({"mcpServers": {"other": {"command": "/bin/true"}}, "someSetting": 1}),
-        encoding="utf-8",
+@pytest.fixture(scope="module")
+def mcp_run(tmp_path_factory, pi_env):
+    project = _installed_project(tmp_path_factory, "pi_e2e_mcp", pi_env)
+    prompt = (
+        "Run exactly this codemode script and nothing else, then reply with its "
+        f"output verbatim:\n{MCP_SCRIPT}"
     )
-    assert pi_cli.run_setup_script(config).returncode == 0
-    assert pi_cli.run_setup_script(config).returncode == 0  # twice: must not duplicate
+    return pi_cli.run_pi(prompt, project=project, timeout=TIMEOUT, extra_env=pi_env)
 
-    data = json.loads(config.read_text(encoding="utf-8"))
-    assert pi_cli.SERVER_NAME in data["mcpServers"], "our server went missing"
-    assert data["mcpServers"].get("other", {}).get("command") == "/bin/true", (
-        "the script clobbered an unrelated MCP server"
+
+def test_mcp_server_answers_a_tool_call(mcp_run):
+    """Pi connected the `mariadb` server the extension registered and called it."""
+    run = mcp_run
+    assert not run.timed_out and run.returncode == 0, f"pi run failed.{run.diagnostics}"
+    calls = run.mcp_tool_results()
+    assert calls, (
+        f"no tool of the {pi_cli.SERVER_NAME!r} MCP server ran, so Pi did not connect the "
+        f"server src/index.ts registers (model: {run.model()}).{run.diagnostics}"
     )
-    assert data.get("someSetting") == 1, "the script dropped an unrelated adapter setting"
+    failed = [c for c in calls if c.get("isError")]
+    assert not failed, f"the mariadb MCP tool call failed: {failed}{run.diagnostics}"

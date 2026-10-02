@@ -75,23 +75,18 @@ Then configure the MCP server — see
 
 ### Pi
 
-Pi installs the repo itself as a package (the `pi` field in the root
-`package.json`), then the MCP server is registered once with the adapter:
+Pi 1.0 or later installs the repo itself as a package (the `pi` field in the
+root `package.json`). Its extension registers the MCP server with Pi's built-in
+MCP support, so there is no separate setup step:
 
 ```sh
-pi install npm:pi-mcp-adapter                              # once — connects pi to MCP servers
-pi install git:github.com/mariadb/ai-plugins   # this repo (skills + extension)
+pi install git:github.com/mariadb/ai-plugins   # this repo (skills + extension + MCP server)
 # …or from a local checkout, at the repo root: pi install .
 ```
 
-```text
-/mariadb-mcp-setup            # in pi: writes the global ~/.config/mcp/mcp.json
-/mariadb-mcp-setup --project  # or ./.mcp.json for just this project
-```
-
-Then `/mcp reconnect mariadb` (or restart pi). The extension also prints a
-one-line reminder at session start while the server isn't configured. Full steps
-in [pi/dev-plugin/README.md](pi/dev-plugin/README.md).
+Run `/mcp` in pi to see the `mariadb` server. Coming from an older Pi with
+`pi-mcp-adapter`? Remove the adapter first — it replaces the built-in MCP
+support. Full steps in [pi/dev-plugin/README.md](pi/dev-plugin/README.md).
 
 That registers the server with pi; configuring what it may access is a separate
 step — see [Configure the MCP server](#configure-the-mcp-server-all-harnesses)
@@ -200,14 +195,12 @@ The folders are `<agent>/{dev,sql,contributor}-plugin/` for each of `claude/`,
 `mariadb-shell` MCP server, while `contributor` is skills-only for now.
 
 Pi differs from the other three in *how* it packages the same content: it has no
-marketplace file and no built-in MCP support. A pi package is any directory with
+marketplace file. A pi package is any directory with
 a `package.json` carrying a `pi` field, so the **repo-root
 [package.json](package.json)** is the manifest (its `pi` field points into
 [pi/dev-plugin/](pi/dev-plugin)) and the whole repo installs as one pi package.
-The MCP server is surfaced through the community
-[`pi-mcp-adapter`](https://pi.dev/packages/pi-mcp-adapter) extension, which pi
-loads only as a package in its own right — so it is installed alongside this one,
-not pulled in by it. See [pi/README.md](pi/README.md).
+The package's extension registers the MCP server with Pi's built-in MCP support
+(Pi 1.0+). See [pi/README.md](pi/README.md).
 
 ## Documentation site
 

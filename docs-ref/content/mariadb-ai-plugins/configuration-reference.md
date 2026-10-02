@@ -45,7 +45,7 @@ The launcher scripts, `mariadb-mcp-launcher.sh` and `mariadb-mcp-launcher.cmd`, 
 | Claude Code | The plugin's `.mcp.json`, installed with the plugin. |
 | Codex | The plugin's `.mcp.json`, installed with the plugin. |
 | OpenCode | The `mcp` block you merge into `opencode.json`. |
-| Pi | `~/.config/mcp/mcp.json`, or `./.mcp.json` with `--project`, written by `/mariadb-mcp-setup`. |
+| Pi | None. The extension registers the server when it loads. A `mariadb` entry in `~/.pi/agent/mcp.json` or `.pi/mcp.json` overrides it. |
 
 ## MCP Server Configuration
 

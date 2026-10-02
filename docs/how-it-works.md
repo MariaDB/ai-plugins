@@ -149,12 +149,11 @@ The content is identical; the packaging is not.
   plugin directory. Codex reads `.agents/plugins/marketplace.json`.
 - **OpenCode** has no marketplace, so its plugin is wired up by hand: one `mcp`
   block merged into your config, an env var, and a symlink for the skills.
-- **Pi** has neither a marketplace nor built-in MCP support. A pi package is any
-  directory with a `pi` field in its `package.json`, so the **repo-root
-  `package.json` is the manifest** and the whole repository installs as one
-  package. MCP arrives through the separately installed community
-  [`pi-mcp-adapter`](https://pi.dev/packages/pi-mcp-adapter) — it is a package in
-  its own right and is not pulled in by this one.
+- **Pi** has no marketplace. A pi package is any directory with a `pi` field in
+  its `package.json`, so the **repo-root `package.json` is the manifest** and the
+  whole repository installs as one package. Its extension registers the MCP
+  server with Pi's built-in MCP support (Pi 1.0+), which exposes the tools
+  through codemode by default.
 
 ## Why the skills are vendored
 

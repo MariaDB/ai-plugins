@@ -11,14 +11,12 @@ support as a **pi extension**, through two parts:
    baseline **MariaDB 11.8 LTS**. They are declared in the package's `pi.skills`
    field, so pi loads them contextually.
 2. **A native MCP server** — the [`mariadb-shell`](https://github.com/mariadb-corporation/mariadb-shell)
-   binary, started by [scripts/mariadb-mcp-launcher.sh](scripts/mariadb-mcp-launcher.sh),
-   surfaced to pi through [`pi-mcp-adapter`](https://pi.dev/packages/pi-mcp-adapter),
-   which is installed as its own pi package.
+   binary, started by [scripts/mariadb-mcp-launcher.sh](scripts/mariadb-mcp-launcher.sh)
+   (or [the `.cmd` launcher](scripts/mariadb-mcp-launcher.cmd) on native Windows).
+   The extension registers it with Pi's built-in MCP support as the `mariadb`
+   server, so there is nothing to configure.
 
-Pi has no bundled MCP support — the community `pi-mcp-adapter` extension is what
-connects pi to MCP servers, exposing them through a single token-cheap `mcp`
-proxy tool. This plugin depends on it and registers the mariadb-shell server in
-its config.
+Requires **Pi 1.0 or later**, the first release with MCP support built in.
 
 ## How it is structured (a pi extension)
 
@@ -28,11 +26,10 @@ directly. Its paths point into this directory:
 
 ```text
 ai-plugins/
-├── package.json     # pi manifest: pi.extensions + pi.skills (→ pi/dev-plugin/…); deps incl. pi-mcp-adapter
+├── package.json     # pi manifest: pi.extensions + pi.skills (→ pi/dev-plugin/…)
 └── pi/dev-plugin/
-    ├── src/index.ts     # the extension (default-export factory): /mariadb-mcp-setup + session hint
+    ├── src/index.ts     # the extension (default-export factory): registers the mariadb MCP server
     ├── scripts/
-    │   ├── setup-pi-mcp.sh          # registers the mariadb server with pi-mcp-adapter
     │   ├── mariadb-mcp-launcher.sh  # installs (if needed) + launches mariadb-shell as the MCP server
     │   └── mariadb-mcp-launcher.cmd # native-Windows launcher
     ├── skills/          # vendored MariaDB skills (flat: skills/<skill>/SKILL.md)
@@ -46,8 +43,7 @@ The root `package.json` `pi` field is what makes pi treat the repo as a package:
   "pi": {
     "extensions": ["./pi/dev-plugin/src/index.ts"],
     "skills": ["./pi/dev-plugin/skills"]
-  },
-  "dependencies": { "pi-mcp-adapter": "^2.15.0" }
+  }
 }
 ```
 
@@ -56,13 +52,7 @@ directory that contains a `SKILL.md` recursively, so only real skills load.
 
 ## Installation
 
-**1. Install the MCP adapter** (once, if you don't have it yet):
-
-```sh
-pi install npm:pi-mcp-adapter
-```
-
-**2. Install this plugin** straight from GitHub:
+Install this plugin straight from GitHub:
 
 ```sh
 pi install git:github.com/mariadb/ai-plugins
@@ -70,57 +60,56 @@ pi install git:github.com/mariadb/ai-plugins
 pi install .
 ```
 
-`pi install` runs `npm install`, so the `pi-mcp-adapter` dependency is pulled in
-automatically. Pi discovers the skills and the extension from the root `pi`
-manifest field; restart pi (or `/reload`) to load them.
+Pi discovers the skills and the extension from the root `pi` manifest field;
+restart pi (or `/reload`) to load them. The extension registers the `mariadb`
+MCP server as it loads, and Pi connects it when the session starts. Run `/mcp`
+in pi to check it: the server is listed with the extension as its source.
 
-**3. Register the MariaDB MCP server** with the adapter — either the slash
-command inside pi:
+On the first connection, the launcher looks for a `mariadb-shell` it can run —
+`$MARIADB_SHELL_BIN`, one on `PATH`, or an existing install in `~/.local/bin`
+(`%LOCALAPPDATA%\Programs\mariadb-shell\bin` on Windows) — and otherwise installs
+the newest release there with the shell's own installer. Then it starts that
+binary as the MCP server. Later runs reuse the install.
 
-```text
-/mariadb-mcp-setup            # writes the global ~/.config/mcp/mcp.json
-/mariadb-mcp-setup --project  # or ./.mcp.json for just this project
-```
+### How the model reaches the tools
 
-…or the script directly:
+Pi exposes MCP tools through **codemode** by default: the model writes a short
+script that calls `tools.mcp__mariadb__db_execute_sql(…)` and the other tools,
+and only the script's output enters the context. Pi turns codemode on by itself
+once the server connects. To change that, open the server in `/mcp` and pick
+another exposure (`direct` declares every tool to the model; `deferred` loads
+them through `tool_search`). Pi saves that choice for the current session only,
+because the server comes from an extension. To keep it, define the server in
+`mcp.json` (next section).
+
+### Overriding the server entry
+
+The registration lives only in the extension. It is not written to any file, so
+`pi mcp list` (which loads no extensions) does not show it. A `mariadb` entry in
+`~/.pi/agent/mcp.json` or the project's `.pi/mcp.json` takes precedence over the
+extension's. Use one to keep an exposure or to give the launcher environment
+variables (`--env MARIADB_SHELL_BIN=…`, for example):
 
 ```sh
-pi/dev-plugin/scripts/setup-pi-mcp.sh            # global
-pi/dev-plugin/scripts/setup-pi-mcp.sh --project  # ./.mcp.json
+pi mcp add mariadb --exposure direct -- <plugin>/scripts/mariadb-mcp-launcher.sh
 ```
 
-Then `/mcp reconnect mariadb` (or restart pi). The extension also prints a
-one-line reminder at session start whenever the server isn't configured yet.
+### Moving from `pi-mcp-adapter`
 
-On first use of a MariaDB tool, the launcher looks for a `mariadb-shell` it can
-run — `$MARIADB_SHELL_BIN`, one on `PATH`, or an existing install in
-`~/.local/bin` (`%LOCALAPPDATA%\Programs\mariadb-shell\bin` on Windows) — and
-otherwise installs the newest release there with the shell's own installer. Then
-it starts that binary as the MCP server. Later runs reuse the install. Set
-`GH_TOKEN` (or run `gh auth login`) while `mariadb-shell` is private; the release
-channel needs no setting, as the launcher falls back to a prerelease while no
-stable `mariadb-shell` is published.
+Earlier versions of this plugin needed the community `pi-mcp-adapter` and a
+`/mariadb-mcp-setup` step. Both are gone. The adapter now gets in the way: an
+extension that registers `/mcp` replaces Pi's built-in MCP support, so the
+`mariadb` server would never connect. To switch over:
 
-## The MCP server entry
-
-`setup-pi-mcp.sh` merges this into the adapter's `mcp.json` (preserving anything
-else already there):
-
-```json
-{
-  "mcpServers": {
-    "mariadb": {
-      "command": "<plugin>/scripts/mariadb-mcp-launcher.sh",
-      "args": [],
-      "env": { "MARIADB_SHELL_VERSION": "26.9.5" },
-      "lifecycle": "lazy"
-    }
-  }
-}
+```sh
+pi remove npm:pi-mcp-adapter
 ```
 
-`lifecycle: "lazy"` tells the adapter to spawn mariadb-shell only when a MariaDB
-tool is first used.
+Pi 1.0 turns its built-in MCP off when it finds the adapter (it adds
+`"-builtin:mcp"` to `extensions` in `~/.pi/agent/settings.json`). Turn it back on
+in `pi config` → Built-in → `mcp`, or delete that entry. The old `mariadb` entry
+in `~/.config/mcp/mcp.json` (or a project's `.mcp.json`) belonged to the adapter.
+Pi does not read it, so you can delete it.
 
 ### Configure what the server may access
 

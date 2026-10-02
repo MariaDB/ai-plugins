@@ -30,6 +30,12 @@ stating, because each one is a way the tier can silently test nothing:
   pi scans for skills; the repo-root ``package.json`` ``pi`` field is what
   declares them, so installing the repo *is* how the skills reach the model.
 
+* **A throwaway agent dir, so the user's own packages stay out.** A globally
+  installed ``pi-mcp-adapter`` replaces Pi's built-in MCP (and Pi then writes
+  ``-builtin:mcp`` into the user's settings), which would silently drop the server
+  this package registers. ``isolated_agent_dir`` copies only the provider files
+  (auth, models, default model) into a temp ``PI_CODING_AGENT_DIR``.
+
 * **The provider is whatever pi is configured for**, including a local one. There
   is no API key for this suite to check, which is why the prerequisite gate runs
   a trivial prompt rather than inspecting credentials: ``pi auth check`` reports
@@ -52,11 +58,14 @@ from pathlib import Path
 TESTS_ROOT = Path(__file__).resolve().parents[1]
 PLUGIN_ROOT = TESTS_ROOT.parent / "dev-plugin"
 REPO_ROOT = TESTS_ROOT.parents[1]
-LAUNCHER = PLUGIN_ROOT / "scripts" / "mariadb-mcp-launcher.sh"
-SETUP_SCRIPT = PLUGIN_ROOT / "scripts" / "setup-pi-mcp.sh"
 
-# The MCP server name the setup script registers with pi-mcp-adapter.
+# The MCP server name src/index.ts registers with Pi's built-in MCP.
 SERVER_NAME = "mariadb"
+
+# Provider files copied into the isolated agent dir; everything else (packages,
+# extensions, mcp.json, sessions) is left behind on purpose.
+_PROVIDER_FILES = ("auth.json", "models.json", "models-store.json")
+_SETTINGS_KEPT = ("defaultProvider", "defaultModel", "defaultThinkingLevel", "enabledModels")
 
 
 def pi_bin() -> str:
@@ -72,7 +81,25 @@ def missing_prerequisite() -> str | None:
     return None
 
 
-def provider_ready(timeout: int = 120) -> str | None:
+def isolated_agent_dir(target: Path) -> Path:
+    """A PI_CODING_AGENT_DIR holding only the user's provider setup."""
+    source = Path(os.environ.get("PI_CODING_AGENT_DIR") or Path.home() / ".pi" / "agent")
+    target.mkdir(parents=True, exist_ok=True)
+    for name in _PROVIDER_FILES:
+        if (source / name).is_file():
+            shutil.copy2(source / name, target / name)
+    settings = {}
+    if (source / "settings.json").is_file():
+        try:
+            settings = json.loads((source / "settings.json").read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            settings = {}
+    kept = {k: v for k, v in settings.items() if k in _SETTINGS_KEPT}
+    (target / "settings.json").write_text(json.dumps(kept, indent=2), encoding="utf-8")
+    return target
+
+
+def provider_ready(timeout: int = 120, env: dict | None = None) -> str | None:
     """Run a trivial prompt; return None when pi can reach a model, else why not.
 
     Credentials cannot be checked directly: pi resolves a provider from its own
@@ -86,6 +113,7 @@ def provider_ready(timeout: int = 120) -> str | None:
             text=True,
             timeout=timeout,
             stdin=subprocess.DEVNULL,
+            env=env,
         )
     except subprocess.TimeoutExpired:
         return f"pi did not answer a trivial prompt within {timeout}s"
@@ -95,7 +123,9 @@ def provider_ready(timeout: int = 120) -> str | None:
     return None
 
 
-def install_package(project: Path, source: Path | None = None) -> subprocess.CompletedProcess:
+def install_package(
+    project: Path, source: Path | None = None, env: dict | None = None
+) -> subprocess.CompletedProcess:
     """Install this repo as a pi package, project-locally (`.pi/settings.json`)."""
     return subprocess.run(
         [pi_bin(), "install", "-l", "--approve", str(source or REPO_ROOT)],
@@ -104,17 +134,7 @@ def install_package(project: Path, source: Path | None = None) -> subprocess.Com
         text=True,
         timeout=180,
         stdin=subprocess.DEVNULL,
-    )
-
-
-def run_setup_script(config: Path) -> subprocess.CompletedProcess:
-    """Register the MCP server into an explicit adapter config (`--config PATH`)."""
-    return subprocess.run(
-        ["bash", str(SETUP_SCRIPT), "--config", str(config)],
-        capture_output=True,
-        text=True,
-        timeout=120,
-        stdin=subprocess.DEVNULL,
+        env=env,
     )
 
 
@@ -154,6 +174,19 @@ class PiRun:
         if not parts:  # text mode, or a renderer that emitted nothing structured
             return self.stdout
         return "\n".join(dict.fromkeys(parts))  # de-dup: message_update repeats partials
+
+    def mcp_tool_results(self, server: str = SERVER_NAME) -> list[dict]:
+        """The finished calls of `server`'s MCP tools, direct or from codemode.
+
+        Pi reports each one as a `tool_execution_end` event whose result details
+        name the server, so this is the server answering — not the model saying so.
+        """
+        return [
+            event
+            for event in self.events
+            if event.get("type") == "tool_execution_end"
+            and ((event.get("result") or {}).get("details") or {}).get("server") == server
+        ]
 
     def model(self) -> str:
         for event in self.events:

@@ -109,7 +109,6 @@ while IFS= read -r f; do files+=("$f"); done < <(
        -type f \( \
          -name 'mariadb-mcp-launcher.sh' -o \
          -name 'mariadb-mcp-launcher.cmd' -o \
-         -name 'setup-pi-mcp.sh' -o \
          -name 'setup-codex-mcp.sh' -o \
          -name 'setup-codex-mcp.cmd' -o \
          -name '.mcp.json' -o \
@@ -132,7 +131,6 @@ DOCS_CONFIG="$REPO_ROOT/docs/_config.yml"
 #   JSON MCP config / README example:  "MARIADB_SHELL_VERSION": "<v>"
 #   bash launcher:                     VERSION="${MARIADB_SHELL_VERSION:-<v>}"
 #   cmd launcher:                      set "MARIADB_SHELL_VERSION=<v>"
-#   setup-pi-mcp.sh:                   SHELL_VERSION="<v>"
 #   README prose:                      `MARIADB_SHELL_VERSION` (default `<v>`)
 #   docs/_config.yml:                  shell_floor: "<v>"
 V="$VERSION" perl -i -pe '
