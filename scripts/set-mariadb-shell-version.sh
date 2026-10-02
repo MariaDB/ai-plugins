@@ -19,8 +19,7 @@
 # every plugin in this repo.
 #
 # Updates the MARIADB_SHELL_VERSION value in each plugin's MCP config
-# (.mcp.json / opencode.json, and the entries the setup-*-mcp scripts write for
-# codex and pi) AND
+# (.mcp.json / opencode.json, and the entry setup-codex-mcp writes for codex) AND
 # the fallback default baked into the launcher scripts (mariadb-mcp-launcher.sh/
 # .cmd), for both the dev-* and sql-* plugins across
 # claude/, codex/, opencode/ and pi/ — plus `shell_floor` in docs/_config.yml,

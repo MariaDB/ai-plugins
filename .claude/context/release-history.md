@@ -2,6 +2,12 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
+**Versioning policy (from 26.10.0, user's decision 2026-10-02): the plugin version and the
+mariadb-shell floor are independent.** Through 26.9.5 every release set both to the same number
+(the ai-plugins release matched a mariadb-shell release); that is no longer required. `/release
+<version> [shell-version]` now checks the plugin version against this repo's tags and moves the
+floor only when a shell version is given. 26.10.0 is planned on top of the current floor 26.9.5.
+
 ## Landed on `main` (through PR #37)
 
 **#37** `5711b11` moved the Pi plugin to Pi 1.0's built-in MCP: the extension registers the
@@ -25,8 +31,8 @@ space banner; **#31** `25d19ad` was the 26.9.5 checkpoint.
 DevHub `.org`-only; **#28** `9eb9119` added the Laravel skills.
 
 **#25** `5d07abf` added the **`/release <version>` command**
-(`.claude/commands/release.md`): checks the version is the newest mariadb-shell
-release, runs the three scripts, CHANGELOG, static tests, checkpoint, PR; after
+(`.claude/commands/release.md`): checked the version was the newest mariadb-shell
+release (until the versions were decoupled for 26.10.0 — see the policy above), ran the three scripts, CHANGELOG, static tests, checkpoint, PR; after
 the merge, tag + prereleases on both repos and a merge-based fork sync that
 keeps the fork's `docs/CNAME`. **#26** `2bbdb2a` was release 26.9.4, the first
 cut with that command (below). **#24**/**#23**
