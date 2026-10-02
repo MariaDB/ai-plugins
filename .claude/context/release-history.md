@@ -61,6 +61,19 @@ overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-op
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
 
+## Release v26.10.0 (2026-10-02) — IN PROGRESS (PR about to open)
+
+- **First release with the plugin version decoupled from the shell floor** (#38): plugin
+  version → 26.10.0 (`set-plugin-version.sh`, 17 files), **floor stays at 26.9.5**
+  (`set-mariadb-shell-version.sh` not run; `v26.9.5` is still the newest mariadb-shell release,
+  published 2026-09-29).
+- **Re-vendor, provenance only**: mariadb-docs `3a0974f` → `8781534` with nothing under
+  `agent-skills/` changed; mariadb-shell `.claude/skills` still `938d473`. Counts 85 / 47 / 3.
+- **Ships #37** (Pi 1.0 built-in MCP): Pi's `[Unreleased]` CHANGELOG section folded into
+  `[26.10.0]`. The other nine CHANGELOGs got a re-vendor + version entry; the MCP-bearing ones
+  also say the plugin version no longer follows mariadb-shell's numbers and the floor stays at 26.9.5.
+- Static tier green: claude 682, codex 686, opencode 682, pi 691.
+
 ## Release v26.9.5 (2026-09-30)
 
 - **Merged as `dec6f52` (#30), tagged `v26.9.5`** (annotated object `c2aa50f`),
