@@ -2,7 +2,11 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
-## Landed on `main` (through PR #35)
+## Landed on `main` (through PR #36)
+
+**#36** `0d77b1e` put everything the reader types in `docs-ref/content/` into code fences
+with a language (reviewer feedback), and fixed the `mcp.setup()` note (SQL-mode start, `\py`, no
+JS mode). Fork fast-forwarded to it by the user.
 
 **#35** `17bce4b` added `docs-ref/`, the GitBook reference docs with an offline Docusaurus
 preview (see [reference docs](docs-ref.md)); **#34** `4e2e6d5` corrected the DevHub's claim that

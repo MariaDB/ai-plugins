@@ -58,6 +58,16 @@ what is NOT in it.
   (URI grammar, connection options, SSH code) and
   `~/git/mariadb-shell-plugins/mcp_plugin` (tools, setup). Nothing
   `--gui`-specific (the VS Code extension's mode) goes in.
+- **Anything the reader types goes in a code fence with a language** (reviewer
+  feedback, PR #36 `0d77b1e`): `bash` for shell, `batch` for Windows cmd,
+  `sql`, and `text` for agent prompts, slash commands (`/plugin`, `/reload`),
+  URIs and sample output. No bare ```` ``` ````. One fence per prompt (Basic
+  Usage's examples are fences, not italic bullets), no backticks inside a
+  `text` fence. Commands only *named* in prose (`configured with mcp setup`)
+  stay inline; so do commands in table cells (a cell can't hold a fence).
+- **MariaDB Shell starts in SQL mode and has no JavaScript mode** (user,
+  2026-10-02): an interactive `mcp.setup()` needs `\py` first; fence it as
+  `python`, never `js`.
 
 ## Current state
 
@@ -115,3 +125,9 @@ what is NOT in it.
 - `mcp setup --help` needs the REAL config home (an empty
   `MARIADB_SHELL_USER_CONFIG_HOME` has no plugins → "no object registered
   under name 'mcp'").
+- **Inactive GitBook tabs aren't in the static HTML** (the Windows tab of
+  Codex/Configuring): they render client-side, so grep `build/assets/js`, not
+  the page's `index.html`, to check their content. Built pages live at
+  `build/tools/…` (no `docs/` dir in `build/`).
+- Prism `batch` must be in `additionalLanguages` (added in #36) or Windows
+  fences render unhighlighted.
