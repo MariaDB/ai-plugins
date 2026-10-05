@@ -8,7 +8,10 @@ mariadb-shell floor are independent.** Through 26.9.5 every release set both to 
 <version> [shell-version]` now checks the plugin version against this repo's tags and moves the
 floor only when a shell version is given. 26.10.0 is planned on top of the current floor 26.9.5.
 
-## Landed on `main` (through PR #37)
+## Landed on `main` (through PR #39)
+
+**#39** `68bd7d4` was release 26.10.0 (below); **#38** `f2ceecb` decoupled the plugin version
+from the shell floor in `/release` (see the policy above).
 
 **#37** `5711b11` moved the Pi plugin to Pi 1.0's built-in MCP: the extension registers the
 `mariadb` server itself (`pi.registerMcpServer`), `pi-mcp-adapter` and the setup script/command are
@@ -61,8 +64,14 @@ overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-op
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
 
-## Release v26.10.0 (2026-10-02) — IN PROGRESS (PR about to open)
+## Release v26.10.0 (2026-10-02) — SHIPPED
 
+- **PR #39**, squash `68bd7d4`. **Annotated tag `v26.10.0` = object `ed68f6a`**, pushed to
+  `origin` and `fork` as the same object; **prerelease on both repos**. Fork's `main`
+  fast-forwarded to `68bd7d4` (tree = `origin/main`). `wip/26.10.0` deleted (GitHub had
+  already removed it on `origin`).
+- Tag notes state the floor (26.9.5, not moved), the decoupling, the Pi 1.0 change with its
+  migration steps, and the provenance-only re-vendor.
 - **First release with the plugin version decoupled from the shell floor** (#38): plugin
   version → 26.10.0 (`set-plugin-version.sh`, 17 files), **floor stays at 26.9.5**
   (`set-mariadb-shell-version.sh` not run; `v26.9.5` is still the newest mariadb-shell release,

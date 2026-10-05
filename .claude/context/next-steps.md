@@ -15,4 +15,4 @@
 10. ~~**Drop in the dark DevHub logos**~~ — **DROPPED**: the `-dark.svg` twins are gone; a dark-mode `drop-shadow` on `.header-logo` keeps the regular logos readable.
 11. (Optional) **Refresh `docs/_data/sponsors.yml`** when mariadb.org's sponsor banner changes — it is a 2026-09-30 snapshot, generated from the `.footer-sponsor-banner` markup of mariadb.org's home page (per-logo inline `style`, WordPress spacer heights as `before`/`after`, the smallest `srcset` candidate ≥ 2× the display width).
 12. **Reference docs** (`docs-ref/`): generate the MCP Tool Reference from the plugin's docstrings, then port to mariadb-docs once the docs team confirms the Enterprise Tools placement. The ordered list is in [reference docs](docs-ref.md#next-steps).
-13. Cut a release so the Pi 1.0 change (#37, `pi/dev-plugin/CHANGELOG.md` `[Unreleased]`) ships; the release notes should carry the `pi-mcp-adapter` migration steps.
+13. ~~Cut a release so the Pi 1.0 change~~ — **DONE: 26.10.0** (#39). Was: cut a release so the Pi 1.0 change (#37, `pi/dev-plugin/CHANGELOG.md` `[Unreleased]`) ships; the release notes should carry the `pi-mcp-adapter` migration steps.

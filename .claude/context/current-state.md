@@ -2,7 +2,7 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
-- **Release 26.10.0 — IN PROGRESS** on `wip/26.10.0` (PR about to open): plugin version 26.10.0, floor stays 26.9.5, provenance-only re-vendor, ships #37. See [release history](release-history.md).
+- **Release 26.10.0 — SHIPPED** (PR #39, squash `68bd7d4`; tag `v26.10.0` = object `ed68f6a`, prerelease on both repos; fork synced): plugin version 26.10.0, floor stays 26.9.5, provenance-only re-vendor, ships #37. See [release history](release-history.md).
 - **Done & working:**
   - **Pi 1.0 MCP — merged as PR #37** (`5711b11`, 2026-10-02): the pi extension registers `mariadb` with Pi's built-in MCP; `pi-mcp-adapter`, `/mariadb-mcp-setup` and `setup-pi-mcp.sh` removed; all Pi docs (READMEs, CONTRIBUTING, DevHub get-started/how-it-works, docs-ref installation/pi, architecture, configuration reference, troubleshooting) rewritten with a migration section. Verified with Pi 1.0.0 + local model: pi static **691 passed**, e2e **5 passed in 66 s**. See [architecture](architecture.md) and [gotchas](gotchas.md).
   - 5 REST skills in `additional-skills/rest/`: `mariadb-rest-service-{create,update-endpoints,authorization,show,drop}`.
