@@ -8,7 +8,14 @@ mariadb-shell floor are independent.** Through 26.9.5 every release set both to 
 <version> [shell-version]` now checks the plugin version against this repo's tags and moves the
 floor only when a shell version is given. 26.10.0 is planned on top of the current floor 26.9.5.
 
-## Landed on `main` (through PR #39)
+## Landed on `main` (through PR #41)
+
+**#41** `2a6ab29` (2026-10-06) corrected the MSM section rules in the schema-management
+skills (250 never deployed → views/routines in 150, removals in 240; 270 only `REVOKE`/`DROP ROLE`,
+grants in 170; `SOURCE` needs a slice), their vendored copies, the MSM e2e tests, `docs-ref` and the
+DevHub, with `[Unreleased]` CHANGELOG entries. It also carried two `.claude/commands/` commits:
+a new `/read-checkpoint` (`991e38b`) and `/checkpoint` without the `$1` target-subfolder argument
+(`b354f57`). **#40** `7f0f593` was the 26.10.0 checkpoint. Unreleased.
 
 **#39** `68bd7d4` was release 26.10.0 (below); **#38** `f2ceecb` decoupled the plugin version
 from the shell floor in `/release` (see the policy above).
