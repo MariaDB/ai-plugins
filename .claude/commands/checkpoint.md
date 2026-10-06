@@ -1,20 +1,14 @@
 ---
-description: Save a compressed summary of this session so a future session can resume. Usage: /checkpoint <path-to-project-subfolder>
+description: Save a compressed summary of this session so a future session can resume. Usage: /checkpoint
 ---
 
 # Checkpoint Command
 
-Target directory for this checkpoint: $1
-
-If $1 is empty, ask which project subfolder this checkpoint is for before doing anything else — do not guess, since this workspace contains multiple projects.
-
-Otherwise, confirm that $1 exists as a directory. If it doesn't, stop and report that instead of creating it blindly. Then work out which of the three layouts $1 is in, and follow that section.
-
 **A checkpoint is an update, not a regeneration.** Where a context file already exists, edit the parts this session changed and leave the rest alone: its structure, its section order and its wording are the record of earlier sessions, and rewriting them from the template below loses what those sessions knew. Only a project with no context file at all gets the template.
 
-## A. `$1/.claude/context/` exists — split layout
+## A. `.claude/context/` exists — split layout
 
-`$1/.claude/PROJECT_CONTEXT.md` is the index: the description, the top-level layout table, a table of the context files with what is in each, and whatever cross-cutting sections it carries.
+`.claude/PROJECT_CONTEXT.md` is the index: the description, the top-level layout table, a table of the context files with what is in each, and whatever cross-cutting sections it carries.
 
 1. Read the index first. It tells you which context file covers which area.
 2. Read only the context files this session's work touched — that is the point of the split, so do not read the whole set to write a checkpoint.
@@ -22,15 +16,15 @@ Otherwise, confirm that $1 exists as a directory. If it doesn't, stop and report
 4. Update the index only when the split itself changed: a new context file, a file whose coverage moved, a change to the description, the layout table or a cross-cutting section. Keep the index's own table in step with the files.
 5. If a context file has grown past roughly 400 lines and has a clean seam in it, split it further, add the new file to the index table, and say so when you report back.
 
-## B. `$1/.claude/PROJECT_CONTEXT.md` exists, with no `context/` — single file
+## B. `.claude/PROJECT_CONTEXT.md` exists, with no `context/` — single file
 
 1. Read it, and update it in place, following the structure it already has rather than the template below.
-2. If it is longer than roughly 400 lines, split it as you write the checkpoint: keep `PROJECT_CONTEXT.md` as the index described in A (description, layout, a table of context files, cross-cutting sections such as known gaps and conventions), and move each area into `$1/.claude/context/<area>.md`. Carry the prose over verbatim — promote heading levels and add each file's title and a link back to `../PROJECT_CONTEXT.md`, but do not reword content while moving it. Verify nothing was lost before finishing, then report the new file list.
+2. If it is longer than roughly 400 lines, split it as you write the checkpoint: keep `PROJECT_CONTEXT.md` as the index described in A (description, layout, a table of context files, cross-cutting sections such as known gaps and conventions), and move each area into `.claude/context/<area>.md`. Carry the prose over verbatim — promote heading levels and add each file's title and a link back to `../PROJECT_CONTEXT.md`, but do not reword content while moving it. Verify nothing was lost before finishing, then report the new file list.
 3. Do not split a file that is comfortably under that size. A small project is easier to read in one place.
 
 ## C. Neither exists — new project
 
-Create `$1/.claude/PROJECT_CONTEXT.md` with a compressed summary structured as:
+Create `.claude/PROJECT_CONTEXT.md` with a compressed summary structured as:
 
 ### Project
 

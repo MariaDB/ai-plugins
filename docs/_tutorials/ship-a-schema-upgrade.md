@@ -83,21 +83,23 @@ fill in.
 ## Fill the update script
 
 This is the actual work of the release: not "how do I build this schema" but
-"how do I get a 1.0.0 database to 1.1.0 without losing its data". The update
-script has its own section numbering:
+"how do I get a 1.0.0 database's *tables* to 1.1.0 without losing its data".
+Views, routines, roles and grants need nothing here: the deployment script
+re-runs the target version's sections 150 and 170 on every deployment, so
+`notes_details` reaches upgraded databases from the development script you
+already wrote. The update script has its own section numbering:
 
 | Section | Contents |
 | --- | --- |
 | 230 | Update helper routines (`msm_` prefix) |
-| **240** | **Non-idempotent changes and ALL drops: `ALTER TABLE`, new tables, data backfill, `DROP`s that unblock table changes** |
-| **250** | **Idempotent re-creation of changed views, routines, triggers, events** |
-| 270 | Authorization changes: `GRANT` / `REVOKE` |
+| **240** | **Non-idempotent changes and ALL drops: `ALTER TABLE`, new tables, data backfill, `DROP`s of removed objects and of objects that block a table change** |
+| 250 | Not deployed — leave it empty |
+| 270 | Only `REVOKE` / `DROP ROLE` — new grants come from section 170 |
 | 290 | Removal of the update helpers |
 
 <div class="prompt" markdown="1">
-*Fill the 1.0.0 → 1.1.0 update script with the migration: the new `notebook` and
-`tag` tables in the non-idempotent update section, and the `notes_details` view
-in the idempotent update section.*
+*Fill the 1.0.0 → 1.1.0 update script with the table migration: the new
+`notebook` and `tag` tables in the non-idempotent update section.*
 </div>
 
 Three things to get right in section 240, all of them MariaDB-specific and all
@@ -113,12 +115,13 @@ of them taught by the `mariadb-alter-table` skill:
   the table for an hour. `ALGORITHM=NOCOPY` is the useful middle ground.
 - **No `DELIMITER` in 240.** Section 240 becomes a stored-procedure body in the
   generated script. Plain `;`-terminated statements, dynamic SQL for anything
-  conditional. Section 250 is top level and does use `DELIMITER %%`.
+  conditional.
 
 <div class="callout callout--warn" markdown="1">
-**Drops go in 240, not 250** — including drops whose only purpose is to unblock a
-table change. Section 250 is for *re-creating* things idempotently; anything
-destructive is version-guarded state and belongs in 240.
+**Drops go in 240** — including drops whose only purpose is to unblock a table
+change. Removing a view or routine is the one change section 150 can't express,
+because 150 only re-creates what the new version has; the `DROP … IF EXISTS`
+belongs in 240. Section 250 of the update script is never deployed.
 </div>
 
 Read it back and confirm it is not still the template — the generated template

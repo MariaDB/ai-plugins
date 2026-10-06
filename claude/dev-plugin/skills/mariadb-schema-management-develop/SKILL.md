@@ -18,13 +18,18 @@ Make changes in the same sections you authored initially, using
 
 - New/changed **tables and data** → section 140.
 - New/changed **views, routines, triggers, events** → section 150 (idempotent:
-  `CREATE OR REPLACE` / `DROP IF EXISTS`).
-- **Grants/roles** → section 170.
+  `CREATE OR REPLACE` / `DROP IF EXISTS`). This is the ONLY place for them: the
+  target's section 150 runs in full on every deployment, so upgraded schemas
+  get them too. Removing an object additionally needs a `DROP ... IF EXISTS` in
+  the update script's section 240.
+- **Grants/roles** → section 170 (`CREATE ROLE IF NOT EXISTS`, then `GRANT`);
+  it also runs on every deployment. Revoking a privilege additionally needs a
+  `REVOKE` in the update script's section 270.
 
 The development file always describes the **full, current** schema (not a diff) —
 it is the source for the next version snapshot. The per-release *migration* from
 the previous version is written separately when you prepare the release (see
-`mariadb-schema-management-release`, sections 240/250/270).
+`mariadb-schema-management-release`, sections 240/270).
 
 Keep the development version in section 910 current with
 `msm.set_development_version` as the target version firms up.
@@ -44,7 +49,9 @@ SOURCE '<relative-or-absolute-path>'[<start>:<end>]; -- optional comment
 ```
 
 - The `[start:end]` **slice is required** and is a character-offset slice of the
-  referenced file's content (Python-style):
+  referenced file's content (Python-style). Use `[0:]` for the whole file. `[:]`
+  makes `prepare_release` fail, and a `SOURCE` line without a slice is copied
+  into the release verbatim, so the deployment fails with a syntax error:
   - `[53:]` — drop the first 53 characters (e.g. a one-line copyright header).
   - `[663:-115]` — drop a 663-char header **and** the last 115 chars (footer).
   - `[:200]` — keep only the first 200 characters.

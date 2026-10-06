@@ -43,7 +43,8 @@ The deployment script decides what to do from the target schema's state:
 - **Empty / absent schema →** created fresh at the target version.
 - **Existing MSM schema at an older released version →** upgraded by running each
   `msm_update_<from>_to_<to>()` in sequence up to the target, then applying the
-  idempotent objects and authorization.
+  target's idempotent objects (150), authorization (the 270 steps, then 170) and
+  REST endpoints (180).
 - **Already at the target version →** nothing to change.
 
 The `msm_schema_version` view is the source of truth for the installed version;
@@ -51,11 +52,16 @@ it is set to `0,0,0` while a create/upgrade is in progress. The script aborts
 with a clear `SIGNAL` error when it cannot safely proceed:
 
 - a non-MSM schema of the same name exists (no `msm_schema_version` view);
-- the schema is stuck at `0,0,0` (a previous run was interrupted);
+- the schema is stuck at `0,0,0` (a previous run failed or was interrupted;
+  `msm.deploy_schema` reports that version `0.0.0` cannot be updated) — without
+  `backup=True`, a failed upgrade leaves the schema in that state;
 - the current version has no update path in this deployment script.
 
-Inspect state with `msm.get_last_deployment_version` (what a server would report)
-and `msm.get_last_released_version` / `msm.get_released_versions` (project side).
+Inspect the project with `msm.get_last_released_version` /
+`msm.get_released_versions` and `msm.get_deployment_script_versions` /
+`msm.get_last_deployment_version` — all four read the project folder, not the
+server. To see what a server has, query the view through the connection:
+``db.execute_sql(connection_id=conn, sql="SELECT * FROM `<schema>`.`msm_schema_version`")``.
 
 ## Guidelines
 

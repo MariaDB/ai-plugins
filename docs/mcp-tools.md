@@ -88,8 +88,8 @@ workflow and the section model.
 </div>
 
 <div class="callout callout--warn" markdown="1">
-**The ordering rule.** `prepare_release` → **fill the update script (sections
-240 / 250 / 270)** → `generate_deployment_script`. Generating before filling
+**The ordering rule.** `prepare_release` → **fill the update script (section
+240, and 270 for revoked privileges)** → `generate_deployment_script`. Generating before filling
 produces a script that creates the schema perfectly on an empty server and
 **silently fails to upgrade** an existing install.
 </div>
@@ -101,18 +101,25 @@ produces a script that creates the schema perfectly on an empty server and
 | Create script | Update script | Contents |
 | --- | --- | --- |
 | 130 | 230 | Helper routines, names prefixed `msm_` |
-| **140** | **240** | **Non-idempotent: tables, base data — and in an update, all `ALTER`s, backfills and drops** |
-| **150** | **250** | **Idempotent: views, procedures, functions, triggers, events** |
-| 170 | 270 | Authorization — `CREATE ROLE`, `GRANT`, `REVOKE` |
-| 180 | — | Optional MariaDB REST Service endpoints |
+| **140** | **240** | **Non-idempotent: tables, base data — and in an update, all `ALTER`s, backfills and drops of removed objects** |
+| **150** | 250 | **Idempotent: views, procedures, functions, triggers, events.** 250 is not deployed — leave it empty |
+| 170 | 270 | Authorization — 170: `CREATE ROLE IF NOT EXISTS`, `GRANT`; 270: only `REVOKE`, `DROP ROLE` |
+| 180 | — | Optional MariaDB REST Service endpoints (`CREATE OR REPLACE REST …`) |
 | 190 | 290 | Removal of the `msm_` helpers |
 
 </div>
 
 Sections **140, 240, 170, 270** become the body of a stored procedure in the
 generated script: plain `;`-terminated statements, **no `DELIMITER`**, dynamic SQL
-for conditional DDL. Sections **130, 150, 230, 250, 190, 290** are emitted at top
+for conditional DDL. Sections **130, 150, 180, 230, 190, 290** are emitted at top
 level and use `DELIMITER %%`.
+
+The deployment script runs the target version's **150, 170 and 180 in full on
+every deployment**, after the table changes, so new and changed views, routines,
+roles, grants and endpoints reach upgraded schemas on their own. The update
+script only carries what those can't express: table changes and drops (240), and
+`REVOKE` / `DROP ROLE` (270). Never `GRANT` in 270 — on an upgrade it runs before
+170 creates a new role, and the deployment fails.
 
 ## `sandbox.*` — throwaway servers
 

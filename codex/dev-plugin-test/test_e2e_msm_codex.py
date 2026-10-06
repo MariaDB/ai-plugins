@@ -26,9 +26,10 @@ v1.1.0), and the assertions are about the *shape* of what MSM produced:
   2. v1.0.0 put tables in the non-idempotent create section (140) and the VIEW in
      the idempotent one (150),
   3. the 1.0.0 deployment script was generated,
-  4. the 1.0.0→1.1.0 **update script was filled** — new tables in 240, the new
-     VIEW in 250. SQL comments are stripped first so the empty template's ToDo
-     prose cannot satisfy the assertion,
+  4. the 1.0.0→1.1.0 **update script was filled** — new tables in 240 — and the
+     new VIEW is in section 150 of the 1.1.0 snapshot (update section 250 is
+     never deployed). SQL comments are stripped first so the empty template's
+     ToDo prose cannot satisfy the assertion,
   5. the v1.1.0 deployment script composes every object from both releases,
   6. Codex registered, started and called this plugin's MariaDB MCP server (a
      completed call in the event stream, and the launcher probe fired), and
@@ -85,9 +86,9 @@ def _build_prompt() -> str:
         "and tags with new `notebook` and `tag` tables, and add a VIEW named "
         "`notes_details` that joins notes with their notebook and tags.\n"
         "4. Prepare version 1.1.0. Fill the previous->1.1.0 update script with "
-        "the migration — the new `notebook` and `tag` tables in the "
-        "non-idempotent update section and the `notes_details` VIEW in the "
-        "idempotent update section — then generate the 1.1.0 deployment script."
+        "the table migration — the new `notebook` and `tag` tables in the "
+        "non-idempotent update section — then generate the 1.1.0 deployment "
+        "script."
     )
 
 
@@ -232,7 +233,7 @@ def test_step3_v1_0_0_deployment_generated(workflow):
 
 
 def test_step4_update_script_filled(workflow):
-    """The 1.0.0->1.1.0 update script was filled: new tables in 240, VIEW in 250."""
+    """The 1.0.0->1.1.0 update script was filled (tables in 240); the VIEW is in the 1.1.0 snapshot's 150."""
     run = workflow["run"]
     proj = workflow["msm_project"]
     assert proj is not None, f"no MSM project.{run.diagnostics}"
@@ -248,16 +249,22 @@ def test_step4_update_script_filled(workflow):
 
     secs = _sections(_read(upd))
     s240 = _strip_sql_comments(secs.get("240", ""))
-    s250 = _strip_sql_comments(secs.get("250", ""))
 
     for table in ("notebook", "tag"):
         assert re.search(rf"(?is)CREATE\s+TABLE.*?\b{table}", s240), (
             f"the `{table}` table is not created in update section 240 — the update "
             f"script was not filled.\n--- section 240 ---\n{s240}{run.diagnostics}"
         )
-    assert "notes_details" in s250.lower() and re.search(r"(?is)VIEW", s250), (
-        f"the `notes_details` VIEW is not created in update section 250 — the update "
-        f"script was not filled.\n--- section 250 ---\n{s250}{run.diagnostics}"
+    # The `notes_details` VIEW belongs in the idempotent section 150 of the dev
+    # script, and so of the 1.1.0 snapshot: the deployment script re-runs the
+    # target's section 150 on every deployment, while update section 250 is
+    # never deployed.
+    snap = proj / "releases" / "versions" / f"{SCHEMA}_1.1.0.sql"
+    s150 = _strip_sql_comments(_sections(_read(snap)).get("150", ""))
+    assert "notes_details" in s150.lower() and re.search(r"(?is)VIEW", s150), (
+        f"the `notes_details` VIEW is not in section 150 of the 1.1.0 snapshot — "
+        f"it must be developed in the dev script's idempotent section.\n"
+        f"--- section 150 ---\n{s150}{run.diagnostics}"
     )
 
 

@@ -127,7 +127,7 @@ Creates the deployment script that creates or upgrades the schema.
 | `overwrite_existing` | Whether to replace an existing script. |
 
 {% hint style="danger" %}
-Run `msm.prepare_release`, then fill the update script's sections 240, 250, and 270, and only then run `msm.generate_deployment_script`. A script generated before the update script is filled creates the schema correctly on an empty server but silently fails to upgrade an existing installation.
+Run `msm.prepare_release`, then fill the update script's section 240, and section 270 if privileges are revoked, and only then run `msm.generate_deployment_script`. A script generated before the update script is filled creates the schema correctly on an empty server but silently fails to upgrade an existing installation.
 {% endhint %}
 
 ## msm.deploy_schema
@@ -149,10 +149,16 @@ Requires an open connection from `db.connect`.
 | Create script | Update script | Contents |
 | --- | --- | --- |
 | 130 | 230 | Helper routines, with names prefixed `msm_`. |
-| 140 | 240 | Non-idempotent statements: tables and base data. In an update script, all `ALTER` statements, data backfills, and drops. |
-| 150 | 250 | Idempotent statements: views, procedures, functions, triggers, and events. |
-| 170 | 270 | Authorization: `CREATE ROLE`, `GRANT`, and `REVOKE`. |
-| 180 | — | Optional MariaDB REST Service endpoints. |
+| 140 | 240 | Non-idempotent statements: tables and base data. In an update script, all `ALTER` statements, data backfills, and every `DROP` of an object that the new version no longer has. |
+| 150 | 250 | Idempotent statements: views, procedures, functions, triggers, and events. Section 250 isn't deployed; leave it empty. |
+| 170 | 270 | Authorization. Section 170: `CREATE ROLE IF NOT EXISTS` and `GRANT`. Section 270: only `REVOKE` and `DROP ROLE`. |
+| 180 | — | Optional MariaDB REST Service endpoints, with `CREATE OR REPLACE REST` statements. |
 | 190 | 290 | Removal of the `msm_` helpers. |
 
-Sections 140, 240, 170, and 270 become the body of a stored procedure in the generated script. Write them as plain statements terminated by `;`, without `DELIMITER`, and use dynamic SQL for conditional DDL. Sections 130, 150, 230, 250, 190, and 290 are emitted at the top level and use `DELIMITER %%`.
+Sections 140, 240, 170, and 270 become the body of a stored procedure in the generated script. Write them as plain statements terminated by `;`, without `DELIMITER` or `USE`, and use dynamic SQL for conditional DDL. Sections 130, 150, 180, 230, 190, and 290 are emitted at the top level and use `DELIMITER %%`.
+
+The deployment script runs the target version's sections 150, 170, and 180 in full on every deployment, after the table changes. New and changed views, routines, roles, grants, and REST endpoints therefore reach upgraded schemas without any statement in the update script. The update script only needs what these sections can't express: table changes, the `DROP` of removed objects in section 240, and `REVOKE` or `DROP ROLE` in section 270.
+
+{% hint style="warning" %}
+Don't grant privileges in section 270. On an upgrade, it runs before section 170, so a role that is new in the version doesn't exist yet, and the deployment fails with error 1133.
+{% endhint %}

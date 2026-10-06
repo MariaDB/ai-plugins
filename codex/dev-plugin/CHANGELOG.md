@@ -4,6 +4,19 @@ All notable changes to the MariaDB Codex plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- The schema-management skills now describe what MSM deployment scripts
+  actually run. New and changed views and routines, and new roles and grants,
+  stay in the development script's sections 150 and 170, which run in full on
+  every deployment; the update script carries only table changes and drops
+  (section 240) and `REVOKE` / `DROP ROLE` (section 270). The skills no longer
+  tell the agent to fill section 250, which is never deployed, or to `GRANT` in
+  section 270, which runs before a new role exists. They also explain that a
+  `SOURCE` statement needs a slice such as `[0:]`.
+
 ## [26.10.0] - 2026-10-02
 
 ### Changed

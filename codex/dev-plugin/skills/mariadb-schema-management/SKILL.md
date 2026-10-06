@@ -36,9 +36,9 @@ deploy vX (create fresh OR upgrade)        →  mariadb-schema-management-deploy
 
 > **The one rule everyone gets wrong:** `prepare_release` creates an *empty*
 > update script (`releases/updates/<schema>_<prev>_to_<vX>.sql`). You MUST fill
-> its migration sections **before** generating the deployment script — the
-> deployment script embeds them to upgrade existing installs. See
-> `mariadb-schema-management-release`.
+> its table-migration section 240 (and 270 for revoked privileges) **before**
+> generating the deployment script — the deployment script embeds them to
+> upgrade existing installs. See `mariadb-schema-management-release`.
 
 ## Project layout
 
@@ -77,9 +77,9 @@ determines how the deployment script treats it.** Always edit sections with
 | 120 | Version-creation indicator: `msm_schema_version` = `0,0,0` (provided) |
 | 130 | Helper routines used during creation — names must start `msm_` |
 | **140** | **Non-idempotent: `CREATE TABLE` + base-data `INSERT`s** |
-| **150** | **Idempotent: VIEWs / PROCEDUREs / FUNCTIONs / TRIGGERs / EVENTs** |
-| 170 | Authorization: `CREATE ROLE` / `GRANT` |
-| 180 | Optional MariaDB REST Service endpoints |
+| **150** | **Idempotent: VIEWs / PROCEDUREs / FUNCTIONs / TRIGGERs / EVENTs** — run in full on every deployment |
+| 170 | Authorization: `CREATE ROLE IF NOT EXISTS` / `GRANT` — run in full on every deployment |
+| 180 | Optional MariaDB REST Service endpoints (`CREATE OR REPLACE REST ...`) — run in full on every deployment |
 | 190 | Removal of the `msm_` helpers |
 | 910 | Final schema version — set via `msm.set_development_version` |
 | 920 | Server-variable restore (provided) |
@@ -90,23 +90,37 @@ determines how the deployment script treats it.** Always edit sections with
 | --- | --- |
 | 010 / 220 | Server vars + update indicator `0,0,0` (provided) |
 | 230 | Update helper routines (`msm_`) |
-| **240** | **Non-idempotent changes + ALL drops: `ALTER TABLE`, new tables, data backfill, `DROP`s that unblock table changes** |
-| **250** | **Idempotent re-creation of changed VIEWs / routines / triggers / events** |
-| 270 | Authorization changes: `GRANT` / `REVOKE` |
+| **240** | **Non-idempotent changes + ALL drops: `ALTER TABLE`, new tables, data backfill, and `DROP ... IF EXISTS` of every object the new version no longer has** |
+| 250 | **Not deployed — leave it empty.** New/changed VIEWs / routines / triggers / events go in the dev script's section 150 |
+| 270 | `REVOKE` / `DROP ROLE` only. New roles and grants go in the dev script's section 170 |
 | 290 | Removal of update helpers |
 | 910 / 920 | New version + server-variable restore (provided) |
 
 **Idempotent vs. non-idempotent** — the core distinction:
 - **Non-idempotent** (140 create / 240 update): `TABLE` structure and data —
-  state that cannot be trivially re-run, so it is version-guarded.
-- **Idempotent** (150 create / 250 update): everything else — always written with
-  `CREATE OR REPLACE` / `DROP ... IF EXISTS` so re-running is safe.
+  state that cannot be trivially re-run, so it is version-guarded. The
+  deployment script runs 140 on a fresh install, or each 240 step in turn on an
+  upgrade.
+- **Idempotent** (150): everything else — always written with
+  `CREATE OR REPLACE` / `DROP ... IF EXISTS` so re-running is safe. The
+  deployment script runs the **target version's full section 150 on every
+  deployment, after the table changes**, so the objects always end in the target
+  state whatever version the server started from. They therefore never need
+  per-version update statements — which is why the update script's section 250
+  is not deployed. Only a *removed* object needs a `DROP ... IF EXISTS` in 240.
+- **Authorization and REST work the same way:** the target's sections 170 and
+  180 also run on every deployment (170 after the 270 steps), so new roles,
+  grants and endpoints reach upgraded schemas through them. Section 270 is only
+  for what 170 cannot express: `REVOKE` and `DROP ROLE`. Never `GRANT` in 270 —
+  on an upgrade it runs before 170 creates a new role, and the deployment fails
+  (error 1133, because the scripts set `NO_AUTO_CREATE_USER`).
 
 **Delimiter/placement rule** (why the split exists): in the generated deployment
 script, sections **140, 240, 170, 270** become the *body of a stored procedure*
-— write them as plain `;`-terminated statements, **no `DELIMITER`**, use dynamic
-SQL for conditional DDL. Sections **130, 150, 230, 250, 190, 290** are emitted at
-top level and use `DELIMITER %%` for routine bodies.
+— write them as plain `;`-terminated statements, **no `DELIMITER`**, no `USE`
+(qualify names with the schema), use dynamic SQL for conditional DDL. Sections
+**130, 150, 180, 230, 190, 290** are emitted at top level and use
+`DELIMITER %%` for routine bodies.
 
 ## The `msm.*` MCP tools
 

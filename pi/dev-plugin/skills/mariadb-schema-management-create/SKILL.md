@@ -71,9 +71,15 @@ intact. Put each kind of object in the section that matches how MSM deploys it:
   DELIMITER ;
   ```
 
-- **Section 170 — authorization.** `CREATE ROLE` and `GRANT`. Also a
-  stored-procedure body → plain `;`-terminated statements, no `DELIMITER`.
+- **Section 170 — authorization.** `CREATE ROLE IF NOT EXISTS` and `GRANT`.
+  Also a stored-procedure body → plain `;`-terminated statements, no
+  `DELIMITER`. It runs in full on every deployment, upgrades included, so it
+  must be re-runnable; create every role before granting to it — a `GRANT` to a
+  missing role fails the deployment (error 1133).
 - **Section 180 — optional REST endpoints** (see `mariadb-rest-service-create`).
+  Runs in full on every deployment: use `CREATE OR REPLACE REST ...`. The server
+  needs the REST metadata schema, and only MariaDB Shell (`msm.deploy_schema`)
+  can run these statements.
 - **Sections 130 / 190 — creation helpers.** Optional routines whose names must
   start `msm_`, defined in 130 and dropped in 190; use them for logic needed only
   while building the schema.

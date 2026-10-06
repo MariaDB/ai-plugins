@@ -1,6 +1,6 @@
 ---
 name: mariadb-schema-management-release
-description: "Prepare a MariaDB Schema Management (MSM) version release — snapshot the development script with msm.prepare_release, FILL the generated previous→new update script (sections 240/250/270) with the actual migration, and only then generate the deployment script with msm.generate_deployment_script. Use when cutting/preparing an MSM schema release or version, writing the release-to-release migration, or generating a deployment script. Read mariadb-schema-management first for the section model."
+description: "Prepare a MariaDB Schema Management (MSM) version release — snapshot the development script with msm.prepare_release, FILL the generated previous→new update script (table changes and drops in section 240, revoked privileges in 270) with the actual migration, and only then generate the deployment script with msm.generate_deployment_script. Use when cutting/preparing an MSM schema release or version, writing the release-to-release migration, or generating a deployment script. Read mariadb-schema-management first for the section model."
 ---
 
 # MSM — Preparing a Version Release
@@ -13,7 +13,7 @@ See `mariadb-schema-management` for the section model. Assume MariaDB 11.8.
 
 ```text
 1. msm.prepare_release          → version snapshot (+ empty update script)
-2. FILL the update script       → sections 240 / 250 / 270  ← do NOT skip
+2. FILL the update script       → sections 240 (+ 270)  ← do NOT skip
 3. msm.generate_deployment_script  ← only after step 2
 ```
 
@@ -54,16 +54,25 @@ section_id, sql_content)`:
   UPDATE `notes-app`.`note` SET `created_at` = NOW() WHERE `created_at` IS NULL;
   ```
 
-- **Section 250 — idempotent re-creation.** Re-create every VIEW / routine /
-  trigger / event that changed, with `CREATE OR REPLACE` / `DROP IF EXISTS`.
-  Top-level, uses `DELIMITER %%`.
-- **Section 270 — authorization changes.** `GRANT` / `REVOKE` relative to the
-  previous version (stored-procedure body → plain `;`, no `DELIMITER`).
+- **Section 250 — leave it empty; it is not deployed.** New and changed VIEWs /
+  routines / triggers / events belong in the dev script's section 150. The
+  deployment script runs the target version's full section 150 on every
+  deployment, after all table changes, so they reach upgraded schemas without
+  any per-version statement. A *removed* object is the one change 150 cannot
+  express — drop it in 240 with `DROP ... IF EXISTS`.
+- **Section 270 — revoked privileges and dropped roles only.** `REVOKE` /
+  `DROP ROLE` for what the new version no longer has (stored-procedure body →
+  plain `;`, no `DELIMITER`). New roles and `GRANT`s belong in the dev script's
+  section 170, which also runs on every deployment, after the 270 steps.
+  **Never `GRANT` in 270**: on an upgrade it runs before 170 creates a role that
+  is new in this version, and the deployment fails with error 1133.
 - **Sections 230 / 290 — update helpers** (`msm_`-prefixed) if the migration
   needs temporary routines; drop them in 290.
 
-Write the migration to match exactly what changed between the previous version
-snapshot and this one. If a section has no changes, leave it empty.
+Write the migration to match exactly what changed in the **tables** between the
+previous version snapshot and this one: an upgraded schema must end with the
+same tables as a fresh install of the new version. If a section has no changes,
+leave it empty.
 
 ## 3. Generate the deployment script
 
@@ -80,9 +89,10 @@ What it produces:
   any prior released version** to the target: it builds `msm_create_<target>()`
   from section 140, an `msm_update_<from>_to_<to>()` from **each** update script's
   section 240, an `msm_create_or_update()` dispatcher that reads
-  `msm_schema_version` and applies the right path, then the idempotent objects
-  (150) and authorization (`msm_auth_*` from 170/270), and finally drops all
-  `msm_` procedures and stamps the new version.
+  `msm_schema_version` and applies the right path, then the target's idempotent
+  objects (150), authorization (`msm_auth_*`: the 270 steps, then the target's
+  170) and REST endpoints (180), and finally drops all `msm_` procedures and
+  stamps the new version. The update scripts' section 250 is not included.
 
 Because it embeds the update sections, generating **before** filling them yields
 a script that can create fresh but cannot correctly upgrade older installs. Every
@@ -101,4 +111,4 @@ Deploy the release onto a server: `mariadb-schema-management-deploy`.
 - `mariadb-schema-management-develop` — the development script the snapshot comes from.
 - `mariadb-schema-management-deploy` — running the deployment script on a server.
 - `mariadb-alter-table` — the DDL for section 240.
-- `mariadb-grant`, `mariadb-revoke` — authorization changes for section 270.
+- `mariadb-grant` — new grants, in the dev script's section 170; `mariadb-revoke` — revoked privileges, in section 270.

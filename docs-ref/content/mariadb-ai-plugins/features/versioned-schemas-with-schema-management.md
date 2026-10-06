@@ -31,7 +31,7 @@ The agent edits the development script one section at a time with `msm.get_sql_c
 ## Release a Version
 
 1. `msm.prepare_release` takes a snapshot of the development script and creates an empty update script.
-2. The agent fills the update script's sections 240, 250, and 270 with the changes since the previous release.
+2. The agent fills the update script with the table changes since the previous release, in section 240, and with revoked privileges, in section 270. New and changed views, routines, roles, and grants stay in the development script, because the deployment script runs them in full on every deployment.
 3. `msm.generate_deployment_script` generates the deployment script.
 
 {% hint style="danger" %}
