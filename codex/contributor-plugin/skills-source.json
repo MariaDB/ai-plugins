@@ -2,7 +2,7 @@
   "source_repo": "mariadb-corporation/mariadb-shell",
   "subdir": ".claude/skills",
   "ref": "main",
-  "commit": "874ad63a45168da3ac8d0df992c5c2782e59cd1f",
+  "commit": "70a9ff5e51052d288133e055dd7db5991cc75c9e",
   "skills_synced": 3,
-  "synced_at": "2026-10-05"
+  "synced_at": "2026-10-08"
 }

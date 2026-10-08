@@ -22,6 +22,12 @@ that only appears when the migration tooling is installed.
 
 </div>
 
+A server in **multi-tenant mode** (`mcp setup --multiTenant=true`, mariadb-shell
+26.10.0 and later) serves only the `db.*` and `msm.*` groups: the `sandbox.*` and
+`migrator.*` tools run local servers and long jobs on the server's own machine
+and are not offered to tenants. The plugins' launchers start a single-tenant
+server, which serves every group.
+
 <div class="callout" markdown="1">
 Arguments below are named as the tools take them. `connection_id` always comes
 from a prior `db.connect`. Anything taking a file path is subject to the

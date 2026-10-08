@@ -15,6 +15,8 @@ The `mariadb-shell` MCP server provides 28 tools in three groups. A fourth, opti
 | [`sandbox.*`](sandbox-tools.md) | 8 | List deployable server versions; deploy, start, stop, and delete local instances. |
 | [`migrator.*`](migrator-tools.md) | 4 | MySQL-to-MariaDB migration. Optional, and not counted in the 28. |
 
+A server in multi-tenant mode (the `--multiTenant` option of `mcp setup`, available in MariaDB Shell 26.10.0 and later) serves only the `db.*` and `msm.*` groups. The `sandbox.*` and `migrator.*` tools run local server instances and long-running jobs on the machine that hosts the MCP server, and aren't offered to tenants. The server that the plugins' launcher scripts start is single-tenant and serves every group.
+
 ## Conventions
 
 * Arguments are named as the tools take them.

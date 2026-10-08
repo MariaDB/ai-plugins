@@ -4,7 +4,26 @@ All notable changes to the MariaDB Claude Code plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [26.10.1] - 2026-10-08
+
+### Changed
+
+- `MARIADB_SHELL_VERSION`, the *minimum* `mariadb-shell` the launcher accepts,
+  now defaults to `26.10.0`, the newest published `mariadb-shell` release. An
+  install already at or above that version is still used as-is; only a machine
+  below it fetches anything.
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `b00b9f3` (synced 2026-10-08). Seven function-reference skills changed
+  (`mariadb-date-time-functions`, `-encryption-functions`,
+  `-information-functions`, `-json-functions`, `-string-functions`,
+  `-vector-functions`, `-window-functions`): the upstream extractor now keeps
+  multi-line signatures whole (every window function, `TO_DATE`, `JSON_TABLE`),
+  strips GitBook tab markup from `SESSION_USER` and `TO_CHAR`, corrects the
+  `AES_DECRYPT` signature, and picks up six functions it used to skip
+  (`MONTHS_BETWEEN`, `SFORMAT`, `VEC_FromText`, `VEC_ToText`,
+  `PERCENTILE_CONT`, `PERCENTILE_DISC`). No skill was added or removed, so
+  the plugin stays at 85 skills.
+- Version bumped to 26.10.1 to stay in lockstep with the other plugins.
 
 ### Fixed
 

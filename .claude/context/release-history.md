@@ -8,7 +8,7 @@ mariadb-shell floor are independent.** Through 26.9.5 every release set both to 
 <version> [shell-version]` now checks the plugin version against this repo's tags and moves the
 floor only when a shell version is given. 26.10.0 is planned on top of the current floor 26.9.5.
 
-## Landed on `main` (through PR #41)
+## Landed on `main` (through PR #41; release 26.10.1 on `wip/26.10.1`)
 
 **#41** `2a6ab29` (2026-10-06) corrected the MSM section rules in the schema-management
 skills (250 never deployed → views/routines in 150, removals in 240; 270 only `REVOKE`/`DROP ROLE`,
@@ -70,6 +70,39 @@ version-comparison tutorial), **#13** `c5759e5` (mariadb-migrator split into an
 overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-open
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
+
+## Release v26.10.1 (2026-10-08) — IN PROGRESS, PR about to open
+
+- Branch `wip/26.10.1` off `1c433bb` (#41's checkpoint merge), five commits, one per step:
+  `7494ae8` floor → 26.10.0 (31 files; 33 at 26.9.5 minus the two Pi files #37 removed),
+  `9ad453b` plugin version → 26.10.1 (17 files), `48e5f9f` re-vendor, `296e07f` CHANGELOGs,
+  `07c530c` checkpoint, `d8f1349` a multi-tenant note in both MCP tool references (see below).
+- **First release since 26.9.5 that moves the shell floor**: mariadb-shell `v26.10.0` was
+  published 2026-10-08 (prerelease, the newest), so `set-mariadb-shell-version.sh 26.10.0` ran
+  first. Plugin version 26.10.1 (highest tag before it: `v26.10.0`).
+- **Re-vendor shipped content**: mariadb-docs `8781534` → `b00b9f3` (`ref` back to `main`
+  from the pinned commit #41 synced at), mariadb-shell `874ad63` → `70a9ff5` (provenance
+  only, 3 contributor skills unchanged). Seven function-reference skills changed in dev AND
+  sql (49 files + 10 `skills-source.json` = 59): upstream's extractor now keeps multi-line
+  signatures whole (all window functions, `TO_DATE`, `JSON_TABLE`), strips GitBook tab markup
+  (`SESSION_USER`, `TO_CHAR`), fixes `AES_DECRYPT`'s signature and extracts six functions it
+  used to skip (`MONTHS_BETWEEN`, `SFORMAT`, `VEC_FromText`, `VEC_ToText`, `PERCENTILE_CONT`,
+  `PERCENTILE_DISC`). Counts unchanged, 85 / 47 / 3; `docs/_data/skills.yml` unchanged.
+- **Ships #41** (MSM section-rule fixes): the four dev-plugin `[Unreleased]` sections folded
+  into `[26.10.1]` as `### Fixed`. All ten CHANGELOGs got the re-vendor + version entry; the
+  seven MCP-bearing ones also the floor line.
+- Static tier green: claude 682, codex 686, opencode 682, pi 691 (same as 26.10.0).
+- **mariadb-shell 26.10.0 is the first with the MCP server's multi-tenant mode** (mcp_plugin
+  PR #37, `a5ad8bdf`, 2026-10-07). Checked against this repo on 2026-10-08: tool names and
+  counts unchanged (8 / 12 / 8 + 4); the launchers' stdio start is unaffected (a server
+  configured `--multiTenant=true` refuses stdio with a clear error, so nothing to handle);
+  the new `--toolNameSeparator` defaults to `.`, which is what every doc and skill names.
+  The one doc gap: a multi-tenant server serves only `db` and `msm`, so one paragraph was
+  added under the group table of `docs/mcp-tools.md` and `docs-ref/.../mcp-tool-reference/README.md`
+  (user's call: nothing more about the mode, the plugins launch the server themselves).
+- Still to do after the PR merges (steps 9–11 of `/release`): tag `v26.10.1` on the squash
+  commit, push to both remotes, prereleases on both repos, fast-forward `fork/main` (at
+  `68bd7d4`, three commits behind), delete `wip/26.10.1`, checkpoint PR.
 
 ## Release v26.10.0 (2026-10-02) — SHIPPED
 
