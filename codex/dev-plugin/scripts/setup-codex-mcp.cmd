@@ -48,7 +48,7 @@ rem   MARIADB_SHELL_VERSION   Minimum mariadb-shell version to pass to the launc
 rem ============================================================================
 
 set "SERVER_NAME=mariadb"
-if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.10.0"
+if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.10.1"
 
 rem %~dp0 is this script's directory, with a trailing backslash.
 set "PLUGIN_ROOT=%~dp0.."

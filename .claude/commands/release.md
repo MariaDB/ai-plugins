@@ -4,18 +4,22 @@ description: Cut an ai-plugins release, optionally raising the mariadb-shell flo
 
 # Release Command
 
-Version to release: $1
-New mariadb-shell floor (optional): $2
+Arguments as typed: `$ARGUMENTS`
 
-If $1 is empty, ask for the version before doing anything else. Both versions
+Split that string on whitespace. The first word is the plugin version
+(required), the second is the new mariadb-shell floor (optional). From here
+on, "the plugin version" and "the floor" mean those two words; `<version>`
+and `<floor>` stand for them in the commands below. If the first word is
+missing, ask for the version before doing anything else. If a third word is
+present, stop and ask what it means. Both versions
 must be a bare `MAJOR.MINOR.PATCH` such as `26.10.0` — no `v` prefix. The
 version *inside* this repo (manifests, CHANGELOG headings) is bare; only the git
 tag carries the `v` (`v26.10.0`). Strip a leading `v` if one was given and say so.
 
-**The two versions are independent.** $1 is the ai-plugins version: the plugin
-manifests, the CHANGELOG headings and the tag. $2 is the `MARIADB_SHELL_VERSION`
+**The two versions are independent.** The plugin version is the ai-plugins version: the plugin
+manifests, the CHANGELOG headings and the tag. The floor is the `MARIADB_SHELL_VERSION`
 floor, the oldest mariadb-shell the launchers accept. Through 26.9.5 the two were
-always equal; that is no longer required. With no $2 the floor stays where it is
+always equal; that is no longer required. With no floor given it stays where it is
 and the release ships on top of the current shell version.
 
 Read `.claude/PROJECT_CONTEXT.md`, then `.claude/context/release-history.md` and
@@ -31,14 +35,14 @@ remote has gone missing before. If either is missing, stop and report it.
 - `git status --short` must be clean and the current branch must be `main`,
   level with `origin/main` after `git fetch --multiple --tags origin fork`. If not, stop
   and report rather than stashing or resetting anything.
-- `v$1` must not already exist as a tag locally or on either remote
+- `v<version>` must not already exist as a tag locally or on either remote
   (`git ls-remote --tags <remote>`, once per remote — `ls-remote` takes one
   remote and would read `fork` as a pattern). If it does, stop.
 
 ## 2. Check the versions
 
 **The plugin version.** List this repo's tags (`git tag -l 'v*' | sort -V`) and
-take the highest. $1 must sort above it, or stop. Report the previous version.
+take the highest. The plugin version must sort above it, or stop. Report the previous version.
 
 **The current shell floor** is `shell_floor` in `docs/_config.yml`; it also
 appears as the launchers' fallback (`VERSION="${MARIADB_SHELL_VERSION:-<v>}"`).
@@ -54,25 +58,25 @@ gh release list --repo mariadb-corporation/mariadb-shell --exclude-drafts --limi
 
 Sort the `tagName`s as versions (strip the `v`; `sort -V`), not by date.
 
-- **No $2:** the floor stays. If a shell release newer than the floor exists,
+- **No floor given:** the floor stays. If a shell release newer than the floor exists,
   mention it (with its publish date) so the user can choose to raise the floor,
   but do not stop.
-- **$2 given:**
-  - `v$2` is not in the list → stop. The shell floor must never sit above a
+- **A floor given:**
+  - `v<floor>` is not in the list → stop. The shell floor must never sit above a
     published release, or every launcher would demand a binary that does not
     exist.
-  - $2 is below the current floor → stop and ask; lowering the floor is not a
+  - It is below the current floor → stop and ask; lowering the floor is not a
     normal release step.
-  - $2 equals the current floor → nothing to move; continue as if no $2 was given.
-  - A version higher than $2 exists → say so and ask whether to use $2 anyway.
-  - Otherwise continue, and report the publish date of `v$2`.
+  - It equals the current floor → nothing to move; continue as if no floor was given.
+  - A version higher than it exists → say so and ask whether to use the given floor anyway.
+  - Otherwise continue, and report the publish date of `v<floor>`.
 
 ## 3. Branch and set the versions
 
 ```bash
-git switch -c wip/$1
-scripts/set-mariadb-shell-version.sh $2   # only when the floor moves (step 2)
-scripts/set-plugin-version.sh $1
+git switch -c wip/<version>
+scripts/set-mariadb-shell-version.sh <floor>   # only when the floor moves (step 2)
+scripts/set-plugin-version.sh <version>
 ```
 
 Run them in that order and stop at the first non-zero exit. Skip the shell-floor
@@ -98,7 +102,7 @@ counts per variant (82 dev / 47 sql / 2 contributor as of 26.9.3). Commit.
 
 ## 5. CHANGELOG entries
 
-Add a `## [$1] - <today>` section to the top of all ten `*/*/CHANGELOG.md`
+Add a `## [<version>] - <today>` section to the top of all ten `*/*/CHANGELOG.md`
 files, following the wording and structure of the previous release's section in
 each file. Write only what actually changed in *that* plugin: the contributor
 plugins have no MCP server, so no shell-floor line; the sql plugins have their
@@ -121,8 +125,8 @@ ships in the release PR.
 ## 8. Open the PR
 
 ```bash
-git push -u origin wip/$1
-gh pr create --repo mariadb-corporation/ai-plugins --base main --head wip/$1 --title "Release $1: …" --body-file <file>
+git push -u origin wip/<version>
+gh pr create --repo mariadb-corporation/ai-plugins --base main --head wip/<version> --title "Release <version>: …" --body-file <file>
 ```
 
 Title in the style of #20 (`Release 26.9.3: shell floor, plugin version, and a
@@ -142,22 +146,22 @@ that `state` is `MERGED`, and note the squash commit.
 git switch main && git pull --ff-only origin main
 ```
 
-Create an annotated tag `v$1` on the squash commit. The annotation's body is the
+Create an annotated tag `v<version>` on the squash commit. The annotation's body is the
 release notes: a short prose summary in the style of the v26.9.3 release (read it
 with `gh release view v26.9.3 --repo mariadb-corporation/ai-plugins`). It states
 the mariadb-shell floor the release requires and whether it moved, and ends with
-"See each plugin's CHANGELOG.md [$1] section for details."
+"See each plugin's CHANGELOG.md [<version>] section for details."
 
-Push the **same tag object** to both remotes (`git push origin v$1` and
-`git push fork v$1`) and verify with `git ls-remote --tags <remote> v$1`, once per remote, that both
+Push the **same tag object** to both remotes (`git push origin v<version>` and
+`git push fork v<version>`) and verify with `git ls-remote --tags <remote> v<version>`, once per remote, that both
 point at the same object.
 
 Publish a **prerelease** on both repos. `gh` refuses `--notes-from-tag` together
 with `--repo`, so extract the body to a file first:
 
 ```bash
-git tag -l --format='%(contents:body)' v$1 > <scratch>/notes.md
-gh release create v$1 --repo <repo> --title v$1 --notes-file <scratch>/notes.md --prerelease --verify-tag
+git tag -l --format='%(contents:body)' v<version> > <scratch>/notes.md
+gh release create v<version> --repo <repo> --title v<version> --notes-file <scratch>/notes.md --prerelease --verify-tag
 ```
 
 for `<repo>` = `mariadb-corporation/ai-plugins` and `mariadb/ai-plugins`.
@@ -172,7 +176,7 @@ the fork has no commits of its own). Since 26.9.5 the fork's `main` *is*
 
 ```bash
 git fetch fork
-git switch -c sync/fork-$1 fork/main
+git switch -c sync/fork-<version> fork/main
 git merge origin/main -m "Sync with mariadb-corporation/ai-plugins main (#<PR>)"
 ```
 
@@ -186,15 +190,15 @@ Before pushing, verify:
 If it is not, stop and show it. Otherwise push with
 `git push fork HEAD:main` (a fast-forward of the fork's `main`; it will be
 refused if the fork moved meanwhile — then fetch and merge again, don't force).
-Return to `main` and delete the local `wip/$1` and `sync/fork-$1` branches, and
-delete `wip/$1` on `origin` once its remote head matches the PR's `headRefOid`.
+Return to `main` and delete the local `wip/<version>` and `sync/fork-<version>` branches, and
+delete `wip/<version>` on `origin` once its remote head matches the PR's `headRefOid`.
 
 ## 11. Report
 
 Tell the user the release is published, with:
 
 - the merged PR and its squash commit
-- the tag `v$1` and its tag object
+- the tag `v<version>` and its tag object
 - both release URLs
 - that the fork is synced and its tree matches `origin/main`
 - anything that did not go as expected

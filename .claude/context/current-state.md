@@ -2,6 +2,7 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
+- **Release 26.10.2 — IN PROGRESS on `wip/26.10.2`** (2026-10-09, PR about to open): shell floor 26.10.0 → **26.10.1** (the newest shell; no v26.10.2 exists, user's call), plugin version 26.10.2, a re-vendor that corrected `mariadb-numeric-functions`' division-by-zero text (dev + sql). Static tier green. After the merge: tag, prereleases, fork sync. See [release history](release-history.md).
 - **Release 26.10.1 — SHIPPED** (PR #42, squash `2574a74`; tag `v26.10.1` = object `9bcbd39`, prerelease on both repos; fork fast-forwarded to `2574a74`): shell floor 26.9.5 → **26.10.0** (mariadb-shell `v26.10.0`, published 2026-10-08, the first with the MCP server's multi-tenant mode), plugin version 26.10.1, a re-vendor that shipped seven updated function-reference skills (dev + sql), #41's MSM fixes, and a multi-tenant note in both MCP tool references. See [release history](release-history.md).
 - **Release 26.10.0 — SHIPPED** (PR #39, squash `68bd7d4`; tag `v26.10.0` = object `ed68f6a`, prerelease on both repos; fork synced): plugin version 26.10.0, floor stays 26.9.5, provenance-only re-vendor, ships #37. See [release history](release-history.md).
 - **Done & working:**

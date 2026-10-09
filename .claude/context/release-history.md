@@ -8,9 +8,9 @@ mariadb-shell floor are independent.** Through 26.9.5 every release set both to 
 <version> [shell-version]` now checks the plugin version against this repo's tags and moves the
 floor only when a shell version is given. 26.10.0 is planned on top of the current floor 26.9.5.
 
-## Landed on `main` (through PR #42)
+## Landed on `main` (through PR #43; release 26.10.2 on `wip/26.10.2`)
 
-**#42** `2574a74` (2026-10-08) was release 26.10.1 (below). **#41** `2a6ab29` (2026-10-06) corrected the MSM section rules in the schema-management
+**#43** `f06db43` (2026-10-09) was the 26.10.1 checkpoint. **#42** `2574a74` (2026-10-08) was release 26.10.1 (below). **#41** `2a6ab29` (2026-10-06) corrected the MSM section rules in the schema-management
 skills (250 never deployed → views/routines in 150, removals in 240; 270 only `REVOKE`/`DROP ROLE`,
 grants in 170; `SOURCE` needs a slice), their vendored copies, the MSM e2e tests, `docs-ref` and the
 DevHub, with `[Unreleased]` CHANGELOG entries. It also carried two `.claude/commands/` commits:
@@ -70,6 +70,28 @@ version-comparison tutorial), **#13** `c5759e5` (mariadb-migrator split into an
 overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-open
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
+
+## Release v26.10.2 (2026-10-09) — IN PROGRESS, PR about to open
+
+- Asked for as `/release 26.10.2 26.10.2`, but **mariadb-shell has no v26.10.2**: the newest is
+  `v26.10.1` (published 2026-10-08 19:49 UTC), so the user chose **floor → 26.10.1** (plugin
+  version 26.10.2 as asked). The 26.10.1 checkpoint PR #43 was merged first, at the user's
+  hand, so the branch is off `f06db43`.
+- Branch `wip/26.10.2`, one commit per step: `fab5412` floor → 26.10.1 (31 files), `83f789c`
+  plugin version → 26.10.2 (17 files), `895aee7` re-vendor (31 files), `df01926` CHANGELOGs,
+  then this checkpoint.
+- **Re-vendor shipped content again**: mariadb-docs `b00b9f3` → `8bb700f`, mariadb-shell
+  `70a9ff5` → `43338f8` (provenance only, 3 contributor skills unchanged). Three skills changed
+  in dev AND sql (21 files + 10 `skills-source.json`): `mariadb-numeric-functions` corrects
+  division by zero (NULL in a query, warning 1365 under `ERROR_FOR_DIVISION_BY_ZERO`, an error
+  only when writing a row under strict mode; the old text named a non-existent
+  `ERROR_ON_DIVISION_BY_ZERO`), `mariadb-control-flow-functions` a typo in `IFNULL`,
+  `mariadb-lock-tables` only its last-updated date. Counts 85 / 47 / 3; `skills.yml` unchanged.
+- No `[Unreleased]` sections to fold. The seven MCP-bearing CHANGELOGs carry the floor line.
+- Static tier green: claude 682, codex 686, opencode 682, pi 691.
+- Still to do after the PR merges (steps 9–11 of `/release`): tag `v26.10.2` on the squash
+  commit, push to both remotes, prereleases on both repos, fast-forward `fork/main` (at
+  `2574a74`, one commit behind), delete `wip/26.10.2`, checkpoint PR.
 
 ## Release v26.10.1 (2026-10-08) — SHIPPED
 

@@ -4,6 +4,24 @@ All notable changes to the MariaDB Codex plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [26.10.2] - 2026-10-09
+
+### Changed
+
+- `MARIADB_SHELL_VERSION`, the *minimum* `mariadb-shell` the launcher accepts,
+  now defaults to `26.10.1`, the newest published `mariadb-shell` release. An
+  install already at or above that version is still used as-is; only a machine
+  below it fetches anything.
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `8bb700f` (synced 2026-10-09). `mariadb-numeric-functions` corrects what
+  division by zero does: in a query `x / 0` and `MOD(n, 0)` return `NULL` (with
+  warning 1365 under the default `ERROR_FOR_DIVISION_BY_ZERO`), and raise an
+  error only when writing a row under strict mode; the old text named a
+  non-existent `ERROR_ON_DIVISION_BY_ZERO` mode. `mariadb-control-flow-functions`
+  fixes a typo in `IFNULL`'s description, and `mariadb-lock-tables` only its
+  last-updated date. No skill was added or removed, so the plugin stays at 85 skills.
+- Version bumped to 26.10.2 to stay in lockstep with the other plugins.
+
 ## [26.10.1] - 2026-10-08
 
 ### Changed
