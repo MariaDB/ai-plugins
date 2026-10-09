@@ -8,14 +8,14 @@ mariadb-shell floor are independent.** Through 26.9.5 every release set both to 
 <version> [shell-version]` now checks the plugin version against this repo's tags and moves the
 floor only when a shell version is given. 26.10.0 is planned on top of the current floor 26.9.5.
 
-## Landed on `main` (through PR #41; release 26.10.1 on `wip/26.10.1`)
+## Landed on `main` (through PR #42)
 
-**#41** `2a6ab29` (2026-10-06) corrected the MSM section rules in the schema-management
+**#42** `2574a74` (2026-10-08) was release 26.10.1 (below). **#41** `2a6ab29` (2026-10-06) corrected the MSM section rules in the schema-management
 skills (250 never deployed → views/routines in 150, removals in 240; 270 only `REVOKE`/`DROP ROLE`,
 grants in 170; `SOURCE` needs a slice), their vendored copies, the MSM e2e tests, `docs-ref` and the
 DevHub, with `[Unreleased]` CHANGELOG entries. It also carried two `.claude/commands/` commits:
 a new `/read-checkpoint` (`991e38b`) and `/checkpoint` without the `$1` target-subfolder argument
-(`b354f57`). **#40** `7f0f593` was the 26.10.0 checkpoint. Unreleased.
+(`b354f57`). **#40** `7f0f593` was the 26.10.0 checkpoint. Shipped in 26.10.1.
 
 **#39** `68bd7d4` was release 26.10.0 (below); **#38** `f2ceecb` decoupled the plugin version
 from the shell floor in `/release` (see the policy above).
@@ -71,12 +71,18 @@ overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-op
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
 
-## Release v26.10.1 (2026-10-08) — IN PROGRESS, PR about to open
+## Release v26.10.1 (2026-10-08) — SHIPPED
 
-- Branch `wip/26.10.1` off `1c433bb` (#41's checkpoint merge), five commits, one per step:
+- **PR #42**, squash `2574a74`. **Annotated tag `v26.10.1` = object `9bcbd39`**, pushed to
+  `origin` and `fork` as the same object; **prerelease on both repos**, bodies sha256-identical
+  to the annotation (trailing whitespace stripped). Fork's `main` fast-forwarded `68bd7d4` →
+  `2574a74` (= `origin/main`, diff empty). `wip/26.10.1` deleted locally; GitHub had already
+  removed it on `origin` at the merge (only the stale tracking ref needed pruning).
+- Branch `wip/26.10.1` off `1c433bb` (#41's checkpoint merge), seven commits, one per step:
   `7494ae8` floor → 26.10.0 (31 files; 33 at 26.9.5 minus the two Pi files #37 removed),
   `9ad453b` plugin version → 26.10.1 (17 files), `48e5f9f` re-vendor, `296e07f` CHANGELOGs,
-  `07c530c` checkpoint, `d8f1349` a multi-tenant note in both MCP tool references (see below).
+  `07c530c` checkpoint, `d8f1349` a multi-tenant note in both MCP tool references (see below),
+  `b1e6e9e` checkpoint fix.
 - **First release since 26.9.5 that moves the shell floor**: mariadb-shell `v26.10.0` was
   published 2026-10-08 (prerelease, the newest), so `set-mariadb-shell-version.sh 26.10.0` ran
   first. Plugin version 26.10.1 (highest tag before it: `v26.10.0`).
@@ -100,9 +106,8 @@ at **https://ai-plugins.mariadb.com/**.
   The one doc gap: a multi-tenant server serves only `db` and `msm`, so one paragraph was
   added under the group table of `docs/mcp-tools.md` and `docs-ref/.../mcp-tool-reference/README.md`
   (user's call: nothing more about the mode, the plugins launch the server themselves).
-- Still to do after the PR merges (steps 9–11 of `/release`): tag `v26.10.1` on the squash
-  commit, push to both remotes, prereleases on both repos, fast-forward `fork/main` (at
-  `68bd7d4`, three commits behind), delete `wip/26.10.1`, checkpoint PR.
+- Tag notes state the floor move (first shell with multi-tenant mode; launchers unchanged), the MSM
+  skill fixes, and the content re-vendor.
 
 ## Release v26.10.0 (2026-10-02) — SHIPPED
 
