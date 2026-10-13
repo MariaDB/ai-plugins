@@ -26,6 +26,7 @@ import fs from 'node:fs';
 import { themes as prismThemes } from 'prism-react-renderer';
 import { remarkGitBook, rehypeGitBook } from 'docusaurus-plugin-gitbook';
 import remarkGitBookExtras, { remarkGitBookPrepare } from './src/remark/gitbook-extras.js';
+import remarkGitBookHeadingIds from './src/remark/gitbook-heading-ids.js';
 
 const REPO = 'https://github.com/mariadb/ai-plugins';
 const LIVE_DOCS = 'https://mariadb.com/docs';
@@ -89,7 +90,9 @@ const config = {
   trailingSlash: true,
 
   onBrokenLinks: 'throw',
-  onBrokenAnchors: 'warn',
+  // Anchors are GitBook's ids (src/remark/gitbook-heading-ids.js), so a
+  // link that fails here is dead on mariadb.com/docs too.
+  onBrokenAnchors: 'throw',
 
   i18n: { defaultLocale: 'en', locales: ['en'] },
 
@@ -125,7 +128,14 @@ const config = {
           exclude: ['**/SUMMARY.md', '**/.gitbook/**'],
           editUrl: `${REPO}/edit/main/docs-ref/`,
           showLastUpdateTime: false,
-          beforeDefaultRemarkPlugins: [remarkGitBookPrepare, remarkGitBook, remarkGitBookExtras],
+          beforeDefaultRemarkPlugins: [
+            remarkGitBookPrepare,
+            // Before remarkGitBook: it re-parses the body of every GitBook
+            // block, so a heading inside one loses its source position.
+            remarkGitBookHeadingIds,
+            remarkGitBook,
+            remarkGitBookExtras,
+          ],
           rehypePlugins: [rehypeGitBook],
         },
         blog: false,
