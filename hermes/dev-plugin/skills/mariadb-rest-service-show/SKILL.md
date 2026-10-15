@@ -1,6 +1,6 @@
 ---
 name: mariadb-rest-service-show
-description: "Browse and inspect existing MariaDB REST Service objects with SHOW REST commands — list services, schemas, data mapping views, procedures, functions, content sets/files, auth apps, roles and grants; check service status; and dump the DDL of any object with SHOW CREATE REST. Use when asked to list, discover, inspect, audit or reverse-engineer existing REST endpoints, or to see the CREATE statement behind a REST object on MariaDB."
+description: "Browse and inspect existing MariaDB REST Service objects with SHOW REST commands — list services, schemas, data mapping views, procedures, functions, scripts, content sets/files, auth apps and vendors, users, roles, grants, REST Daemons and metadata schemas; check service status; list the columns a table can expose; dump the DDL (or JSON) of any object with SHOW CREATE REST. Use when asked to list, discover, inspect, audit or reverse-engineer existing REST endpoints, or to see the CREATE statement behind a REST object on MariaDB."
 ---
 
 # Browsing a MariaDB REST Service with SHOW REST
@@ -28,11 +28,23 @@ USE REST SERVICE /myService SCHEMA /sakila;
 ## Overall status
 
 ```sql
-SHOW REST STATUS;
+SHOW REST STATUS;            -- synonym: SHOW REST METADATA STATUS
+SHOW REST METADATA SCHEMAS;  -- the metadata schemas this account can see
+SHOW REST DAEMONS;           -- the REST Daemon instances serving the services
 ```
 
-Reports basic information about the current state of the MariaDB REST Service
-(whether it is configured/enabled, metadata version, etc.).
+`SHOW REST STATUS` reports whether the metadata schema is configured and
+enabled, the number of enabled services, the current and available metadata
+version, whether it can be updated, and which metadata schema the session uses.
+
+The metadata schema is `mariadb_rest_service`, or one with a prefix/postfix such
+as `acme_mariadb_rest_service`. When an account sees several but not
+`mariadb_rest_service`, REST statements fail until you pick one:
+`USE REST METADATA SCHEMA acme_mariadb_rest_service;`
+
+`SHOW REST DAEMONS` lists each instance's `id` (a UUID), address, version, last
+check-in, whether it is `active` (checked in within 10 s) and its `developer`.
+`SHOW REST SERVICES FOR DAEMON '<id>'` lists what one instance serves.
 
 ## Listing objects
 
@@ -40,8 +52,9 @@ Work top-down: services → schemas → objects. The service/schema clause is
 optional once a default context is set with `USE`.
 
 ```sql
--- All REST services
+-- All REST services (or only those linked to an auth app)
 SHOW REST SERVICES;
+SHOW REST SERVICES FOR AUTH APP "MRS";
 
 -- Schemas of a service
 SHOW REST SCHEMAS FROM SERVICE /myService;
@@ -50,6 +63,7 @@ SHOW REST SCHEMAS FROM SERVICE /myService;
 SHOW REST VIEWS FROM SERVICE /myService SCHEMA /sakila;
 SHOW REST PROCEDURES FROM SERVICE /myService SCHEMA /sakila;
 SHOW REST FUNCTIONS FROM SERVICE /myService SCHEMA /sakila;
+SHOW REST SCRIPTS FROM SERVICE /myService SCHEMA /sales;   -- MRS scripts
 
 -- Static content
 SHOW REST CONTENT SETS FROM SERVICE /myService;
@@ -58,13 +72,27 @@ SHOW REST CONTENT FILES FROM SERVICE /myService CONTENT SET /myContentSet;
 
 `ON` and `FROM` are interchangeable in these statements (`... ON SERVICE ...`
 == `... FROM SERVICE ...`). After a `USE`, the clause can be dropped entirely,
-e.g. `SHOW REST VIEWS;`.
+e.g. `SHOW REST VIEWS;` once both a service and a schema are current.
+
+To see what a table, view or routine *could* expose — columns, foreign-key
+references in both directions, or routine parameters and return type:
+
+```sql
+SHOW REST COLUMNS FROM sakila.city;
+SHOW REST COLUMNS FROM PROCEDURE sakila.film_in_stock;
+```
 
 ## Listing authorization objects
 
 ```sql
--- Auth apps linked to a service
+-- Auth apps linked to a service, all auth apps, and the available vendors
 SHOW REST AUTH APPS FROM SERVICE /myService;
+SHOW REST AUTH APPS ON ANY SERVICE;
+SHOW REST AUTH VENDORS;
+
+-- REST users (of a service's auth apps, or of one auth app); never passwords
+SHOW REST USERS ON SERVICE /myService;
+SHOW REST USERS FOR AUTH APP "MRS";
 
 -- Roles (optionally scoped, or filtered to a user's granted roles)
 SHOW REST ROLES;
@@ -86,9 +114,11 @@ the reliable way to see an endpoint's exact definition (field mapping, CRUD
 flags, options) before editing or cloning it.
 
 ```sql
--- Service; add INCLUDING SCHEMA ENDPOINTS to also emit all nested endpoint DDL
+-- Service; INCLUDING ... ENDPOINTS also emits the nested endpoint DDL:
+-- SCHEMA (= DATABASE) for schemas and objects, ALL to add content sets and scripts
 SHOW CREATE REST SERVICE /myService;
 SHOW CREATE REST SERVICE /myService INCLUDING SCHEMA ENDPOINTS;
+SHOW CREATE REST SERVICE /myService INCLUDING ALL ENDPOINTS;
 
 SHOW CREATE REST SCHEMA /sakila FROM SERVICE /myService;
 
@@ -97,10 +127,10 @@ SHOW CREATE REST PROCEDURE /filmInStock ON SERVICE /myService SCHEMA /sakila;
 SHOW CREATE REST FUNCTION /maxRate ON SERVICE /myService SCHEMA /sakila;
 
 SHOW CREATE REST CONTENT SET /myContentSet FROM SERVICE /myService;
-SHOW CREATE REST CONTENT FILE /index.html FROM SERVICE /myService CONTENT SET /myContentSet;
+SHOW CREATE REST CONTENT FILE `/index.html` FROM SERVICE /myService CONTENT SET /myContentSet;
 
--- Authorization objects
-SHOW CREATE REST AUTH APP "MRS" FROM SERVICE /myService;
+-- Authorization objects (auth apps are not per service)
+SHOW CREATE REST AUTH APP "MRS";
 SHOW CREATE REST ROLE "editor" ON SERVICE /myService;
 SHOW CREATE REST USER "alice"@"MRS";
 ```
@@ -108,6 +138,22 @@ SHOW CREATE REST USER "alice"@"MRS";
 `SHOW CREATE REST VIEW` is especially useful: creating a REST view without an
 explicit GraphQL block auto-expands to all columns, and `SHOW CREATE REST VIEW`
 reveals the generated field mapping so you can copy and refine it.
+
+Request paths with characters other than letters, digits, `_` and `$` (such as
+the `.` in `/index.html`) must be back-tick quoted.
+
+### JSON output
+
+Append `FORMAT=JSON` to any `SHOW CREATE REST ...`, to every list statement
+above except `SHOW REST GRANTS`, and to `SHOW REST STATUS`, `SHOW REST COLUMNS`
+and `SHOW REST DAEMONS`, to get a JSON document (lists: one row holding a JSON
+array) instead of DDL or a table — handy for tools. Ids are UUID strings; secrets and passwords are never
+returned.
+
+```sql
+SHOW CREATE REST VIEW /city ON SERVICE /myService SCHEMA /sakila FORMAT=JSON;
+SHOW REST VIEWS ON SERVICE /myService SCHEMA /sakila FORMAT=JSON;
+```
 
 ## Typical browse workflow
 

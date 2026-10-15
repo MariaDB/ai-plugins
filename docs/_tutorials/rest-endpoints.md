@@ -83,15 +83,15 @@ The agent answers that with `SHOW REST SERVICES` and its siblings, which the
 CONFIGURE REST METADATA;
 ```
 
-Run once per MariaDB instance. It creates the `mysql_rest_service_metadata`
-schema, so the account needs privileges to create schemas — which is why this
-tutorial uses a sandbox.
+Run once per MariaDB instance. It creates the `mariadb_rest_service` metadata
+schema and its roles (`mariadb_rest_service_admin`, `mariadb_rest_service_dev`,
+…), so the account needs privileges to create schemas and roles — which is why
+this tutorial uses a sandbox.
 
 <div class="callout" markdown="1">
-The metadata schema and its roles keep their upstream `mysql_rest_service_*`
-names. MariaDB's REST Service is a fork of the MySQL REST Service and the
-identifiers are unchanged on purpose, so existing tooling keeps working. Only the
-serving component was renamed, to **REST Daemon**.
+REST SQL is built into MariaDB Shell and needs a MariaDB server. Before
+metadata schema 5.0.0 the schema and its roles kept the MySQL REST Service's
+`mysql_rest_service_*` names; 5.0.0 renamed them to `mariadb_rest_service*`.
 </div>
 
 To also upgrade an existing metadata schema and enable the service in one go:

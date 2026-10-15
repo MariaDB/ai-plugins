@@ -11,6 +11,21 @@ project adheres to [Semantic Versioning](https://semver.org/).
 - When the launcher cannot install `mariadb-shell`, its error message now
   suggests downloading the installer and then running it, rather than piping
   `curl` into `bash`, so the script can be read before it runs.
+- The five REST Service skills follow the REST SQL that MariaDB Shell now runs
+  in its built-in `mrs` module, with metadata schema 5.0.0: the metadata schema
+  is `mariadb_rest_service` and its roles are `mariadb_rest_service_*` (with an
+  optional prefix or postfix, `CONFIGURE REST METADATA SCHEMA …`), the
+  server-account auth vendor is `MARIADB` (there is no `MYSQL` vendor), and the
+  new `SHOW REST STATUS`, `SHOW REST COLUMNS`, `SHOW REST USERS`,
+  `SHOW REST AUTH VENDORS`, `SHOW REST DAEMONS`, `DROP REST DAEMON` and
+  `FORMAT=JSON` statements are covered.
+
+### Fixed
+
+- REST Service skill examples that were syntax errors: `ALTER REST VIEW` now uses
+  `CLASS <name>`, request paths such as `/index.html` and wildcards are quoted in
+  backticks, and `SHOW CREATE REST AUTH APP` has no `FROM SERVICE` clause. A REST
+  function's result maps the column `result`.
 
 ## [26.10.2] - 2026-10-09
 

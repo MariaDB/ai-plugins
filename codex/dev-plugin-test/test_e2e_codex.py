@@ -77,7 +77,7 @@ TIMEOUT = int(os.environ.get("E2E_TIMEOUT", "900"))
 # The sandbox schema may be created as `notes-app` or normalized to `notes_app`.
 SCHEMA_CANDIDATES = ("notes-app", "notes_app")
 # REST metadata schema created by CONFIGURE REST METADATA (unchanged in the fork).
-REST_META_SCHEMA = "mysql_rest_service_metadata"
+REST_META_SCHEMA = "mariadb_rest_service"
 
 # The two lines that uniquely identify the skill's mandated Start Block.
 START_BLOCK_MARKERS = ("@OLD_UNIQUE_CHECKS", "SET NAMES utf8mb4")
@@ -168,7 +168,7 @@ def _rest_metadata(port: int) -> dict | None:
     services = _sandbox_query(port, f"SELECT url_context_root FROM {REST_META_SCHEMA}.service")
     if services is None:
         return None
-    objects = _sandbox_query(port, f"SELECT COUNT(*) FROM {REST_META_SCHEMA}.db_object")
+    objects = _sandbox_query(port, f"SELECT COUNT(*) FROM {REST_META_SCHEMA}.rest_object")
     return {
         "services": [r[0] for r in services],
         "objects": int(objects[0][0]) if objects else 0,
@@ -323,7 +323,7 @@ def test_step5_rest_service_created(workflow):
         f"{run.diagnostics}"
     )
     assert meta["objects"] > 0, (
-        f"no REST objects registered in {REST_META_SCHEMA}.db_object.{run.diagnostics}"
+        f"no REST objects registered in {REST_META_SCHEMA}.rest_object.{run.diagnostics}"
     )
 
 

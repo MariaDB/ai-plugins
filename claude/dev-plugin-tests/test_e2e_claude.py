@@ -35,7 +35,7 @@ a separate `test_stepN_*` so it is reported and can be run individually
      the sandbox reports the `/notesApp` service and its endpoints  → the REST
      script was run via the MCP server. `SHOW REST ...` are mariadb-shell DDL
      extensions, so they are executed through the MCP server (a plain SQL
-     connection can't parse them); a `mysql_rest_service_metadata` query is the
+     connection can't parse them); a `mariadb_rest_service` query is the
      fallback when the server's SQL tool can't be resolved.
 
 Teardown drops the sandbox with a real `sandbox.delete` MCP call (discovered
@@ -130,7 +130,7 @@ TIMEOUT = int(os.environ.get("E2E_TIMEOUT", "900"))
 SCHEMA_CANDIDATES = ("notes-app", "notes_app")
 
 # REST metadata schema created by CONFIGURE REST METADATA (unchanged in the fork).
-REST_META_SCHEMA = "mysql_rest_service_metadata"
+REST_META_SCHEMA = "mariadb_rest_service"
 
 # Keys the SQL-execution MCP tool's argument is likely called.
 _SQL_ARG_NAMES = ("sql", "statement", "statements", "query", "script", "command", "code", "stmt")
@@ -406,7 +406,7 @@ def _rest_via_metadata(port: int) -> dict | None:
         with conn.cursor() as cur:
             cur.execute(f"SELECT url_context_root FROM {REST_META_SCHEMA}.service")
             services = [row[0] for row in cur.fetchall()]
-            cur.execute(f"SELECT COUNT(*) FROM {REST_META_SCHEMA}.db_object")
+            cur.execute(f"SELECT COUNT(*) FROM {REST_META_SCHEMA}.rest_object")
             objects = cur.fetchone()[0]
         return {"services": services, "objects": int(objects)}
     except Exception as exc:  # metadata schema absent / different layout
@@ -521,7 +521,7 @@ def test_step5_rest_service_created(workflow):
     """The REST script ran against the sandbox: /notesApp + its endpoints exist.
 
     Verified primarily through the SHOW REST commands run via the MCP server
-    (they are mariadb-shell DDL extensions), with a mysql_rest_service_metadata
+    (they are mariadb-shell DDL extensions), with a mariadb_rest_service
     query as the fallback.
     """
     diagnostics = workflow["diagnostics"]

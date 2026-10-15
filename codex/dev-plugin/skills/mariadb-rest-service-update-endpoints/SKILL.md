@@ -11,6 +11,11 @@ Each `ALTER` accepts the same options as the matching `CREATE` (see the
 `mariadb-rest-service-create` and `mariadb-rest-service-authorization` skills);
 this skill covers what is specific to *changing* endpoints.
 
+Each statement is atomic: if it fails, none of its changes remain. Inside an
+explicit transaction, `ALTER`s of views/procedures/functions that change the
+privileges they need (and every `CREATE`/`DROP` of one) commit it implicitly, as
+they run `GRANT`/`REVOKE`.
+
 Assume MariaDB 11.8 if not told otherwise.
 
 ## Inspect before you change
@@ -26,6 +31,8 @@ SHOW CREATE REST PROCEDURE /filmInStock ON SERVICE /myService SCHEMA /sakila;
 SHOW CREATE REST FUNCTION /maxRate ON SERVICE /myService SCHEMA /sakila;
 ```
 
+Use `INCLUDING ALL ENDPOINTS` to also dump content sets and scripts. Append
+`FORMAT=JSON` to any `SHOW CREATE REST ...` for a JSON document instead of DDL.
 `SHOW REST SERVICES`, `SHOW REST SCHEMAS`, `SHOW REST VIEWS`,
 `SHOW REST PROCEDURES` and `SHOW REST FUNCTIONS` list what exists.
 
@@ -110,21 +117,27 @@ ALTER REST SCHEMA /sakila ON SERVICE /myService PRIVATE;
 ## ALTER REST VIEW
 
 `ALTER REST DATA MAPPING VIEW` changes the field mapping (GraphQL block), CRUD
-annotations, request path or object options. Re-supply the `CLASS`/GraphQL block
-when changing fields:
+annotations, request path or object options. Field and CRUD changes go after
+`CLASS <name>` — take the class name from `SHOW CREATE REST VIEW` (e.g.
+`MyServiceSakilaCity`). A GraphQL block replaces the whole field mapping; `CLASS`
+with only CRUD annotations keeps the fields and replaces the CRUD flags. The
+underlying table/view cannot be changed by `ALTER` — use `CREATE OR REPLACE REST
+VIEW` for that.
 
 ```sql
+-- Replace the field mapping
 ALTER REST VIEW /city
 ON SERVICE /myService SCHEMA /sakila
-FROM `sakila`.`city` AS MyServiceSakilaCity {
+CLASS MyServiceSakilaCity {
     cityId: city_id @SORTABLE @KEY,
     city: city
 };
 
--- Toggle CRUD and auth without touching fields
+-- Set CRUD operations without touching fields
 ALTER REST VIEW /city ON SERVICE /myService SCHEMA /sakila
-    @INSERT @UPDATE @NODELETE;
+    CLASS MyServiceSakilaCity @INSERT @UPDATE @NODELETE;
 
+-- Object options need no CLASS
 ALTER REST VIEW /city ON SERVICE /myService SCHEMA /sakila
     AUTHENTICATION NOT REQUIRED;
 ```
@@ -134,8 +147,12 @@ Field/CRUD annotations (`@SORTABLE`, `@KEY`, `@UNNEST`, `@INSERT`, `@NOUPDATE`,
 
 ## ALTER REST PROCEDURE / FUNCTION
 
-Change parameters, result sets, request path or options. Re-declare the
-`PARAMETERS` and `RESULT` blocks you want in effect:
+Change parameters, result sets, request path or options. An `ALTER` with only
+options keeps the parameters and results; once it has a `PARAMETERS` or `RESULT`
+block, the blocks given replace all existing ones — left-out parameters are
+regenerated from the routine under a default class name, and a left-out
+`RESULT` is removed. So re-declare every `PARAMETERS` and `RESULT` block you want
+in effect:
 
 ```sql
 ALTER REST PROCEDURE /filmInStock
@@ -158,7 +175,7 @@ ON SERVICE /myService SCHEMA /sakila
 ALTER REST AUTH APP "MRS" NEW NAME "MRSAuth";
 ALTER REST AUTH APP "MRS" DISABLED;
 
-ALTER REST USER "alice"@"MRS" IDENTIFIED BY "new-password";
+ALTER REST USER "alice"@"MRS" IDENTIFIED BY "********";
 ALTER REST USER "alice"@"MRS" ACCOUNT LOCK;
 ```
 

@@ -8,19 +8,22 @@ description: "Create a MariaDB REST Service for a database schema — configure 
 The MariaDB REST Service exposes database schema objects (tables, views, stored
 procedures and functions) as REST endpoints that serve and accept JSON. It is a
 fork of the MySQL REST Service and is administered entirely through SQL DDL
-statements run in **`mariadb-shell`**, which understands the extended
-`... REST ...` grammar. The endpoints themselves are served over HTTP(S) by the
-**REST Daemon**.
+statements run in **`mariadb-shell`**, whose built-in `mrs` module handles the
+extended `... REST ...` grammar (in SQL mode, or with `session.run_sql()`). REST
+SQL needs a MariaDB server — every statement fails on a MySQL session — and it
+never reads or writes files on the client. The endpoints themselves are served
+over HTTP(S) by the **MariaDB REST Daemon**.
 
-Assume MariaDB 11.8 and the latest REST Service metadata schema if not told
-otherwise. Comment each REST object you create to describe its purpose.
+Assume MariaDB 11.8 and the latest REST Service metadata schema (5.0.0) if not
+told otherwise. Comment each REST object you create to describe its purpose.
 
 ## The four steps
 
 REST-enabling a schema always follows the same order. Each step has its own
 statement; run them in `mariadb-shell`:
 
-1. **Configure** the REST metadata schema once per server — `CONFIGURE REST METADATA`.
+1. **Configure** the REST metadata schema once per server — `CONFIGURE REST METADATA`
+   (add `UPDATE IF AVAILABLE` when it may already exist in an older version).
 2. **Create the service** — `CREATE REST SERVICE`, the URL root of your API.
 3. **Add a REST schema** — `CREATE REST SCHEMA ... FROM <db_schema>`, mapping a
    database schema into the service. *This alone exposes nothing.*
@@ -69,21 +72,37 @@ only served by a REST Daemon running in development mode; publish it with
 
 ## Step 1 — CONFIGURE REST METADATA
 
-Run once per MariaDB instance (or InnoDB Cluster/Set). It creates the
-`mysql_rest_service_metadata` database schema, so the account running it needs
-privileges to create schemas.
+Run once per MariaDB server (or cluster). It creates the `mariadb_rest_service`
+database schema and the MRS roles (`mariadb_rest_service_admin`, `..._dev`, …;
+see `mariadb-rest-service-authorization`), so the account running it needs
+privileges to create schemas and roles. Running it again is harmless.
 
 ```sql
 CONFIGURE REST METADATA;
 ```
 
-To also upgrade an existing metadata schema to the latest version, and to enable
-the service after configuring:
+An older metadata schema is left as it is and reported as needing an update, and
+all other REST statements refuse to work on it until it is updated. To update it
+(MariaDB Shell backs it up first) and enable the service:
 
 ```sql
 CONFIGURE REST METADATA
     ENABLED
     UPDATE IF AVAILABLE;
+```
+
+`SHOW REST STATUS;` reports whether the metadata schema is configured and
+enabled, its current and available version, and whether it can be updated.
+
+To keep several metadata schemas on one server (e.g. one per customer), name one
+with `SCHEMA`: a prefix and/or postfix around `mariadb_rest_service`. Its roles
+carry the same affixes (`acme_mariadb_rest_service_admin`), and the session
+switches to it. Choose between existing ones with `USE REST METADATA SCHEMA`;
+`SHOW REST METADATA SCHEMAS` lists them.
+
+```sql
+CONFIGURE REST METADATA SCHEMA acme_mariadb_rest_service;
+USE REST METADATA SCHEMA acme_mariadb_rest_service;
 ```
 
 Global options are set as a JSON document via `OPTIONS` (add `MERGE` before
@@ -185,7 +204,7 @@ USE REST SCHEMA /sakila;
 - State option is `ENABLED` / `DISABLED` / `PRIVATE`. `PRIVATE` blocks public
   HTTPS access but keeps the schema reachable from internal MRS scripts.
 - `ITEMS PER PAGE <n>` sets the default page size for its objects.
-- Also supports `OPTIONS`, `COMMENT`, `METADATA`.
+- Also supports `AUTHENTICATION [NOT] REQUIRED`, `OPTIONS`, `COMMENT`, `METADATA`.
 
 ## Step 4 — Expose database objects
 
@@ -193,7 +212,9 @@ USE REST SCHEMA /sakila;
 
 `CREATE REST DATA MAPPING VIEW` (the `DATA MAPPING` words are optional) turns a
 table or view into a JSON endpoint. The JSON shape is defined with an extended
-GraphQL block. Omitting the block exposes every column as a flat object:
+GraphQL block. Omitting the block exposes every column as a flat object.
+`SHOW REST COLUMNS FROM sakila.city;` lists the columns and the foreign-key
+references (both directions) you can map:
 
 ```sql
 CREATE OR REPLACE REST VIEW /city
@@ -304,7 +325,8 @@ RESULT MyServiceSakilaFilmInStock {
 
 ### Stored functions → CREATE REST FUNCTION
 
-Same shape as procedures, with a single `RESULT` for the return value:
+Same shape as procedures, with at most one `RESULT` for the return value. The
+return value is always the column `result`; only the field name is yours:
 
 ```sql
 CREATE OR REPLACE REST FUNCTION /maxFilmRentalRate
@@ -314,7 +336,7 @@ PARAMETERS MyServiceParams {
     pCategory: p_category @IN
 }
 RESULT MyServiceResult {
-    maxRate: max_rate @DATATYPE("decimal")
+    maxRate: result @DATATYPE("decimal")
 };
 ```
 
@@ -323,11 +345,14 @@ RESULT MyServiceResult {
 ## Automatic privilege grants
 
 When you create or alter a REST object, `mariadb-shell` automatically grants the
-privileges the REST Daemon needs (via the `mysql_rest_service_data_provider`
-role) to read/write the referenced database object. If a stored routine touches
-other tables or calls other routines, add those grants through the object's
-`OPTIONS.grants` list (or set `OPTIONS.disableAutomaticGrants` to manage them
-fully yourself).
+privileges the REST Daemon needs to the `mariadb_rest_service_data_provider`
+role: the CRUD privileges on a view's table/view, `EXECUTE` on a routine. If a
+stored routine touches other tables or calls other routines, add those grants
+through the object's `OPTIONS.grants` list, or grant them to
+`mariadb_rest_service_data_provider` yourself (set
+`OPTIONS.disableAutomaticGrants` to manage them fully yourself). Because these
+are `GRANT`s, creating or dropping a REST view/procedure/function commits an
+open transaction implicitly.
 
 ## Verify what you created
 
@@ -339,6 +364,8 @@ SHOW REST PROCEDURES FROM SERVICE /myService SCHEMA /sakila;
 SHOW CREATE REST VIEW /city ON SERVICE /myService SCHEMA /sakila;
 SHOW REST STATUS;
 ```
+
+See `mariadb-rest-service-show` for all `SHOW REST` statements.
 
 ## See Also
 
