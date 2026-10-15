@@ -69,3 +69,16 @@
   splits it itself (first word the plugin version, second the floor, a third word stops it).
   Write any future command with more than one argument the same way, and if a command body
   ever shows a literal `$N`, read the arguments off the user's own command line.
+- **Hermes' install scan, not `--force`'s help text, decides whether `--force` is needed.**
+  Hermes v0.21.7 documents `plugins install --force` only as "reinstall over an existing
+  plugin", yet it is also what overrides a BLOCKED verdict (community source + *caution*). The
+  scan reads every `SKILL.md`: `sudo` lines rated HIGH (`privilege_escalation`), so any
+  vendored skill reintroducing `sudo` would block the dev/sql plugins again. Since #47 the e2e
+  installs WITHOUT `--force`, so that regression fails the e2e. To check by hand: copy `hermes/`
+  into a throwaway git repo, `hermes profile create <tmp> --no-skills`, then
+  `hermes -p <tmp> plugins install file://<repo>#hermes/dev-plugin --enable --yes-deps`, and
+  `hermes profile delete <tmp> --yes`.
+- **A PR adding docs-ref pages at the old `content/mariadb-ai-plugins/` path** (anything branched
+  before #51) conflicts with the move: git reports "added in a directory that was renamed" and
+  usually relocates the file itself; regenerate `SUMMARY.md` from `main`'s version, nesting the
+  plugin subtree under `* [Community Tools](community/README.md)` with `community/` prefixed.

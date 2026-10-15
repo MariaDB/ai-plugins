@@ -8,8 +8,9 @@ mariadb-shell floor are independent.** Through 26.9.5 every release set both to 
 <version> [shell-version]` now checks the plugin version against this repo's tags and moves the
 floor only when a shell version is given. 26.10.0 is planned on top of the current floor 26.9.5.
 
-## Landed on `main` (through PR #51)
+## Landed on `main` (through PR #52)
 
+**#52** `43a33cb` (2026-10-15) was release 26.10.3 (below).
 **#51** `4747939` (2026-10-15) moved `docs-ref/content/mariadb-ai-plugins/` to
 `content/community/mariadb-ai-plugins/` (mariadb.com/docs now lists the plugins under
 Community Tools, `tools/community/`), with a Community Tools landing stand-in and a
@@ -86,7 +87,18 @@ overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-op
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
 
-## Release v26.10.3 (2026-10-15) — IN PROGRESS (PR about to open)
+## Release v26.10.3 (2026-10-15) — SHIPPED
+
+- **PR #52**, squash `43a33cb` (merged head `dfb77b9`). **Annotated tag `v26.10.3` = object
+  `65b8865`**, pushed to `origin` and `fork` as the same object; **prerelease on both repos**,
+  bodies identical. The tag has a one-line subject (`MariaDB AI Plugins 26.10.3`) so the whole
+  summary lands in `%(contents:body)` — v26.10.2's first paragraph had become its subject and
+  is missing from that release's notes. Fork's `main` fast-forwarded `13685aa` → `43a33cb`
+  (= `origin/main`, diff empty).
+- **The PR was merged before `3ba3ecc` (the "PR open" checkpoint, with the two new gotchas)
+  reached it**, so `wip/26.10.3` on `origin` ends one commit past the merged head; that commit
+  was cherry-picked onto `wip/checkpoint-26.10.3`. Per the deletion rule the branch is kept
+  until the user decides.
 
 - `/release 26.10.3`, no floor: it stays **26.10.1**, still the newest mariadb-shell release
   (2026-10-08). Branch `wip/26.10.3` off `4747939` (#51).
@@ -103,6 +115,8 @@ at **https://ai-plugins.mariadb.com/**.
   release** — their `[Unreleased]` became `[26.10.3]`, with the vendored commits corrected from
   `8bb700f`/`43338f8` to `cc8dd40`/`37cb1d3`.
 - Static tier green: claude 682, codex 686, hermes 779, opencode 682, pi 691.
+- `dfb77b9` checkpoint. **PR #52** ("Release 26.10.3: plugin version, CHANGELOGs, and
+  Hermes Agent's first release"; no `[bypass-ci]`, manifests in the diff).
 
 ## Release v26.10.2 (2026-10-09) — SHIPPED
 
