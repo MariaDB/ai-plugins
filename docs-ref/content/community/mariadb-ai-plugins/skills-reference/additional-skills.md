@@ -21,10 +21,10 @@ Skills for creating and managing REST endpoints with the MariaDB REST Service.
 
 | Skill | Plugins | What it covers |
 | --- | --- | --- |
-| `mariadb-rest-service-authorization` | `dev` | Set up authentication and authorization for a MariaDB REST Service — create a REST AUTH APP (MRS, MYSQL or OAuth2 vendor), link it to a service, add REST users, and control access with REST roles and GRANT/REVOKE REST CREATE/READ/UPDATE/DELETE privileges at service/schema/object level. |
+| `mariadb-rest-service-authorization` | `dev` | Set up authentication and authorization for a MariaDB REST Service — create a REST AUTH APP (MRS, MARIADB or OAuth2 vendor), link it to a service, add REST users, and control access with REST roles and GRANT/REVOKE REST CREATE/READ/UPDATE/DELETE privileges at service/schema/object level. |
 | `mariadb-rest-service-create` | `dev` | Create a MariaDB REST Service for a database schema — configure the REST metadata schema, create the REST service, add a REST schema, and expose tables/views as REST data mapping views and stored procedures/functions as REST procedures/functions. |
-| `mariadb-rest-service-drop` | `dev` | Remove MariaDB REST Service objects with DROP REST statements — drop a REST service, schema, data mapping view, procedure, function, content set/file, auth app, user or role, using IF EXISTS to avoid errors. |
-| `mariadb-rest-service-show` | `dev` | Browse and inspect existing MariaDB REST Service objects with SHOW REST commands — list services, schemas, data mapping views, procedures, functions, content sets/files, auth apps, roles and grants; check service status; and dump the DDL of any object with SHOW CREATE REST. |
+| `mariadb-rest-service-drop` | `dev` | Remove MariaDB REST Service objects with DROP REST statements — drop a REST service, schema, data mapping view, procedure, function, content set/file, auth app, user, role or stale REST Daemon registration, using IF EXISTS to avoid errors. |
+| `mariadb-rest-service-show` | `dev` | Browse and inspect existing MariaDB REST Service objects with SHOW REST commands — list services, schemas, data mapping views, procedures, functions, scripts, content sets/files, auth apps and vendors, users, roles, grants, REST Daemons and metadata schemas; check service status; list the columns a table can expose; dump the DDL (or JSON) of any object with SHOW CREATE REST. |
 | `mariadb-rest-service-update-endpoints` | `dev` | Update MariaDB REST Service endpoints — alter a REST service, schema, data mapping view, procedure or function; rename request paths; enable/disable; publish/unpublish a service; add/remove auth apps; merge JSON options; and drop endpoints. |
 
 ## Schema Management

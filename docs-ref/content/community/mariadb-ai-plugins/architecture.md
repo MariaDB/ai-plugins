@@ -13,7 +13,7 @@ This page describes how MariaDB AI Plugins reach a coding agent, how their compo
 
 MariaDB AI Plugins involve three parts: the coding agent, the agent plugin, and the native tools package. The agent plugin is specific to each coding agent, while the native tools package is shared by all of them.
 
-![The architecture of MariaDB AI Plugins: coding agents with their MariaDB plugins, which are installed from GitHub and download a shared native tools package for the operating system and CPU architecture](../.gitbook/assets/MariaDB_AI-Plugins_Architecture.svg)
+![The architecture of MariaDB AI Plugins: coding agents with their MariaDB plugins, which are installed from GitHub and download a shared native tools package for the operating system and CPU architecture](../../.gitbook/assets/MariaDB_AI-Plugins_Architecture.svg)
 
 _A plugin is installed from GitHub (1 and 2), and downloads the native tools package for its platform on first use (3)._
 

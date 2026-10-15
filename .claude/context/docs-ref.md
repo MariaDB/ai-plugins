@@ -3,9 +3,9 @@
 [← Project Context](../PROJECT_CONTEXT.md)
 
 GitBook reference docs for the plugins, merged as **PR #35** (`17bce4b`,
-2026-10-01). Target: the **Enterprise Tools** space of mariadb.com/docs
-(`tools/` in `mariadb-corporation/mariadb-docs`, next to Enterprise MCP Server
-and AI RAG) — placement still needs the docs team's OK. `docs-ref/README.md` is
+2026-10-01). Target: the **Community Tools** section of the Enterprise Tools space of
+mariadb.com/docs (`tools/community/` in `mariadb-corporation/mariadb-docs`, next
+to the MySQL to MariaDB Migrator; moved there from `tools/` on 2026-10-15). `docs-ref/README.md` is
 the maintainer guide (preview, writing rules, porting steps); this file holds
 what is NOT in it.
 
@@ -13,16 +13,19 @@ what is NOT in it.
 
 - **`content/` is GitBook source, ported unchanged**; everything else in
   `docs-ref/` is the Docusaurus 3.10 preview (`docusaurus-plugin-gitbook`
-  1.0.6). `content/README.md` is a stand-in for the Enterprise Tools space
-  landing — only its `## MariaDB AI Plugins` section is for porting.
+  1.0.6). `content/README.md` and `content/community/README.md` are
+  stand-ins for the Enterprise Tools and Community Tools landings — only their
+  `MariaDB AI Plugins` sections are for porting. Product pages live in
+  `content/community/mariadb-ai-plugins/`.
 - **`content/SUMMARY.md` is the only page tree**: `sidebars.js` parses it
   (`* [Title](path.md)`, 2-space indent; an entry with children → category
   linked to its own page). Never hand-maintain a Docusaurus sidebar.
 - **Images live in `content/.gitbook/assets/`** (GitBook's place), referenced
-  relatively (`../.gitbook/assets/x.svg`) so they resolve in `tools/` too. NOT
+  relatively (`../../.gitbook/assets/x.svg` from the product root) so they resolve in
+  `tools/community/` too. NOT
   `static/img/` — that is preview-only (logos, favicons, root redirect).
 - **URLs mirror mariadb.com/docs**: `baseUrl` `/docs/`, `routeBasePath`
-  `tools` → `/docs/tools/mariadb-ai-plugins/…`. `trailingSlash: true` so every
+  `tools` → `/docs/tools/community/mariadb-ai-plugins/…`. `trailingSlash: true` so every
   page is `<page>/index.html` (plain Apache/nginx). `DOCS_BASE_URL` overrides
   the base path. A postBuild plugin writes `build/.htaccess`
   (`ErrorDocument 404 <base>404.html` only).
@@ -99,9 +102,9 @@ what is NOT in it.
    `sandbox.*` and `db.execute_sql_script` were checked against
    `mcp_plugin/lib/*_functions.py`; `db`/`msm`/`migrator` args still come from
    the DevHub.
-2. **Port to mariadb-docs** per `docs-ref/README.md` (copy into `tools/`,
-   merge SUMMARY + landing section, cross-space links → `{server}/…` aliases,
-   run `docs-check`). Needs the placement decision first.
+2. **Port to mariadb-docs** per `docs-ref/README.md` (copy into
+   `tools/community/`, merge SUMMARY + landing sections, cross-space links → `{server}/…` aliases,
+   run `docs-check`).
 3. Unverified on the pages: an end-to-end SSH tunnel (no SSH host here); error
    1130 (not reproducible on a sandbox — MariaDB's documented text is used); a
    TLS-failure row was dropped because the sandbox accepted `ssl-mode=REQUIRED`.
@@ -136,6 +139,6 @@ what is NOT in it.
 - **Inactive GitBook tabs aren't in the static HTML** (the Windows tab of
   Codex/Configuring): they render client-side, so grep `build/assets/js`, not
   the page's `index.html`, to check their content. Built pages live at
-  `build/tools/…` (no `docs/` dir in `build/`).
+  `build/tools/community/…` (no `docs/` dir in `build/`).
 - Prism `batch` must be in `additionalLanguages` (added in #36) or Windows
   fences render unhighlighted.

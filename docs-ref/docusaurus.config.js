@@ -19,7 +19,7 @@
 // The pages in content/ are GitBook source: Markdown plus GitBook blocks,
 // a SUMMARY.md for navigation, and `.gitbook/assets/` for images. They are
 // written to be copied into the Enterprise Tools space of mariadb-docs
-// (`tools/`) unchanged. This site only renders them, styled after
+// (`tools/community/`) unchanged. This site only renders them, styled after
 // https://mariadb.com/docs/, because GitBook itself cannot build offline.
 
 import fs from 'node:fs';
@@ -80,7 +80,7 @@ const config = {
   tagline: 'MariaDB AI Plugins reference (offline preview)',
   favicon: 'img/favicon.ico',
 
-  // Mirrors the published layout: https://mariadb.com/docs/tools/<product>/…
+  // Mirrors the published layout: https://mariadb.com/docs/tools/community/<product>/…
   // To host the preview under another path, build with e.g.
   // DOCS_BASE_URL=/ai-plugins-docs/ npm run build.
   url: 'https://mariadb.com',
@@ -161,7 +161,7 @@ const config = {
       announcementBar: {
         id: 'offline-preview',
         content:
-          'Offline preview of the <b>MariaDB AI Plugins</b> reference docs. The published version will live on <a href="https://mariadb.com/docs/tools">mariadb.com/docs</a>.',
+          'Offline preview of the <b>MariaDB AI Plugins</b> reference docs. The published version will live on <a href="https://mariadb.com/docs/tools/community">mariadb.com/docs</a>.',
         isCloseable: true,
       },
       navbar: {

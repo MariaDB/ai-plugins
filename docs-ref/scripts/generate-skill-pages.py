@@ -29,7 +29,7 @@ Reads:
   * additional-skills/<group>/<skill>/    — which group a local skill is in
 
 Writes one GitBook page per layer under
-docs-ref/content/mariadb-ai-plugins/skills-reference/. The section README is
+docs-ref/content/community/mariadb-ai-plugins/skills-reference/. The section README is
 hand-written and not touched.
 """
 
@@ -41,7 +41,7 @@ CATALOG = REPO / "docs/_data/skills.yml"
 DEV_SKILLS = REPO / "claude/dev-plugin/skills"
 CONTRIBUTOR_SKILLS = REPO / "claude/contributor-plugin/skills"
 ADDITIONAL = REPO / "additional-skills"
-OUT = REPO / "docs-ref/content/mariadb-ai-plugins/skills-reference"
+OUT = REPO / "docs-ref/content/community/mariadb-ai-plugins/skills-reference"
 
 # layer id → (file name, page title, page description, intro paragraph)
 PAGES = {
