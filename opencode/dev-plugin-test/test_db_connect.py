@@ -137,9 +137,9 @@ def test_connect_accepts_other_spellings_of_the_same_connection(instance):
     `db.list_connections` hands out the bare `user@host:port`, but a client
     writing a URI tends to prefix a scheme, case the host differently or put a
     password in it. `config.normalize_connection_uri` folds exactly those
-    together — scheme, host case, default port, an inline password — because the
-    alternative is telling a caller that a connection it can see listed is not
-    configured.
+    together — the `mariadb://` scheme, host case, default port, an inline
+    password — because the alternative is telling a caller that a connection it
+    can see listed is not configured.
 
     Note this is a *behaviour change*: these spellings used to be rejected, and
     the project's notes recorded the bare form as mandatory. They are equivalent
@@ -148,7 +148,6 @@ def test_connect_accepts_other_spellings_of_the_same_connection(instance):
     uri = sandbox.connection_uri(instance)
     spellings = [
         f"mariadb://{uri}",
-        f"mysql://{uri}",
         f"{instance.user}:wrong-password-ignored@{instance.host}:{instance.port}",
         f"{instance.user}@{instance.host.upper()}:{instance.port}",
     ]
@@ -163,6 +162,26 @@ def test_connect_accepts_other_spellings_of_the_same_connection(instance):
             connection_id = sandbox.tool_text(opened).strip()
             # Close each one: only a limited number may be open at a time.
             client.call_tool("db.close", {"connection_id": connection_id})
+
+
+def test_connect_refuses_the_mysql_scheme(instance):
+    """`mariadb://` is the scheme; `mysql://` no longer names the same connection.
+
+    The shell used to fold `mysql://` in with the other spellings. Since
+    `mariadb://` became the default scheme it is refused, and a caller that
+    composes a `mysql://` URI is told the connection is not configured.
+    """
+    spelling = f"mysql://{sandbox.connection_uri(instance)}"
+    with sandbox.mcp_client(instance) as client:
+        result = client.call_tool("db.connect", {"uri": spelling})
+        assert sandbox.tool_failed(result), (
+            f"db.connect({spelling!r}) succeeded, but mysql:// is no longer an "
+            "accepted scheme"
+        )
+        assert "not a configured connection" in sandbox.tool_text(result).lower(), (
+            f"the refusal should say the URI is not a configured connection. Got: "
+            f"{sandbox.tool_text(result)}"
+        )
 
 
 def test_connect_refuses_a_uri_that_asks_for_more_than_was_configured(instance):

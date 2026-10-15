@@ -307,7 +307,7 @@
       "path": "topical",
       "author": "mariadb-foundation",
       "vendored_from": "https://github.com/MariaDB/skills",
-      "vendored_ref": "86623494f8051e766c973d35c1f07368c3b4c267",
+      "vendored_ref": "7b01484d7a7475824bea86f3e628e29273d1817b",
       "vendored_license": "MIT",
       "skills": [
         {

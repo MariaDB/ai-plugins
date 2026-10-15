@@ -1,0 +1,95 @@
+# Golden SQL fixtures for the mariadb-create-table skill.
+# Schema documented in mariadb-create-database.yaml.
+# `{ns}` is the throwaway database, created and USEd before each case, so
+# unqualified tables below land in it.
+
+skill: mariadb-create-table
+cases:
+  - name: CREATE OR REPLACE TABLE recreates with the new definition
+    claim: "OR REPLACE is the atomic equivalent of DROP + CREATE"
+    setup:
+      - "CREATE TABLE t (id INT)"
+      - "INSERT INTO t VALUES (1)"
+    sql:
+      - "CREATE OR REPLACE TABLE t (id INT, extra INT)"
+    expect: success
+    assert:
+      - query: "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='{ns}' AND TABLE_NAME='t'"
+        equals: 2
+      - query: "SELECT COUNT(*) FROM t"
+        equals: 0
+
+  - name: OR REPLACE cannot be combined with IF NOT EXISTS
+    claim: "CREATE OR REPLACE ... IF NOT EXISTS is rejected"
+    sql:
+      - "CREATE OR REPLACE TABLE IF NOT EXISTS t (id INT)"
+    expect: error
+
+  - name: WITH SYSTEM VERSIONING creates a system-versioned table
+    claim: "WITH SYSTEM VERSIONING is the MariaDB form for transaction-time history"
+    sql:
+      - "CREATE TABLE t (id INT, val INT) WITH SYSTEM VERSIONING"
+    expect: success
+    assert:
+      - query: "SHOW CREATE TABLE t"
+        column: 1
+        contains: "SYSTEM VERSIONING"
+
+  - name: application-time PERIOD FOR is accepted
+    claim: "PERIOD FOR declares an application-time period"
+    sql:
+      - "CREATE TABLE t (id INT, valid_from DATE, valid_to DATE, PERIOD FOR effective (valid_from, valid_to))"
+    expect: success
+    assert:
+      - query: "SHOW CREATE TABLE t"
+        column: 1
+        contains: "PERIOD FOR"
+
+  - name: INVISIBLE column is flagged INVISIBLE and excluded from SELECT *
+    claim: "INVISIBLE columns are hidden from SELECT * but still explicitly selectable"
+    setup:
+      - "CREATE TABLE t (id INT, secret INT INVISIBLE)"
+      - "INSERT INTO t (id, secret) VALUES (1, 9)"
+    sql:
+      - "SELECT secret FROM t"
+    expect: success
+    assert:
+      - query: "SELECT EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='{ns}' AND TABLE_NAME='t' AND COLUMN_NAME='secret'"
+        contains: "INVISIBLE"
+      - query: "SELECT secret FROM t"
+        equals: 9
+
+  - name: utf8mb4 column stores a 4-byte character
+    claim: "utf8mb4 (not the legacy utf8/utf8mb3 alias) stores 4-byte characters"
+    setup:
+      - "CREATE TABLE t (s VARCHAR(16)) CHARSET=utf8mb4"
+      - "INSERT INTO t VALUES ('😀')"
+    sql:
+      - "SELECT s FROM t"
+    expect: success
+    assert:
+      - query: "SELECT s FROM t"
+        equals: "😀"
+
+  - name: PERSISTENT generated column is created as a stored generated column
+    claim: "PERSISTENT is MariaDB's keyword for a stored generated column"
+    sql:
+      - "CREATE TABLE t (a INT, b INT GENERATED ALWAYS AS (a + 1) PERSISTENT)"
+    expect: success
+    assert:
+      - query: "SHOW CREATE TABLE t"
+        column: 1
+        contains: "GENERATED ALWAYS"
+
+  - name: IF NOT EXISTS on a differing schema warns and leaves the table untouched
+    claim: "IF NOT EXISTS on an existing table warns (not errors) and keeps the old definition"
+    setup:
+      - "CREATE TABLE t (id INT)"
+    sql:
+      - "CREATE TABLE IF NOT EXISTS t (id INT, other INT)"
+    expect: success
+    assert:
+      - query: "SHOW WARNINGS"
+        rowcount_min: 1
+      - query: "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='{ns}' AND TABLE_NAME='t'"
+        equals: 1

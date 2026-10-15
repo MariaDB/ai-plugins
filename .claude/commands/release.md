@@ -82,7 +82,8 @@ scripts/set-plugin-version.sh <version>
 Run them in that order and stop at the first non-zero exit. Skip the shell-floor
 script entirely when the floor is not moving. After each, note how many files
 changed (`git status --short | wc -l`). For reference, 26.9.5 moved 33 files for
-the shell floor and 17 for the plugin version; a very different count is worth
+the shell floor and 17 for the plugin version; the Hermes plugins, added after
+26.10.2, add 8 and 6 to those; a very different count is worth
 looking into before going on. If a version was already at its target the script
 changes nothing — say so, don't treat it as a failure. Commit each step on its
 own so the PR is reviewable per step.
@@ -95,14 +96,14 @@ scripts/sync-skills.sh
 
 No argument: it vendors the latest upstream `main`. Afterwards, **look at
 `git status` rather than assuming the sync shipped something** — often only the
-ten `skills-source.json` provenance files move. Record, for the release notes:
+thirteen `skills-source.json` provenance files move. Record, for the release notes:
 the old → new upstream commits for `mariadb-docs` and `mariadb-shell` (from the
 `skills-source.json` diffs), any skills added, removed or changed, and the skill
 counts per variant (82 dev / 47 sql / 2 contributor as of 26.9.3). Commit.
 
 ## 5. CHANGELOG entries
 
-Add a `## [<version>] - <today>` section to the top of all ten `*/*/CHANGELOG.md`
+Add a `## [<version>] - <today>` section to the top of all thirteen `*/*/CHANGELOG.md`
 files, following the wording and structure of the previous release's section in
 each file. Write only what actually changed in *that* plugin: the contributor
 plugins have no MCP server, so no shell-floor line; the sql plugins have their

@@ -1,0 +1,18 @@
+# Ephemeral MariaDB 11.8 for the live-DB test tier (matches the skills' baseline).
+#   docker compose -f hermes/dev-plugin-tests/docker-compose.yml up -d
+#   MARIADB_PASSWORD=test pytest hermes/dev-plugin-tests -m db
+#   docker compose -f hermes/dev-plugin-tests/docker-compose.yml down -v
+services:
+  mariadb:
+    image: mariadb:11.8
+    environment:
+      MARIADB_ROOT_PASSWORD: test
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+    tmpfs:
+      - /var/lib/mysql  # keep the test DB in memory; nothing to persist

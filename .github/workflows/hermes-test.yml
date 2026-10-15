@@ -1,0 +1,59 @@
+name: hermes-tests
+
+# Two jobs, not three: the Hermes suite has no `eval` tier (Hermes has no SDK of
+# its own to prompt — driving the `hermes` binary is the behavioural test, and
+# that is the `e2e` tier). The `e2e` tier is deliberately absent here too: it
+# needs the `hermes` CLI with a configured model provider and a resolvable
+# `mariadb-shell`, neither of which a runner has, so it stays a local tier and
+# self-skips elsewhere. The one static test that runs `hermes plugins validate`
+# skips here for the same reason.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: hermes/dev-plugin-tests
+
+jobs:
+  static:
+    name: static (Tier 1)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: pytest -m static -ra
+
+  db:
+    name: db (Tier 2)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    services:
+      mariadb:
+        image: mariadb:11.8
+        env:
+          MARIADB_ROOT_PASSWORD: test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=3s --health-timeout=5s --health-retries=20
+    # With these set, the tier uses the service container instead of deploying a
+    # sandbox through mariadb-shell — which runners do not have.
+    env:
+      MARIADB_HOST: 127.0.0.1
+      MARIADB_PORT: "3306"
+      MARIADB_USER: root
+      MARIADB_PASSWORD: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: pytest -m db -ra

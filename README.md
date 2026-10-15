@@ -22,7 +22,7 @@ Installing a plugin gives you three things:
 > **New to MCP?** The Model Context Protocol is a standardized interface for
 > AI agents to call tools — here, the tools that talk to MariaDB.
 
-Works with [Claude Code](https://claude.com/claude-code), [Codex](https://openai.com/codex), [OpenCode](https://opencode.ai) and [Pi](https://pi.dev) — see [Installation](#installation).
+Works with [Claude Code](https://claude.com/claude-code), [Codex](https://openai.com/codex), [OpenCode](https://opencode.ai), [Pi](https://pi.dev) and [Hermes Agent](https://hermes-agent.nousresearch.com/) — see [Installation](#installation).
 
 > **Prefer a guided start?** The **[DevHub](https://mariadb.github.io/ai-plugins/)**
 > has the same installation steps plus hands-on tutorials — building a schema and
@@ -91,6 +91,23 @@ support. Full steps in [pi/dev-plugin/README.md](pi/dev-plugin/README.md).
 That registers the server with pi; configuring what it may access is a separate
 step — see [Configure the MCP server](#configure-the-mcp-server-all-harnesses)
 below.
+
+### Hermes Agent
+
+Hermes installs a plugin straight from its folder in this repo — each one is a
+portable Agent Plugins v1 package:
+
+```sh
+hermes plugins install mariadb/ai-plugins#hermes/dev-plugin --enable
+```
+
+Then start a new Hermes session; MCP servers connect at session start.
+`--enable` is needed because Hermes installs portable packages disabled. On native Windows the MCP server needs an entry in Hermes'
+`config.yaml`. Full steps in
+[hermes/dev-plugin/README.md](hermes/dev-plugin/README.md).
+
+Then configure the MCP server — see
+[Configure the MCP server](#configure-the-mcp-server-all-harnesses) below.
 
 ## Configure the MCP server (all harnesses)
 
@@ -190,7 +207,7 @@ Each agent ships the plugin variants below — all built by the same
 | `contributor` | skills for **contributing to MariaDB tooling** | no | [`mariadb-shell`](https://github.com/mariadb-corporation/mariadb-shell) `.claude/skills/` |
 
 The folders are `<agent>/{dev,sql,contributor}-plugin/` for each of `claude/`,
-`codex/`, and `opencode/`; `pi/` ships `dev` only for now. Skills are baseline
+`codex/`, `opencode/` and `hermes/`; `pi/` ships `dev` only for now. Skills are baseline
 **MariaDB 11.8 LTS**; the `dev` and `sql` plugins share the same auto-downloading
 `mariadb-shell` MCP server, while `contributor` is skills-only for now.
 
@@ -201,6 +218,11 @@ a `package.json` carrying a `pi` field, so the **repo-root
 [pi/dev-plugin/](pi/dev-plugin)) and the whole repo installs as one pi package.
 The package's extension registers the MCP server with Pi's built-in MCP support
 (Pi 1.0+). See [pi/README.md](pi/README.md).
+
+Hermes Agent installs each plugin folder on its own as a portable **Agent
+Plugins v1** package — a root `plugin.json`, `skills/` and, for `dev` and `sql`,
+a root `mcp.json` — so it needs no marketplace file either. Its plugin names are
+`mariadb-dev`, `mariadb-sql` and `mariadb-contributor`.
 
 ## Documentation site
 

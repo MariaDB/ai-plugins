@@ -25,7 +25,7 @@
 # exercise, and coverage is recorded the same way (term + XML + HTML reports
 # plus a JUnit XML per suite).
 #
-# The suites live one per agent (claude/, codex/, opencode/, ...) and each has
+# The suites live one per agent (claude/, codex/, opencode/, pi/, hermes/) and each has
 # its own conftest.py, so they are discovered from disk and run as separate
 # pytest processes — their same-named test modules and `lib` packages would
 # collide in a single process. Coverage data is appended across the runs, so the

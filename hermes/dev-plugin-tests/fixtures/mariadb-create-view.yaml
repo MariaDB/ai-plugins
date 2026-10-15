@@ -1,0 +1,5 @@
+# Golden SQL fixtures for the mariadb-create-view skill.
+# Schema documented in mariadb-create-database.yaml.
+# TODO: add cases mirroring the skill's "What LLMs Often Miss" claims.
+skill: mariadb-create-view
+cases: []

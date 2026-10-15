@@ -1,0 +1,27 @@
+{
+  "baseline": "n/a",
+  "layers": {
+    "contributor": {
+      "tier": 0,
+      "path": ".",
+      "author": "mariadb-shell",
+      "skills": [
+        {
+          "name": "create-shell-plugin",
+          "path": "create-shell-plugin/SKILL.md",
+          "status": "contributor"
+        },
+        {
+          "name": "review-shell-change",
+          "path": "review-shell-change/SKILL.md",
+          "status": "contributor"
+        },
+        {
+          "name": "split-scripted-test",
+          "path": "split-scripted-test/SKILL.md",
+          "status": "contributor"
+        }
+      ]
+    }
+  }
+}

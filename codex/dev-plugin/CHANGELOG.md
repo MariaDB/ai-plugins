@@ -4,6 +4,14 @@ All notable changes to the MariaDB Codex plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- When the launcher cannot install `mariadb-shell`, its error message now
+  suggests downloading the installer and then running it, rather than piping
+  `curl` into `bash`, so the script can be read before it runs.
+
 ## [26.10.2] - 2026-10-09
 
 ### Changed

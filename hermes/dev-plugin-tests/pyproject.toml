@@ -1,0 +1,12 @@
+[tool.pytest.ini_options]
+# Run from the hermes/dev-plugin-tests/ directory (or point pytest at it).
+testpaths = ["."]
+markers = [
+    "static: structural/static checks of the skills and the Hermes plugin (no model, no DB)",
+    "db: SQL executed against a live MariaDB 11.8 (needs a reachable server)",
+    "e2e: full Hermes CLI run with the plugin installed (needs hermes + a ready provider; deselected by default)",
+]
+# By default skip the slow/expensive e2e tier; opt in with `-m e2e`.
+# NOTE: no `eval` tier here — Hermes has no SDK of its own to prompt; the e2e tier
+# drives the `hermes` binary instead, which is the same thing one tier up.
+addopts = "-m 'not e2e' -ra"

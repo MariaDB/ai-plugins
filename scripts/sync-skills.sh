@@ -40,12 +40,15 @@
 #   - codex/dev-plugin      (Codex)         — all skill layers
 #   - opencode/dev-plugin   (OpenCode)      — all skill layers
 #   - pi/dev-plugin         (Pi / pi.dev)   — all skill layers
+#   - hermes/dev-plugin     (Hermes Agent)  — all skill layers
 #   - claude/sql-plugin     (Claude Code)   — statements + functions + topical only
 #   - codex/sql-plugin      (Codex)         — statements + functions + topical only
 #   - opencode/sql-plugin   (OpenCode)      — statements + functions + topical only
+#   - hermes/sql-plugin     (Hermes Agent)  — statements + functions + topical only
 #   - claude/contributor-plugin   (Claude Code)  — mariadb-shell .claude/skills only
 #   - codex/contributor-plugin    (Codex)        — mariadb-shell .claude/skills only
 #   - opencode/contributor-plugin (OpenCode)     — mariadb-shell .claude/skills only
+#   - hermes/contributor-plugin   (Hermes Agent) — mariadb-shell .claude/skills only
 #
 # The contributor-* plugins vendor a DIFFERENT source repo — the skills tracked in
 # mariadb-corporation/mariadb-shell under .claude/skills/ (public; no token needed).
@@ -98,11 +101,13 @@ TARGET_PLUGINS=(
   "codex/dev-plugin"
   "opencode/dev-plugin"
   "pi/dev-plugin"
+  "hermes/dev-plugin"
 )
 SQL_PLUGINS=(
   "claude/sql-plugin"
   "codex/sql-plugin"
   "opencode/sql-plugin"
+  "hermes/sql-plugin"
 )
 # Include keys the sql plugins vendor: the upstream manifest layers
 # granular/statements, granular/functions and topical, plus the local
@@ -132,6 +137,7 @@ CONTRIB_PLUGINS=(
   "claude/contributor-plugin"
   "codex/contributor-plugin"
   "opencode/contributor-plugin"
+  "hermes/contributor-plugin"
 )
 
 command -v jq >/dev/null 2>&1 || { echo "error: jq is required" >&2; exit 1; }

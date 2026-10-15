@@ -83,10 +83,10 @@ The agent cannot invent a host. `db.connect` checks its argument against the
 configured connections, and `db.list_connections` is what an agent calls first
 to find out what exists.
 
-The matching normalizes equivalent spellings — a `mariadb://` or `mysql://`
-scheme, host case, the default port, an inline password — so all of those open
-the stored connection. What is refused is a URI asking for **more** than was
-configured:
+The matching normalizes equivalent spellings — a `mariadb://` scheme, host case,
+the default port, an inline password — so all of those open the stored
+connection. A `mysql://` scheme is not accepted. What is also refused is a URI
+asking for **more** than was configured:
 
 ```text
 root@127.0.0.1:3310/notes_app        → refused (a default schema)
@@ -139,7 +139,7 @@ Each harness ships the same three variants, all built by the same
 </div>
 
 The folders are `<harness>/{dev,sql,contributor}-plugin/` for `claude/`,
-`codex/` and `opencode/`. `pi/` ships `dev` only.
+`codex/`, `opencode/` and `hermes/`. `pi/` ships `dev` only.
 
 ## How the harnesses differ
 
@@ -154,6 +154,13 @@ The content is identical; the packaging is not.
   whole repository installs as one package. Its extension registers the MCP
   server with Pi's built-in MCP support (Pi 1.0+), which exposes the tools
   through codemode by default.
+- **Hermes Agent** has no marketplace either. Each plugin folder is a portable
+  **Agent Plugins v1** package — a root `plugin.json`, `skills/` and, for `dev`
+  and `sql`, an `mcp.json` declaring the server — that Hermes installs straight
+  from the repository with `hermes plugins install …#hermes/dev-plugin`. The
+  tools reach the model as `mcp__mariadb__<tool>`, and the skills sit under a
+  namespace Hermes derives from the plugin. `mcp.json` cannot branch per OS, so
+  native Windows points Hermes' `config.yaml` at the `.cmd` launcher instead.
 
 ## Why the skills are vendored
 

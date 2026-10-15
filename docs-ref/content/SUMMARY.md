@@ -8,6 +8,7 @@
     * [Codex](mariadb-ai-plugins/installation/codex.md)
     * [OpenCode](mariadb-ai-plugins/installation/opencode.md)
     * [Pi](mariadb-ai-plugins/installation/pi.md)
+    * [Hermes Agent](mariadb-ai-plugins/installation/hermes.md)
   * [Configuring the MCP Server](mariadb-ai-plugins/configuring-the-mcp-server/README.md)
     * [Database Accounts for the MCP Server](mariadb-ai-plugins/configuring-the-mcp-server/database-accounts-for-the-mcp-server.md)
     * [Adding Database Connections](mariadb-ai-plugins/configuring-the-mcp-server/adding-database-connections.md)

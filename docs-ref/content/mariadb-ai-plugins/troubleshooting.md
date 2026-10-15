@@ -31,6 +31,13 @@ Check that the harness loaded the plugin:
   /plugins
   ```
 * Pi: a project-local package must be approved at run time with `--approve`, or it is configured but never loaded.
+* Hermes Agent: Hermes installs portable packages disabled. Check that the plugin is enabled:
+
+  ```bash
+  hermes plugins list
+  ```
+
+  To enable it, run `hermes plugins enable mariadb-dev`.
 
 ## The MCP Server Doesn't Start
 
@@ -38,6 +45,7 @@ Check that the harness loaded the plugin:
 * To use a MariaDB Shell you installed yourself, set `MARIADB_SHELL_BIN`. See [Configuration Reference](configuration-reference.md).
 * For Codex, register the server manually. See [Codex](installation/codex.md#register-the-mcp-server-manually).
 * For Pi, the server requires Pi 1.0 or later and the built-in MCP support of Pi. An installed `pi-mcp-adapter` replaces the built-in support, so the `mariadb` server never connects. Remove the adapter and turn the built-in `mcp` back on. See [Pi](installation/pi.md#upgrade-from-pi-mcp-adapter).
+* For Hermes Agent, start a new session after the installation, because Hermes connects MCP servers when a session starts. On native Windows, the plugin's `.sh` launcher can't run, so add a `mariadb` server with the `.cmd` launcher to `config.yaml`. See [Hermes Agent](installation/hermes.md#windows).
 
 ## A Sandbox Doesn't Work
 

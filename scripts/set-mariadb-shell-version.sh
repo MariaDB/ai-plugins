@@ -19,10 +19,10 @@
 # every plugin in this repo.
 #
 # Updates the MARIADB_SHELL_VERSION value in each plugin's MCP config
-# (.mcp.json / opencode.json, and the entry setup-codex-mcp writes for codex) AND
-# the fallback default baked into the launcher scripts (mariadb-mcp-launcher.sh/
-# .cmd), for both the dev-* and sql-* plugins across
-# claude/, codex/, opencode/ and pi/ — plus `shell_floor` in docs/_config.yml,
+# (.mcp.json / opencode.json / Hermes' mcp.json, and the entry setup-codex-mcp
+# writes for codex) AND the fallback default baked into the launcher scripts
+# (mariadb-mcp-launcher.sh/.cmd), for both the dev-* and sql-* plugins across
+# claude/, codex/, opencode/, pi/ and hermes/ — plus `shell_floor` in docs/_config.yml,
 # which is where the DevHub quotes the floor in prose.
 # Keeping all of them on the same version means every plugin accepts the same
 # binary (see scripts/mariadb-mcp-launcher.sh — the version is the minimum each
@@ -52,8 +52,9 @@ Arguments:
   <version>   The mariadb-shell binary version to require, e.g. 26.8.1. This is
               a *minimum*: each launcher accepts any install at or above it.
 
-Updates, across claude/, codex/, opencode/ and pi/:
-  - MARIADB_SHELL_VERSION in each plugin's MCP config (.mcp.json, opencode.json)
+Updates, across claude/, codex/, opencode/, pi/ and hermes/:
+  - MARIADB_SHELL_VERSION in each plugin's MCP config (.mcp.json, opencode.json,
+    mcp.json)
   - the fallback default in the launchers (mariadb-mcp-launcher.sh / .cmd)
   - the version the setup-*-mcp scripts write (codex, pi)
   - the MARIADB_SHELL_VERSION shown in each plugin README
@@ -78,7 +79,7 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-# Reject anything that is not version-shaped rather than writing it into 36
+# Reject anything that is not version-shaped rather than writing it into 44
 # files. A mistyped flag used to be accepted as the version and substituted
 # everywhere, which is a tedious thing to undo.
 case "$VERSION" in
@@ -105,12 +106,14 @@ while IFS= read -r f; do files+=("$f"); done < <(
        "$REPO_ROOT"/codex/*-plugin \
        "$REPO_ROOT"/opencode/*-plugin \
        "$REPO_ROOT"/pi/*-plugin \
+       "$REPO_ROOT"/hermes/*-plugin \
        -type f \( \
          -name 'mariadb-mcp-launcher.sh' -o \
          -name 'mariadb-mcp-launcher.cmd' -o \
          -name 'setup-codex-mcp.sh' -o \
          -name 'setup-codex-mcp.cmd' -o \
          -name '.mcp.json' -o \
+         -name 'mcp.json' -o \
          -name 'opencode.json' -o \
          -name 'README.md' \
        \) | sort
@@ -121,7 +124,8 @@ while IFS= read -r f; do files+=("$f"); done < <(
 # The DevHub quotes the floor in prose from this key, so it is a version site
 # like any other. It lives outside the plugin dirs, hence the separate append —
 # this script's reach has lagged a new version site four times now (pi, the
-# *_disabled launchers, the setup-codex-mcp scripts, and this), so check it
+# *_disabled launchers, the setup-codex-mcp scripts, and this) — and Hermes'
+# mcp.json, a fifth file name, needed adding to the list above — so check it
 # whenever a file gains one.
 DOCS_CONFIG="$REPO_ROOT/docs/_config.yml"
 [ -f "$DOCS_CONFIG" ] && files+=("$DOCS_CONFIG")

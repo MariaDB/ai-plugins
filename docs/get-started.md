@@ -4,9 +4,9 @@ title: Get Started
 subtitle: >-
   Install the plugin, tell the MCP server what it may touch, then build a real
   schema on a throwaway server. Fifteen minutes end to end.
-badges: ["Claude Code", "Codex", "OpenCode", "Pi"]
+badges: ["Claude Code", "Codex", "OpenCode", "Pi", "Hermes Agent"]
 permalink: /get-started/
-description: Install the MariaDB AI Plugins into Claude Code, Codex, OpenCode or Pi, configure the mariadb-shell MCP server, and run your first working example.
+description: Install the MariaDB AI Plugins into Claude Code, Codex, OpenCode, Pi or Hermes Agent, configure the mariadb-shell MCP server, and run your first working example.
 ---
 
 There are three steps, and only the first is mandatory. The **skills** work the
@@ -78,6 +78,38 @@ Run `/mcp` inside pi to see the `mariadb` server. If you still have
 `pi-mcp-adapter` from an older Pi, remove it (`pi remove npm:pi-mcp-adapter`)
 and turn the built-in `mcp` back on in `pi config`. The adapter replaces the
 built-in MCP support.
+
+### Hermes Agent
+
+Hermes installs a plugin straight from its folder in this repository. Each one
+is a portable Agent Plugins v1 package — a `plugin.json`, the skills and an
+`mcp.json` that declares the MCP server — so Hermes needs no code of ours:
+
+```sh
+hermes plugins install {{ site.install_org }}/ai-plugins#hermes/dev-plugin --enable
+```
+
+Then start a new Hermes session — MCP servers connect at session start.
+`--enable` is there because Hermes installs portable packages disabled. Without
+the flag, run `hermes plugins enable mariadb-dev` afterwards.
+
+The `sql` and `contributor` plugins install the same way from
+`#hermes/sql-plugin` and `#hermes/contributor-plugin`. Later, `hermes plugins update mariadb-dev` updates the plugin and
+`hermes plugins remove mariadb-dev` removes it.
+
+**On native Windows**, the plugin's `mcp.json` cannot switch to the `.cmd`
+launcher — it names the `.sh` one, which needs a POSIX shell. Add a server of
+the same name to Hermes' `config.yaml` (in `%LOCALAPPDATA%\hermes`); it replaces
+the plugin's entry:
+
+```yaml
+mcp_servers:
+  mariadb:
+    command: "C:\\Users\\<you>\\AppData\\Local\\hermes\\plugins\\mariadb-dev\\scripts\\mariadb-mcp-launcher.cmd"
+    args: []
+```
+
+Full steps are in [`hermes/dev-plugin/README.md`]({{ site.repo }}/blob/main/hermes/dev-plugin/README.md).
 
 ### Check that the skills arrived
 
@@ -229,9 +261,13 @@ shell's bundled Python as a workaround:
 **Nothing at all happened.** Check the plugin actually loaded. In Claude Code,
 `/plugin` lists what is installed; in Codex, `/plugins`. In pi, remember that a
 project-local package needs `--approve` at run time or it is configured and
-never loaded.
+never loaded. In Hermes, `hermes plugins list` shows whether the plugin is
+installed *and* enabled.
 
 **In pi, `/mcp` doesn't list the `mariadb` server.** You need Pi 1.0 or later,
 and no `pi-mcp-adapter`: the adapter replaces Pi's built-in MCP, so the server
 the plugin registers never connects. Run `pi remove npm:pi-mcp-adapter`, then
 turn the built-in `mcp` back on in `pi config`.
+
+**Hermes's MCP tools are missing after the install.** Start a new Hermes
+session — servers connect at session start.

@@ -1,0 +1,624 @@
+{
+  "$comment": "Index of all MariaDB agent skills for DOCS-6206. Hand-maintained for now; a CI step can regenerate it from the directory tree + frontmatter once the layout is final. Per-skill `last_reviewed` (YYYY-MM-DD of the last human verification pass) and `baseline_version` (the MariaDB LTS the skill was last verified against) drive the staleness report — see dev-docs/agent-skills-maintenance.md.",
+  "baseline": "11.8 LTS",
+  "layers": {
+    "granular-statements": {
+      "tier": 1,
+      "path": "granular/statements",
+      "author": "docs-team",
+      "skills": [
+        {
+          "name": "mariadb-create-table",
+          "path": "mariadb-create-table/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-alter-table",
+          "path": "mariadb-alter-table/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-select",
+          "path": "mariadb-select/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-insert",
+          "path": "mariadb-insert/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-update",
+          "path": "mariadb-update/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-delete",
+          "path": "mariadb-delete/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-replace",
+          "path": "mariadb-replace/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-create-view",
+          "path": "mariadb-create-view/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-create-index",
+          "path": "mariadb-create-index/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-drop-table",
+          "path": "mariadb-drop-table/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-create-database",
+          "path": "mariadb-create-database/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-load-data",
+          "path": "mariadb-load-data/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-transactions",
+          "path": "mariadb-transactions/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-set-transaction",
+          "path": "mariadb-set-transaction/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-lock-tables",
+          "path": "mariadb-lock-tables/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-create-user",
+          "path": "mariadb-create-user/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-grant",
+          "path": "mariadb-grant/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-revoke",
+          "path": "mariadb-revoke/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-alter-user",
+          "path": "mariadb-alter-user/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-drop-user",
+          "path": "mariadb-drop-user/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-create-procedure",
+          "path": "mariadb-create-procedure/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-create-function",
+          "path": "mariadb-create-function/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-create-trigger",
+          "path": "mariadb-create-trigger/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-call",
+          "path": "mariadb-call/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-create-sequence",
+          "path": "mariadb-create-sequence/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-truncate-table",
+          "path": "mariadb-truncate-table/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-rename-table",
+          "path": "mariadb-rename-table/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-set",
+          "path": "mariadb-set/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-show",
+          "path": "mariadb-show/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-explain",
+          "path": "mariadb-explain/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-prepare",
+          "path": "mariadb-prepare/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        }
+      ]
+    },
+    "granular-functions": {
+      "tier": 2,
+      "path": "granular/functions",
+      "author": "docs-team+extractor",
+      "skills": [
+        {
+          "name": "mariadb-json-functions",
+          "path": "mariadb-json-functions/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-string-functions",
+          "path": "mariadb-string-functions/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-date-time-functions",
+          "path": "mariadb-date-time-functions/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-numeric-functions",
+          "path": "mariadb-numeric-functions/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-aggregate-functions",
+          "path": "mariadb-aggregate-functions/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-control-flow-functions",
+          "path": "mariadb-control-flow-functions/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-window-functions",
+          "path": "mariadb-window-functions/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-information-functions",
+          "path": "mariadb-information-functions/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-vector-functions",
+          "path": "mariadb-vector-functions/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-encryption-functions",
+          "path": "mariadb-encryption-functions/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        }
+      ]
+    },
+    "granular-tools": {
+      "path": "granular/tools",
+      "author": "docs-team",
+      "skills": [
+        {
+          "name": "mariadb-dump",
+          "path": "mariadb-dump/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-import",
+          "path": "mariadb-import/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-client",
+          "path": "mariadb-client/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-binlog",
+          "path": "mariadb-binlog/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-07-20",
+          "baseline_version": "11.8"
+        }
+      ]
+    },
+    "granular-connectors": {
+      "$comment": "Tier 1 (connectors) — two skills per client connector, split by task (DOCS-6379): `-install` covers installation, packaging, and configuration; `-usage` covers application-development usage (connect, query, params, transactions, pooling, error handling). Consumed by the AI Plugin (DOCS-6345). baseline_version tracks the connector release line, which is independent of the MariaDB server version.",
+      "tier": 1,
+      "path": "granular/connectors",
+      "author": "docs-team",
+      "skills": [
+        {
+          "name": "mariadb-connector-python-install",
+          "path": "mariadb-connector-python-install/SKILL.md",
+          "status": "draft",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "1.1"
+        },
+        {
+          "name": "mariadb-connector-python-usage",
+          "path": "mariadb-connector-python-usage/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "1.1"
+        },
+        {
+          "name": "mariadb-connector-j-install",
+          "path": "mariadb-connector-j-install/SKILL.md",
+          "status": "draft",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "3.5"
+        },
+        {
+          "name": "mariadb-connector-j-usage",
+          "path": "mariadb-connector-j-usage/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "3.5"
+        },
+        {
+          "name": "mariadb-connector-nodejs-install",
+          "path": "mariadb-connector-nodejs-install/SKILL.md",
+          "status": "draft",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "3.5"
+        },
+        {
+          "name": "mariadb-connector-nodejs-usage",
+          "path": "mariadb-connector-nodejs-usage/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "3.5"
+        },
+        {
+          "name": "mariadb-connector-odbc-install",
+          "path": "mariadb-connector-odbc-install/SKILL.md",
+          "status": "draft",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "3.2"
+        },
+        {
+          "name": "mariadb-connector-odbc-usage",
+          "path": "mariadb-connector-odbc-usage/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "3.2"
+        },
+        {
+          "name": "mariadb-connector-r2dbc-install",
+          "path": "mariadb-connector-r2dbc-install/SKILL.md",
+          "status": "draft",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "1.4"
+        },
+        {
+          "name": "mariadb-connector-r2dbc-usage",
+          "path": "mariadb-connector-r2dbc-usage/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "1.4"
+        },
+        {
+          "name": "mariadb-connector-cpp-install",
+          "path": "mariadb-connector-cpp-install/SKILL.md",
+          "status": "draft",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "1.0"
+        },
+        {
+          "name": "mariadb-connector-cpp-usage",
+          "path": "mariadb-connector-cpp-usage/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "1.0"
+        },
+        {
+          "name": "mariadb-connector-c-install",
+          "path": "mariadb-connector-c-install/SKILL.md",
+          "status": "draft",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "3.4"
+        },
+        {
+          "name": "mariadb-connector-c-usage",
+          "path": "mariadb-connector-c-usage/SKILL.md",
+          "status": "pilot",
+          "last_reviewed": "2026-08-10",
+          "baseline_version": "3.4"
+        }
+      ]
+    },
+    "topical": {
+      "path": "topical",
+      "author": "mariadb-foundation",
+      "vendored_from": "https://github.com/MariaDB/skills",
+      "vendored_ref": "7b01484d7a7475824bea86f3e628e29273d1817b",
+      "vendored_license": "MIT",
+      "skills": [
+        {
+          "name": "mariadb-features",
+          "path": "mariadb-features/SKILL.md",
+          "status": "vendored",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-query-optimization",
+          "path": "mariadb-query-optimization/SKILL.md",
+          "status": "vendored",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-system-versioned-tables",
+          "path": "mariadb-system-versioned-tables/SKILL.md",
+          "status": "vendored",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mysql-to-mariadb",
+          "path": "mysql-to-mariadb/SKILL.md",
+          "status": "vendored",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        },
+        {
+          "name": "mariadb-vector",
+          "path": "mariadb-vector/SKILL.md",
+          "status": "vendored",
+          "last_reviewed": "2026-06-24",
+          "baseline_version": "11.8"
+        }
+      ]
+    },
+    "additional": {
+      "tier": 3,
+      "path": ".",
+      "author": "local",
+      "skills": [
+        {
+          "name": "mariadb-schema-create-script",
+          "path": "mariadb-schema-create-script/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-rest-service-authorization",
+          "path": "mariadb-rest-service-authorization/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-rest-service-create",
+          "path": "mariadb-rest-service-create/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-rest-service-drop",
+          "path": "mariadb-rest-service-drop/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-rest-service-show",
+          "path": "mariadb-rest-service-show/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-rest-service-update-endpoints",
+          "path": "mariadb-rest-service-update-endpoints/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-schema-management-create",
+          "path": "mariadb-schema-management-create/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-schema-management-deploy",
+          "path": "mariadb-schema-management-deploy/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-schema-management-develop",
+          "path": "mariadb-schema-management-develop/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-schema-management-release",
+          "path": "mariadb-schema-management-release/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-schema-management",
+          "path": "mariadb-schema-management/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-migrator-configure",
+          "path": "mariadb-migrator-configure/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-migrator-discovery",
+          "path": "mariadb-migrator-discovery/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-migrator-modes",
+          "path": "mariadb-migrator-modes/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-migrator-run",
+          "path": "mariadb-migrator-run/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-migrator-troubleshooting",
+          "path": "mariadb-migrator-troubleshooting/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-migrator-verify",
+          "path": "mariadb-migrator-verify/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-migrator",
+          "path": "mariadb-migrator/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-laravel-ai-sdk",
+          "path": "mariadb-laravel-ai-sdk/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-laravel-connector",
+          "path": "mariadb-laravel-connector/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        },
+        {
+          "name": "mariadb-laravel-vector",
+          "path": "mariadb-laravel-vector/SKILL.md",
+          "status": "local",
+          "baseline_version": "11.8 LTS"
+        }
+      ]
+    }
+  }
+}

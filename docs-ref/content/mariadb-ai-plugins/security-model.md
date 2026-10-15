@@ -12,7 +12,7 @@ The MCP server only accesses databases and directories that you have explicitly 
 
 The agent can only connect to the servers in the list of configured connections. `db.connect` checks each connection request against this list, and the agent calls `db.list_connections` to find out which connections exist.
 
-When the MCP server compares a URI with the configured connections, it treats equivalent forms as equal, such as a `mariadb://` or `mysql://` scheme, a different capitalization of the host name, an explicit default port, or a password in the URI. It rejects a URI that requests more than the configured connection, for example a default schema or an additional option:
+When the MCP server compares a URI with the configured connections, it treats equivalent forms as equal, such as a `mariadb://` scheme, a different capitalization of the host name, an explicit default port, or a password in the URI. It does not accept a `mysql://` scheme, and it rejects a URI that requests more than the configured connection, for example a default schema or an additional option:
 
 ```text
 root@127.0.0.1:3310/notes_app         → refused (a default schema)

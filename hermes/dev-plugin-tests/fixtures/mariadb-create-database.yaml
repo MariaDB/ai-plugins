@@ -1,0 +1,88 @@
+# Golden SQL fixtures for the mariadb-create-database skill.
+# Each case is traceable to a claim in ../dev-plugin/skills/.../mariadb-create-database/SKILL.md.
+#
+# Schema:
+#   skill: <skill name>
+#   cases:
+#     - name: <unique label>
+#       claim: <the skill claim this verifies>           # documentation only
+#       setup:  [<stmt>, ...]                             # optional; must all succeed
+#       sql:    [<stmt>, ...]                             # executed in order
+#       expect: success | error | {error: <errno>}        # default: success
+#       assert:                                           # optional, run after sql
+#         - query: <SELECT/SHOW ...>
+#           column: <int, default 0>
+#           equals: <scalar> | contains: <substr> | rowcount: <int> | rowcount_min: <int>
+#
+# `{ns}` is substituted with a unique throwaway database name (created + USEd
+# before the case, and everything matching `{ns}%` is dropped afterwards).
+
+skill: mariadb-create-database
+cases:
+  - name: charset and collate set the database default
+    claim: "CHARACTER SET / COLLATE specify the database default charset/collation"
+    sql:
+      - "CREATE DATABASE `{ns}_app` CHARACTER SET = 'utf8mb4' COLLATE = 'uca1400_ai_ci'"
+    expect: success
+    assert:
+      - query: "SELECT DEFAULT_CHARACTER_SET_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME='{ns}_app'"
+        equals: "utf8mb4"
+      - query: "SELECT DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME='{ns}_app'"
+        contains: "uca1400_ai_ci"  # MariaDB reports the charset-qualified name, e.g. utf8mb4_uca1400_ai_ci
+
+  - name: CREATE OR REPLACE DATABASE drops the existing database first
+    claim: "OR REPLACE drops the database (and all its tables) before recreating"
+    setup:
+      - "CREATE DATABASE `{ns}_app`"
+      - "CREATE TABLE `{ns}_app`.keep (id INT)"
+    sql:
+      - "CREATE OR REPLACE DATABASE `{ns}_app`"
+    expect: success
+    assert:
+      - query: "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA='{ns}_app'"
+        equals: 0
+
+  - name: CREATE SCHEMA is a synonym for CREATE DATABASE
+    claim: "SCHEMA and DATABASE are exact synonyms"
+    sql:
+      - "CREATE SCHEMA `{ns}_s`"
+    expect: success
+    assert:
+      - query: "SELECT COUNT(*) FROM information_schema.SCHEMATA WHERE SCHEMA_NAME='{ns}_s'"
+        equals: 1
+
+  - name: IF NOT EXISTS on an existing database warns and leaves it untouched
+    claim: "IF NOT EXISTS downgrades to a note; the existing database is not modified"
+    setup:
+      - "CREATE DATABASE `{ns}_app` CHARACTER SET utf8mb4"
+    sql:
+      - "CREATE DATABASE IF NOT EXISTS `{ns}_app` CHARACTER SET latin1"
+    expect: success
+    assert:
+      - query: "SHOW WARNINGS"
+        rowcount_min: 1
+      - query: "SELECT DEFAULT_CHARACTER_SET_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME='{ns}_app'"
+        equals: "utf8mb4"
+
+  - name: bare CREATE DATABASE on an existing name errors (1007)
+    claim: "A re-run of bare CREATE DATABASE errors 1007 (database exists)"
+    setup:
+      - "CREATE DATABASE `{ns}_dup`"
+    sql:
+      - "CREATE DATABASE `{ns}_dup`"
+    expect: {error: 1007}
+
+  - name: DROP DATABASE on a missing name errors (1008)
+    claim: "Without IF EXISTS, dropping a missing database errors 1008"
+    sql:
+      - "DROP DATABASE `{ns}_missing`"
+    expect: {error: 1008}
+
+  - name: DROP DATABASE IF EXISTS on a missing name warns instead of erroring
+    claim: "IF EXISTS downgrades a missing-database drop to a note"
+    sql:
+      - "DROP DATABASE IF EXISTS `{ns}_missing`"
+    expect: success
+    assert:
+      - query: "SHOW WARNINGS"
+        rowcount_min: 1

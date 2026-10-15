@@ -46,6 +46,7 @@ The launcher scripts, `mariadb-mcp-launcher.sh` and `mariadb-mcp-launcher.cmd`, 
 | Codex | The plugin's `.mcp.json`, installed with the plugin. |
 | OpenCode | The `mcp` block you merge into `opencode.json`. |
 | Pi | None. The extension registers the server when it loads. A `mariadb` entry in `~/.pi/agent/mcp.json` or `.pi/mcp.json` overrides it. |
+| Hermes Agent | The plugin's `mcp.json`, installed with the plugin. A `mariadb` entry under `mcp_servers` in the Hermes `config.yaml` overrides it; native Windows requires such an entry. |
 
 ## MCP Server Configuration
 

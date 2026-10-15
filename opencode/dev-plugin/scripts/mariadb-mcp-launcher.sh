@@ -229,7 +229,8 @@ fi
 if [ ! -x "$LOCAL_BIN" ]; then
   die "no mariadb-shell at $LOCAL_BIN after installing.
   Install it by hand and retry, or point MARIADB_SHELL_BIN at an existing binary:
-      curl -fsSL https://github.com/$REPO/raw/main/install.sh | bash"
+      curl -fsSLo install.sh https://github.com/$REPO/raw/main/install.sh
+      bash install.sh"
 fi
 [ "$install_failed" = 0 ] || log "using the mariadb-shell already present at $LOCAL_BIN"
 

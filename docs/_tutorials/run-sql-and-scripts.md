@@ -57,7 +57,8 @@ purpose:
 | How you name it in the prompt | Works? |
 | --- | --- |
 | `root@127.0.0.1:3310` | yes — the canonical form |
-| `mariadb://…` or `mysql://…` | yes — the scheme is folded away |
+| `mariadb://…` | yes — the scheme is folded away |
+| `mysql://…` | **no** — `mariadb://` is the scheme |
 | `root@127.0.0.1`, when 3306 is the stored port | yes |
 | with a password in it | yes, but pointless — the stored password is used, and you have leaked yours into the transcript |
 | with a default schema: `…:3310/notes_app` | **no** |

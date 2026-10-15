@@ -16,6 +16,7 @@ Everything below is for people working **on** the plugins rather than with them.
 | [Codex](https://openai.com/codex) | [`codex`](codex) | [`codex/dev-plugin-test`](codex/dev-plugin-test) | [codex-test.yml](.github/workflows/codex-test.yml) |
 | [OpenCode](https://opencode.ai) | [`opencode`](opencode) | [`opencode/dev-plugin-test`](opencode/dev-plugin-test) | [opencode-test.yml](.github/workflows/opencode-test.yml) |
 | [Pi](https://pi.dev) | [`pi`](pi) | [`pi/dev-plugin-tests`](pi/dev-plugin-tests) | [pi-test.yml](.github/workflows/pi-test.yml) |
+| [Hermes Agent](https://hermes-agent.nousresearch.com/) | [`hermes`](hermes) | [`hermes/dev-plugin-tests`](hermes/dev-plugin-tests) | [hermes-test.yml](.github/workflows/hermes-test.yml) |
 
 ### How the plugins are built
 
@@ -38,7 +39,12 @@ Everything below is for people working **on** the plugins rather than with them.
    first. Either way it execs that binary as the MCP server over stdio, and later
    runs reuse the install. Pi uses the same launcher, which its extension
    [pi/dev-plugin/src/index.ts](pi/dev-plugin/src/index.ts) registers with Pi's
-   built-in MCP support (`pi.registerMcpServer`).
+   built-in MCP support (`pi.registerMcpServer`). Hermes runs it too: each
+   Hermes plugin is a portable Agent Plugins v1 package whose root `mcp.json`
+   declares the `mariadb` server with `./scripts/mariadb-mcp-launcher.sh` as its
+   command. `mcp.json` cannot branch per OS, so native Windows users add the
+   `.cmd` launcher in Hermes' `config.yaml` instead (see
+   [hermes/dev-plugin/README.md](hermes/dev-plugin/README.md)).
 
 ### Repository layout
 
@@ -68,6 +74,11 @@ ai-plugins/
 ├── pi/                                # Pi (pi.dev) extension sources — dev only for now
 │   ├── dev-plugin/                    # src/index.ts extension (registers the MCP server), scripts/ (launchers), skills/
 │   └── dev-plugin-tests/              # its pytest suite (static + db + e2e; no eval tier)
+├── hermes/                            # Hermes Agent — portable Agent Plugins v1 packages
+│   ├── dev-plugin/                    # plugin.json, mcp.json, scripts/ (launchers), skills/ → mariadb-dev
+│   ├── sql-plugin/                    # → mariadb-sql
+│   ├── contributor-plugin/            # → mariadb-contributor (plugin.json + skills/ only)
+│   └── dev-plugin-tests/              # its pytest suite (static + db + e2e; no eval tier)
 ├── package.json                       # repo-root pi manifest (`pi` field → pi/dev-plugin/) + test scripts
 ├── run_tests.py                        # runs every suite with the mariadb-shell Python + coverage
 ├── pytest-coverage.ini                 # shared pytest config used by run_tests.py
@@ -78,7 +89,7 @@ ai-plugins/
 │   └── README.md                      # how to publish it and add a tutorial
 ├── scripts/
 │   └── sync-skills.sh                 # vendors skills into every plugin
-└── .github/workflows/                 # one CI workflow per harness (pi has no eval job)
+└── .github/workflows/                 # one CI workflow per harness (pi and hermes have no eval job)
 ```
 
 ### Skills sync
@@ -122,7 +133,7 @@ resolve. Requires `jq` and `curl`.
 
 ### Testing
 
-All four harness plugins have a parallel pytest suite;
+All five harness plugins have a parallel pytest suite;
 [run_tests.py](run_tests.py) discovers them by `*/dev-plugin-test*/conftest.py`:
 
 | Tier | Marker | Needs | Checks |
@@ -150,6 +161,18 @@ because what there is to drive differs:
   registers. Both runs use a throwaway `PI_CODING_AGENT_DIR` with only the
   provider setup copied in, so the user's own packages (a global `pi-mcp-adapter`
   would replace the built-in MCP) stay out of the way.
+- **Hermes** — `e2e` only, and **no `eval` tier**, for the same reason as pi. Its
+  static tier also runs `hermes plugins validate` on the dev plugin when the CLI
+  is present. The e2e creates a temporary Hermes profile (`hermes profile create …
+  --no-skills`), copies in the user's provider setup (`config.yaml` without its
+  `mcp_servers`, `.env`, `auth.json`), installs the working tree's plugin with
+  `hermes plugins install file://…#hermes/dev-plugin --enable` and drives
+  `hermes chat -q … --format stream-json --yolo`. It checks that the model loaded
+  a skill under the plugin's namespace through `skill_view`, that the generated
+  schema script carries the mandated Start Block, and that a
+  `mcp__mariadb__db_list_connections` call succeeded; the profile is deleted
+  afterwards. `HERMES_BIN`, `HERMES_HOME` and `E2E_TIMEOUT` override the binary,
+  the Hermes home the provider setup is copied from, and the per-run timeout.
 
 The `e2e` tiers self-skip rather than fail when their toolchain is absent — no
 CLI, no authenticated provider, or no resolvable `mariadb-shell`.
@@ -205,17 +228,17 @@ checks instead.
 #### Per-suite, without the runner
 
 ```sh
-cd claude/dev-plugin-tests      # or pi/dev-plugin-tests , codex/ , opencode/ dev-plugin-test
+cd claude/dev-plugin-tests      # or pi/ , hermes/dev-plugin-tests , codex/ , opencode/ dev-plugin-test
 pip install -r requirements.txt
 pytest -m static                # fast, no services
 pytest -m db                    # needs a MariaDB 11.8 server (docker-compose.yml provided)
-pytest -m eval                  # opt-in, calls the LLM API      (not in the pi suite)
-pytest -m e2e                   # opt-in, drives the harness CLI (claude, codex, pi)
+pytest -m eval                  # opt-in, calls the LLM API      (not in the pi/hermes suites)
+pytest -m e2e                   # opt-in, drives the harness CLI (claude, codex, pi, hermes)
 ```
 
 The eval tier uses the SDK matching its agent: the Claude and OpenCode suites call
 the Anthropic SDK (`claude-opus-4-8`, needs `ANTHROPIC_API_KEY`); the Codex suite
-calls the OpenAI SDK. The pi suite has no eval tier at all — see the tier notes
-above. CI runs `static` on every push/PR and `db` on PRs for all four suites, and `eval`
+calls the OpenAI SDK. The pi and Hermes suites have no eval tier at all — see the
+tier notes above. CI runs `static` on every push/PR and `db` on PRs for all five suites, and `eval`
 nightly / on demand for the three that have it; the `e2e` tiers are local-only,
 since they need an authenticated CLI and a `mariadb-shell` on the machine.

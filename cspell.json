@@ -39,7 +39,12 @@
         "gitbook",
         "contentref",
         "mdast",
-        "rehype"
+        "rehype",
+        "hermes",
+        "nousresearch",
+        "mdbe2e",
+        "stdio",
+        "yolo"
     ],
     "ignorePaths": [
         ".venv",

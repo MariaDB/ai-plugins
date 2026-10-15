@@ -18,10 +18,11 @@
 # set-plugin-version.sh — set the plugin package version across every plugin in
 # this repo.
 #
-# Updates the "version" field in each plugin manifest (.claude-plugin/plugin.json
-# and .codex-plugin/plugin.json) and the "Version **x.y.z**" line in each
-# plugin README, for the dev-*, sql-* and contributor-* plugins across claude/,
-# codex/, opencode/ and pi/, plus the repo-root package.json.
+# Updates the "version" field in each plugin manifest (.claude-plugin/plugin.json,
+# .codex-plugin/plugin.json and Hermes' plugin.json) and the "Version **x.y.z**"
+# line in each plugin README, for the dev-*, sql-* and contributor-* plugins
+# across claude/, codex/, opencode/, pi/ and hermes/, plus the repo-root
+# package.json.
 #
 # Not every plugin carries both: OpenCode has no manifest version field, so only
 # its README is updated, and pi has no per-plugin manifest at all — the repo-root
@@ -51,9 +52,9 @@ Arguments:
   <version>   The plugin package version to set, e.g. 26.8.1.
 
 Updates, for the dev-*, sql-* and contributor-* plugins across claude/, codex/,
-opencode/ and pi/:
+opencode/, pi/ and hermes/:
   - the "version" field in each plugin manifest (.claude-plugin/plugin.json,
-    .codex-plugin/plugin.json)
+    .codex-plugin/plugin.json, hermes/*-plugin/plugin.json)
   - the "Version **x.y.z**" line in each plugin README
   - the repo-root package.json
 
@@ -81,7 +82,7 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-# Reject anything that is not version-shaped rather than writing it into 17
+# Reject anything that is not version-shaped rather than writing it into 23
 # files. A mistyped flag used to be accepted as the version and substituted
 # everywhere, which is a tedious thing to undo.
 case "$VERSION" in
@@ -108,6 +109,7 @@ while IFS= read -r f; do files+=("$f"); done < <(
        "$REPO_ROOT"/codex/*-plugin \
        "$REPO_ROOT"/opencode/*-plugin \
        "$REPO_ROOT"/pi/*-plugin \
+       "$REPO_ROOT"/hermes/*-plugin \
        -type f \( -name 'plugin.json' -o -name 'README.md' \) | sort
 )
 files+=("$REPO_ROOT/package.json")
