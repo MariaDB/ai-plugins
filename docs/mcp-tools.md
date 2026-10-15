@@ -5,11 +5,12 @@ subtitle: >-
   Every tool the mariadb-shell MCP server exposes, what it takes, and the
   behaviour that is not obvious from the name.
 permalink: /mcp-tools/
-description: Reference for the mariadb-shell MCP server tools — db.*, msm.*, sandbox.* and the optional migrator.* group.
+description: Reference for the mariadb-shell MCP server tools — db.*, msm.*, sandbox.*, the optional migrator.* group and the newer rest.* group.
 ---
 
 The server exposes **{{ site.tool_count }} tools in three groups**, plus an optional fourth
-that only appears when the migration tooling is installed.
+that only appears when the migration tooling is installed, and a fifth for REST
+Daemons in mariadb-shell releases newer than 26.10.1.
 
 <div class="table-wrap" markdown="1">
 
@@ -19,13 +20,14 @@ that only appears when the migration tooling is installed.
 | [`msm.*`](#msm--schema-management) | 12 | Versioned schema projects, releases, deployments |
 | [`sandbox.*`](#sandbox--throwaway-servers) | 8 | List deployable server versions; deploy, start, stop and delete local instances |
 | [`migrator.*`](#migrator--mysql-to-mariadb) | 4 | MySQL-to-MariaDB migration — **optional, not counted above** |
+| [`rest.*`](#rest--rest-daemons) | 5 | Set up, start, stop and delete MariaDB REST Daemons — **mariadb-shell newer than 26.10.1, not counted above** |
 
 </div>
 
 A server in **multi-tenant mode** (`mcp setup --multiTenant=true`, mariadb-shell
-26.10.0 and later) serves only the `db.*` and `msm.*` groups: the `sandbox.*` and
-`migrator.*` tools run local servers and long jobs on the server's own machine
-and are not offered to tenants. The plugins' launchers start a single-tenant
+26.10.0 and later) serves only the `db.*` and `msm.*` groups: the `sandbox.*`, `migrator.*` and
+`rest.*` tools run local servers, daemons and long jobs on the server's own
+machine and are not offered to tenants. The plugins' launchers start a single-tenant
 server, which serves every group.
 
 <div class="callout" markdown="1">
@@ -196,6 +198,32 @@ directory that already holds a `state.json` and the run reports every step
 pass it only to `resume`, and check that every step says `DONE` — never trust
 `succeeded` on its own.
 </div>
+
+## `rest.*` — REST Daemons
+
+**Needs a mariadb-shell newer than 26.10.1, and not part of the {{ site.tool_count }}.**
+These five tools set up and run the MariaDB REST Daemon, `mariadb-restd`, which
+serves the REST services defined in a server's REST metadata. See
+[Tutorial 8]({{ '/tutorials/rest-endpoints/' | relative_url }}) for defining them.
+
+<div class="table-wrap" markdown="1">
+
+| Tool | Arguments | Notes |
+| --- | --- | --- |
+| `rest.configure_restd` | `connection_id`, `password`, `sandbox_port`, `sandbox_dir`, `port`, `metadata_schema`, `restd_path` | Sets a daemon up for a server and starts it. Uses the connection's stored password when none is given; picks the server's only REST metadata schema, **refuses to guess between several**, and runs `CONFIGURE REST METADATA` when there is none. **Installs `mariadb-restd` if it is missing — after you confirm.** Offered only with the `db.*` group. |
+| `rest.start_restd` | `directory`, `restd_path` | Starts a deployment's daemon. A no-op when it is running. |
+| `rest.stop_restd` | `directory` | Stops it; killed after 30 seconds. A no-op when it is stopped. |
+| `rest.delete_restd_config` | `directory`, `connection_id`, `drop_accounts=True` | Stops the daemon, drops the account the setup generated and its `rest_daemon` row, and deletes the folder. `drop_accounts=False` deletes only the folder. |
+| `rest.get_restd_status` | — | Every deployment: folder, server, `port`, `url`, `status`, `pid`, `log_path`, `metadata_schema`, `connection_uri`, `sandbox_port`. |
+
+</div>
+
+A sandbox's deployment lives in `<sandboxDir>/<port>/mariadb-restd`, any other
+server's in `~/.mariadb-restd/<host>_<port>`; each daemon listens on the first
+free port from 8443 up. Both serve HTTPS with a self-signed certificate, and **the
+daemon outlives the MCP server**. A sandbox's daemon follows its sandbox:
+`sandbox.start` starts it after the server, `sandbox.stop` and `sandbox.kill`
+stop it first, and `sandbox.delete` stops it before the folder goes.
 
 ## Error messages you will meet
 

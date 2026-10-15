@@ -71,13 +71,21 @@ what is NOT in it.
 
 ## Current state
 
-- 41 pages: About, Installation (4 harnesses), Configuring the MCP Server group
+- 42 pages: About, Installation (4 harnesses), Configuring the MCP Server group
   (Database Accounts, Adding Database Connections, Tunnel via SSH, Command Line
   Configuration), Basic Usage, Plugin Variants, Features (SQL Script Creation
   and Execution, Sandbox Instances, MSM, REST, MySQL migration), Architecture
   (with the user's `MariaDB_AI-Plugins_Architecture.svg`), Security Model,
-  Skills Reference (7 generated), MCP Tool Reference (4), Configuration
+  Skills Reference (7 generated), MCP Tool Reference (5), Configuration
   Reference, Troubleshooting, Release Notes, License, Bug Reports.
+- **`rest-tools.md` documents a group no released MariaDB Shell has yet**
+  (mariadb-shell-plugins PR #50, `wip/restd_support`; checked against
+  `mcp_plugin/lib/rest_functions.py`, `restd.py`, `sandbox_functions.py`).
+  Every mention says "MariaDB Shell releases later than 26.10.1" and keeps
+  `rest.*` out of the 28-tool count, like `migrator.*`. When the shell release
+  that ships it becomes the floor, replace that wording with "<version> and
+  later" and decide whether `rest.*` joins the count (also in
+  `docs/mcp-tools.md`, `architecture.md`, `sandbox-tools.md`).
 - Verified: clean build (fails on broken links / missing content-ref targets),
   static tests pass, no horizontal overflow at 390px, Apache 2.4 serving
   `/docs/` (pages, 301 to slash, 404 page, `AllowOverride FileInfo`).
