@@ -2,6 +2,9 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
+- **Release 26.10.3 — IN PROGRESS** (branch `wip/26.10.3`, PR about to open): plugin version 26.10.3, floor stays 26.10.1, ships Hermes Agent's first release (#47), the REST 5.0.0 skills (#50) and the sudo-free connector skills re-vendored in #47. See [release history](release-history.md).
+- **Hermes Agent — merged as PR #47** (`ee00bf4`): fifth harness, `hermes/{dev,sql,contributor}-plugin` + `hermes/dev-plugin-tests` (static, db, opt-in e2e). Installs with `--enable` only — no `--force` since the re-vendored skills pass Hermes' install scan.
+- **docs-ref lives under `content/community/`** since #51 (`/docs/tools/community/mariadb-ai-plugins/`). See [reference docs](docs-ref.md).
 - **Release 26.10.2 — SHIPPED** (PR #44, squash `13685aa`; tag `v26.10.2` = object `a648c37`, prerelease on both repos; fork fast-forwarded to `13685aa`): shell floor 26.10.0 → **26.10.1** (the newest shell; no v26.10.2 exists, user's call), plugin version 26.10.2, a re-vendor that corrected `mariadb-numeric-functions`' division-by-zero text (dev + sql), and `/release` now parsing `$ARGUMENTS` itself. See [release history](release-history.md).
 - **Release 26.10.1 — SHIPPED** (PR #42, squash `2574a74`; tag `v26.10.1` = object `9bcbd39`, prerelease on both repos; fork fast-forwarded to `2574a74`): shell floor 26.9.5 → **26.10.0** (mariadb-shell `v26.10.0`, published 2026-10-08, the first with the MCP server's multi-tenant mode), plugin version 26.10.1, a re-vendor that shipped seven updated function-reference skills (dev + sql), #41's MSM fixes, and a multi-tenant note in both MCP tool references. See [release history](release-history.md).
 - **Release 26.10.0 — SHIPPED** (PR #39, squash `68bd7d4`; tag `v26.10.0` = object `ed68f6a`, prerelease on both repos; fork synced): plugin version 26.10.0, floor stays 26.9.5, provenance-only re-vendor, ships #37. See [release history](release-history.md).

@@ -1,6 +1,6 @@
 {
   "name": "contributor",
-  "version": "26.10.2",
+  "version": "26.10.3",
   "description": "Skills for contributing to MariaDB tooling, for Claude Code.",
   "author": { "name": "MariaDB Corporation", "url": "https://mariadb.com" },
   "homepage": "https://github.com/mariadb/ai-plugins",

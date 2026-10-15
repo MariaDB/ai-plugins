@@ -4,6 +4,18 @@ All notable changes to the MariaDB contributor Claude Code plugin are documented
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [26.10.3] - 2026-10-15
+
+### Changed
+
+- Skills re-vendored from `mariadb-corporation/mariadb-shell` `.claude/skills/`
+  at commit `37cb1d3` (synced 2026-10-15). `create-shell-plugin` points at the
+  current line of `Mysql_shell::get_plugins` and no longer mentions the
+  `plugins_path` shell option. The plugin keeps its 3 skills.
+- Version bumped to 26.10.3 to stay in lockstep with the other plugins. This
+  plugin ships skills only and no MCP server, so the `MARIADB_SHELL_VERSION`
+  floor does not apply here.
+
 ## [26.10.2] - 2026-10-09
 
 ### Changed

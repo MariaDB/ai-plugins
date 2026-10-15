@@ -4,7 +4,7 @@ All notable changes to the MariaDB Claude Code plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [26.10.3] - 2026-10-15
 
 ### Changed
 
@@ -19,6 +19,17 @@ project adheres to [Semantic Versioning](https://semver.org/).
   new `SHOW REST STATUS`, `SHOW REST COLUMNS`, `SHOW REST USERS`,
   `SHOW REST AUTH VENDORS`, `SHOW REST DAEMONS`, `DROP REST DAEMON` and
   `FORMAT=JSON` statements are covered.
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `cc8dd40` (synced 2026-10-15). The Connector/C, C++, ODBC and Python
+  install skills and `mariadb-features` no longer run privileged commands: root
+  steps such as package installs and writes under `/usr` are handed to the user,
+  as one command to run or a script to review, and the examples show them without
+  `sudo`. The C, C++ and ODBC skills add a build into `$HOME/.local` that needs no
+  root, the ODBC skill registers the driver and the DSN per user, the Python skill
+  installs into a virtual environment, and `mariadb-connector-cpp-install` names
+  the library directory of the RPM tarballs (`lib64/mariadb`). No skill was added
+  or removed, so the plugin stays at 85 skills.
+- Version bumped to 26.10.3 to stay in lockstep with the other plugins.
 
 ### Fixed
 

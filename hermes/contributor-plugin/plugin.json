@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "mariadb-contributor",
-  "version": "26.10.2",
+  "version": "26.10.3",
   "description": "Skills for contributing to MariaDB tooling, for Hermes Agent.",
   "author": { "name": "MariaDB Corporation", "url": "https://mariadb.com" },
   "homepage": "https://github.com/mariadb/ai-plugins",

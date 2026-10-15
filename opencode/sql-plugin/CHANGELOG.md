@@ -4,13 +4,19 @@ All notable changes to the MariaDB SQL OpenCode plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [26.10.3] - 2026-10-15
 
 ### Changed
 
 - When the launcher cannot install `mariadb-shell`, its error message now
   suggests downloading the installer and then running it, rather than piping
   `curl` into `bash`, so the script can be read before it runs.
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `cc8dd40` (synced 2026-10-15). `mariadb-features` no longer runs
+  `sudo mariadb` for the first connection to a fresh install: the user runs
+  `mariadb` from a root shell in their own terminal. No skill was added or
+  removed, so this plugin stays at 47 skills.
+- Version bumped to 26.10.3 to stay in lockstep with the other plugins.
 
 ## [26.10.2] - 2026-10-09
 

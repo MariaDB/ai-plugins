@@ -8,7 +8,22 @@ mariadb-shell floor are independent.** Through 26.9.5 every release set both to 
 <version> [shell-version]` now checks the plugin version against this repo's tags and moves the
 floor only when a shell version is given. 26.10.0 is planned on top of the current floor 26.9.5.
 
-## Landed on `main` (through PR #44)
+## Landed on `main` (through PR #51)
+
+**#51** `4747939` (2026-10-15) moved `docs-ref/content/mariadb-ai-plugins/` to
+`content/community/mariadb-ai-plugins/` (mariadb.com/docs now lists the plugins under
+Community Tools, `tools/community/`), with a Community Tools landing stand-in and a
+regenerated Skills Reference page #50 had left stale. **#50** `6976f16` moved the five REST
+skills to the shell's built-in `mrs` module and metadata schema 5.0.0 (`mariadb_rest_service`,
+`VENDOR MARIADB`, `rest_object`), Hermes copies included after the rebase on #47. **#49**
+`00e22c7` documented the MCP server's `rest.*` tools in docs-ref. **#48** `dac9f78` made the
+docs-ref preview check anchors and descriptions the way GitBook does. **#47** `ee00bf4` added
+**Hermes Agent** as the fifth harness (`hermes/{dev,sql,contributor}-plugin`, test suite, CI,
+docs), the launcher's download-then-run hint, and the `mysql://` test/doc fixes; after the
+upstream skill fixes (mariadb-docs#1271, MariaDB/skills#31) it re-vendored to mariadb-docs
+`cc8dd40` / mariadb-shell `37cb1d3` and dropped `--force` from every Hermes install (the
+install scan now passes all three plugins; the e2e installs without it). **#45** `5660e22` was
+the 26.10.2 checkpoint. **#46** (GitHub Copilot in VS Code, docs only) is still open.
 
 **#44** `13685aa` (2026-10-09) was release 26.10.2 (below); it also made `/release` parse `$ARGUMENTS` itself. **#43** `f06db43` (2026-10-09) was the 26.10.1 checkpoint. **#42** `2574a74` (2026-10-08) was release 26.10.1 (below). **#41** `2a6ab29` (2026-10-06) corrected the MSM section rules in the schema-management
 skills (250 never deployed → views/routines in 150, removals in 240; 270 only `REVOKE`/`DROP ROLE`,
@@ -70,6 +85,24 @@ version-comparison tutorial), **#13** `c5759e5` (mariadb-migrator split into an
 overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-open
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
+
+## Release v26.10.3 (2026-10-15) — IN PROGRESS (PR about to open)
+
+- `/release 26.10.3`, no floor: it stays **26.10.1**, still the newest mariadb-shell release
+  (2026-10-08). Branch `wip/26.10.3` off `4747939` (#51).
+- `2e2876c` plugin version → 26.10.3 (**23 files**: 17 + 6 for Hermes, as expected).
+- Re-vendor changed **nothing** — upstream heads are still mariadb-docs `cc8dd40` and
+  mariadb-shell `37cb1d3`, which #47 already vendored — so no commit for that step. But those
+  commits are new since v26.10.2 (`8bb700f` / `43338f8`), so the CHANGELOGs record them: the
+  Connector/C, C++, ODBC, Python install skills and `mariadb-features` no longer run `sudo`
+  (root steps handed to the user; `$HOME/.local` builds; per-user ODBC registration; venv;
+  `lib64/mariadb` for RPM tarballs) — dev; only `mariadb-features` in sql; contributor's
+  `create-shell-plugin` line ref + dropped `plugins_path` note. Counts 85 / 47 / 3.
+- `02f2756` CHANGELOGs: the `[Unreleased]` sections (launcher hint, REST 5.0.0, REST fixes)
+  folded into `[26.10.3]`; no floor line (floor didn't move); the **Hermes plugins' first
+  release** — their `[Unreleased]` became `[26.10.3]`, with the vendored commits corrected from
+  `8bb700f`/`43338f8` to `cc8dd40`/`37cb1d3`.
+- Static tier green: claude 682, codex 686, hermes 779, opencode 682, pi 691.
 
 ## Release v26.10.2 (2026-10-09) — SHIPPED
 
