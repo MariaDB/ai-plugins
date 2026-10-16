@@ -20,7 +20,8 @@ tag carries the `v` (`v26.10.0`). Strip a leading `v` if one was given and say s
 manifests, the CHANGELOG headings and the tag. The floor is the `MARIADB_SHELL_VERSION`
 floor, the oldest mariadb-shell the launchers accept. Through 26.9.5 the two were
 always equal; that is no longer required. With no floor given it stays where it is
-and the release ships on top of the current shell version.
+and the release ships on top of the current shell version — unless a newer shell
+release exists, in which case step 2 asks whether to raise the floor to it.
 
 Read `.claude/PROJECT_CONTEXT.md`, then `.claude/context/release-history.md` and
 `.claude/context/repo-conventions.md` before starting: the previous release's
@@ -58,9 +59,15 @@ gh release list --repo mariadb-corporation/mariadb-shell --exclude-drafts --limi
 
 Sort the `tagName`s as versions (strip the `v`; `sort -V`), not by date.
 
-- **No floor given:** the floor stays. If a shell release newer than the floor exists,
-  mention it (with its publish date) so the user can choose to raise the floor,
-  but do not stop.
+- **No floor given:** the floor would stay at the last release's shell version.
+  Check that this is still the latest published shell release (the highest
+  `tagName`). If it is, continue with the floor unchanged. If a newer one exists,
+  the user most likely just forgot to pass it: **stop and ask explicitly**
+  whether to keep the current floor or raise it to the latest shell release,
+  naming both versions and the latest one's publish date. Do not go on until
+  they answer. If they choose to raise it, take the latest shell release as the
+  floor and continue as if it had been given (the checks below then pass
+  trivially); if they keep it, continue with the floor unchanged.
 - **A floor given:**
   - `v<floor>` is not in the list → stop. The shell floor must never sit above a
     published release, or every launcher would demand a binary that does not
