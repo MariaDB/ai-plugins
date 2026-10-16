@@ -1,0 +1,6 @@
+name: mariadb-guard
+version: "26.10.3"
+description: "Stops the agent from using the MariaDB/MySQL command-line clients for what the mariadb MCP server's tools do, so no password reaches a command line."
+author: "MariaDB Corporation"
+provides_hooks:
+  - pre_tool_call

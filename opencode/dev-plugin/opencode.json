@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "plugin": ["{env:MARIADB_DEV_PLUGIN}/plugins/mariadb-guard.ts"],
   "mcp": {
     "mariadb": {
       "type": "local",

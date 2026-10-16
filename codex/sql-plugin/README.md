@@ -134,6 +134,42 @@ installer only prints a `PATH` hint; it never edits your shell profile. That cop
 appears the first time this plugin starts the MCP server, so either let the agent
 run once first, or install the shell yourself before configuring it.
 
+### Database access goes through the MCP server
+
+The agent uses the MCP server's tools, not a command-line client, for anything
+those tools do. A client run from the agent's shell needs the password on its
+command line (`-p<password>`) or in its environment. From there it reaches the
+process list, logs, and the conversation the model provider sees. A connection
+opened through the MCP server reads its password from the secret store, so the
+agent never sees one. To give the agent a server, configure it yourself with
+`mariadb-shell -- mcp setup` (see above) or its
+[command-line options](https://mariadb.com/docs/tools/community/mariadb-shell/mcp-server/automated-setup).
+For a local test server the agent deploys a sandbox, with a random root
+password it generates; the password is stored with the sandbox's connection.
+
+This plugin enforces that with a `PreToolUse` hook on the shell tool
+([hooks/hooks.json](hooks/hooks.json), [hooks/mariadb-cli-guard.sh](hooks/mariadb-cli-guard.sh)).
+**Codex runs a plugin's hooks only once you have trusted them.** Start an
+interactive `codex` session after installing; it asks you to review the new
+hooks, and approving them is a one-time step. Until then Codex skips the hook
+without a word, and `codex exec` never asks.
+
+It looks at only five clients, and each only where an MCP tool does the job:
+
+| Client | Blocked when | Use instead |
+| --- | --- | --- |
+| `mariadb`, `mysql` | it runs SQL | `db.execute_sql`, `db.execute_sql_script` |
+| `mariadb-shell`, `mysqlsh` | it runs SQL (SQL mode) | `db.execute_sql`, `db.execute_sql_script` |
+| `mariadb-shell`, `mysqlsh` | it calls `-- <object> <method>` that a tool wraps, such as `-- util dump-schemas` | the matching tool, here `util.dump_schemas` |
+| `mariadb-dump` | its output is piped into another client | `util.copy_instance`, `util.copy_schemas`, `util.copy_tables` |
+
+Everything else runs: `--version` and `--help`, Python or JavaScript mode, a dump
+written to a file, `mariadb-shell -- mcp setup`, an API call no tool wraps, and
+every other client. A client is caught behind a path, `env`, a pipe, `&&`,
+`sh -c "..."` or `$(...)`. The model is told which tool to use instead. To let
+the agent run the clients regardless, start it with `MARIADB_PLUGIN_ALLOW_CLI=1`
+in its environment; the model cannot set that itself.
+
 ## Skills
 
 Skills are vendored under [skills/](skills/), preserving the upstream layer

@@ -26,10 +26,17 @@
 // (which loads no extensions) does not show the server; `/mcp` inside pi does. A
 // `mariadb` entry in ~/.pi/agent/mcp.json or .pi/mcp.json takes precedence over
 // this one, which is how a user overrides the command or its environment.
+//
+// It also keeps the agent from using the MariaDB/MySQL command-line clients for
+// what the MCP tools do (see ./cli-guard.ts): the system prompt says to use the
+// tools, and a bash or powershell call that uses a client for such a task is
+// blocked with the tool to call instead. Starting pi with
+// MARIADB_PLUGIN_ALLOW_CLI=1 turns both off.
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { SYSTEM_PROMPT_RULE, blockReason, findClient, guardDisabled } from "./cli-guard.ts";
 
 const MCP_SERVER_NAME = "mariadb";
 
@@ -49,5 +56,20 @@ export default function (pi: ExtensionAPI) {
     description:
       "MariaDB Shell: connect to MariaDB servers, run SQL, inspect schemas, " +
       "manage sandbox instances, versioned schemas (MSM) and MySQL migrations",
+  });
+
+  if (guardDisabled()) return;
+
+  pi.on("before_agent_start", (event) => {
+    const guidelines = (event.systemPromptOptions.promptGuidelines ??= []);
+    if (!guidelines.includes(SYSTEM_PROMPT_RULE)) guidelines.push(SYSTEM_PROMPT_RULE);
+  });
+
+  pi.on("tool_call", (event) => {
+    if (event.toolName !== "bash" && event.toolName !== "powershell") return;
+    const command = (event.input as { command?: unknown }).command;
+    if (typeof command !== "string") return;
+    const finding = findClient(command);
+    if (finding) return { block: true, reason: blockReason(finding) };
   });
 }

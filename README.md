@@ -99,7 +99,13 @@ portable Agent Plugins v1 package:
 
 ```sh
 hermes plugins install mariadb/ai-plugins#hermes/dev-plugin --enable
+hermes plugins install mariadb/ai-plugins#hermes/guard-plugin --enable
 ```
+
+The second package, `mariadb-guard`, stops the agent from using the MariaDB
+command-line clients for what the MCP tools do (see
+[below](#database-access-goes-through-the-mcp-server)). It is a separate package
+because Hermes runs hooks only from a Python plugin.
 
 Then start a new Hermes session; MCP servers connect at session start.
 `--enable` is needed because Hermes installs portable packages disabled. On native Windows the MCP server needs an entry in Hermes'
@@ -147,6 +153,36 @@ for the full reference:
   [MySQL-to-MariaDB migration tooling](https://github.com/mariadb-corporation/Mysql-to-MariaDB-Migration)
   and extracts it into `~/.local/share/mariadb-migrator/<version>`.
   See [Migration tooling](https://github.com/mariadb-corporation/mariadb-shell-plugins/blob/main/mcp_plugin/README.md#migration-tooling).
+
+### Database access goes through the MCP server
+
+Once the plugins are installed, the agent uses the MCP server's tools, not
+`mariadb`, `mariadb-shell`, `mariadb-dump` or another command-line client run
+from its shell, for anything those tools do. Such a client needs the password on
+its command line or in its environment, where it lands in the process list, in
+logs, and in the conversation the model provider sees. The MCP server reads each
+password from the secret store, so the agent never sees one. Configure the
+servers the agent may use with `mariadb-shell -- mcp setup` or its
+[command-line options](https://mariadb.com/docs/tools/community/mariadb-shell/mcp-server/automated-setup),
+and let it deploy sandboxes for local testing.
+
+Two layers keep it that way:
+
+- **The MCP server's instructions**, which a harness puts in the system prompt,
+  and its tool descriptions say so, and ask the agent to deploy sandboxes with a
+  random password.
+- **A guard** blocks a shell command that uses `mariadb` or `mysql` to run SQL,
+  `mariadb-shell` or `mysqlsh` in SQL mode or for an API call a tool wraps
+  (`-- util dump-schemas`), or `mariadb-dump` piped into another client, and
+  tells the model which tool to use instead. Everything the tools do not cover
+  still runs, so the agent keeps the clients' other features. The guard is a
+  `PreToolUse` hook in the Claude Code and Codex plugins, the Pi extension
+  itself, an OpenCode plugin, and the separate `mariadb-guard` package for
+  Hermes. Codex runs it only after you have trusted the plugin's hooks once in
+  an interactive session.
+
+To let the agent run the clients regardless, start it with
+`MARIADB_PLUGIN_ALLOW_CLI=1` in its environment.
 
 ## What you can ask for
 

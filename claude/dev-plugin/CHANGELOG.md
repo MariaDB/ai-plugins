@@ -4,6 +4,20 @@ All notable changes to the MariaDB Claude Code plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- A guard that stops the agent from using the MariaDB and MySQL command-line
+  clients for what the `mariadb` MCP server's tools do, so no password reaches a
+  command line, the process list, logs or the model: `mariadb`/`mysql` running
+  SQL, `mariadb-shell`/`mysqlsh` in SQL mode or calling an API a tool wraps (`--
+  util dump-schemas`), and `mariadb-dump` piped into another client. Everything
+  the tools do not cover still runs. It is a `PreToolUse` hook on the Bash tool
+  (`hooks/hooks.json`, `hooks/mariadb-cli-guard.sh`). A blocked command is
+  answered with the tool to use instead. `MARIADB_PLUGIN_ALLOW_CLI=1` turns it
+  off.
+
 ## [26.10.3] - 2026-10-15
 
 ### Changed

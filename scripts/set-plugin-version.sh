@@ -19,7 +19,7 @@
 # this repo.
 #
 # Updates the "version" field in each plugin manifest (.claude-plugin/plugin.json,
-# .codex-plugin/plugin.json and Hermes' plugin.json) and the "Version **x.y.z**"
+# .codex-plugin/plugin.json, Hermes' plugin.json and plugin.yaml) and the "Version **x.y.z**"
 # line in each plugin README, for the dev-*, sql-* and contributor-* plugins
 # across claude/, codex/, opencode/, pi/ and hermes/, plus the repo-root
 # package.json.
@@ -54,7 +54,7 @@ Arguments:
 Updates, for the dev-*, sql-* and contributor-* plugins across claude/, codex/,
 opencode/, pi/ and hermes/:
   - the "version" field in each plugin manifest (.claude-plugin/plugin.json,
-    .codex-plugin/plugin.json, hermes/*-plugin/plugin.json)
+    .codex-plugin/plugin.json, hermes/*-plugin/plugin.json and plugin.yaml)
   - the "Version **x.y.z**" line in each plugin README
   - the repo-root package.json
 
@@ -110,14 +110,15 @@ while IFS= read -r f; do files+=("$f"); done < <(
        "$REPO_ROOT"/opencode/*-plugin \
        "$REPO_ROOT"/pi/*-plugin \
        "$REPO_ROOT"/hermes/*-plugin \
-       -type f \( -name 'plugin.json' -o -name 'README.md' \) | sort
+       -type f \( -name 'plugin.json' -o -name 'plugin.yaml' -o -name 'README.md' \) | sort
 )
 files+=("$REPO_ROOT/package.json")
 
 [ "${#files[@]}" -gt 0 ] || { echo "error: no plugin files found under $REPO_ROOT" >&2; exit 1; }
 
-# Two shapes the version appears in:
+# Three shapes the version appears in:
 #   plugin manifest JSON:  "version": "<v>"
+#   Hermes plugin.yaml:    version: "<v>"
 #   README header line:    Version **<v>**
 #
 # The JSON substitution is anchored to the start of a line so it can only ever
@@ -126,9 +127,10 @@ files+=("$REPO_ROOT/package.json")
 V="$VERSION" perl -i -pe '
   my $v = $ENV{V};
   s/^(\s*"version"\s*:\s*")[^"]*(")/${1}${v}${2}/;
+  s/^(version:\s*")[^"]*(")/${1}${v}${2}/;
   s/^(Version \*\*)[^*]*(\*\*)$/${1}${v}${2}/;
 ' "${files[@]}"
 
 echo "Set plugin version -> $VERSION in ${#files[@]} file(s):"
-grep -rnE "\"version\": \"${VERSION}\"|^Version \*\*${VERSION}\*\*" "${files[@]}" \
+grep -rnE "\"version\": \"${VERSION}\"|^version: \"${VERSION}\"|^Version \*\*${VERSION}\*\*" "${files[@]}" \
   | sed 's/^/  /'

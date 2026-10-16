@@ -1,0 +1,17 @@
+{
+  "description": "MariaDB: stop the agent from using the MariaDB/MySQL command-line clients for what the mariadb MCP server's tools do, so no password reaches a command line. Everything else still runs. Set MARIADB_PLUGIN_ALLOW_CLI=1 to turn it off.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/mariadb-cli-guard.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

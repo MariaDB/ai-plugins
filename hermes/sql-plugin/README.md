@@ -111,6 +111,44 @@ installer only prints a `PATH` hint; it never edits your shell profile. That cop
 appears the first time this plugin starts the MCP server, so either let the agent
 run once first, or install the shell yourself before configuring it.
 
+### Database access goes through the MCP server
+
+The agent uses the MCP server's tools, not a command-line client, for anything
+those tools do. A client run from the agent's shell needs the password on its
+command line (`-p<password>`) or in its environment. From there it reaches the
+process list, logs, and the conversation the model provider sees. A connection
+opened through the MCP server reads its password from the secret store, so the
+agent never sees one. To give the agent a server, configure it yourself with
+`mariadb-shell -- mcp setup` (see above) or its
+[command-line options](https://mariadb.com/docs/tools/community/mariadb-shell/mcp-server/automated-setup).
+For a local test server the agent deploys a sandbox, with a random root
+password it generates; the password is stored with the sandbox's connection.
+
+Hermes runs hooks only from a Python plugin, and a Python plugin cannot also
+carry skills and an MCP server. So the hook that enforces this is a package of
+its own, [`mariadb-guard`](../guard-plugin/README.md). Install it next to this
+one:
+
+```sh
+hermes plugins install mariadb/ai-plugins#hermes/guard-plugin --enable
+```
+
+The guard looks at only five clients, and each only where an MCP tool does the job:
+
+| Client | Blocked when | Use instead |
+| --- | --- | --- |
+| `mariadb`, `mysql` | it runs SQL | `db.execute_sql`, `db.execute_sql_script` |
+| `mariadb-shell`, `mysqlsh` | it runs SQL (SQL mode) | `db.execute_sql`, `db.execute_sql_script` |
+| `mariadb-shell`, `mysqlsh` | it calls `-- <object> <method>` that a tool wraps, such as `-- util dump-schemas` | the matching tool, here `util.dump_schemas` |
+| `mariadb-dump` | its output is piped into another client | `util.copy_instance`, `util.copy_schemas`, `util.copy_tables` |
+
+Everything else runs: `--version` and `--help`, Python or JavaScript mode, a dump
+written to a file, `mariadb-shell -- mcp setup`, an API call no tool wraps, and
+every other client. A client is caught behind a path, `env`, a pipe, `&&`,
+`sh -c "..."` or `$(...)`. The model is told which tool to use instead. To let
+the agent run the clients regardless, start it with `MARIADB_PLUGIN_ALLOW_CLI=1`
+in its environment; the model cannot set that itself.
+
 ## Skills
 
 Hermes lists plugin skills through its `skills_list` and `skill_view` tools under
