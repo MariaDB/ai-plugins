@@ -167,4 +167,33 @@
     });
     apply();
   }
+
+  /* --- Scroll to top ------------------------------------------------------ */
+  /* mariadb.org's logic (scroll-top.js): shown once the page is scrolled past
+     60% of the viewport height, so short pages never show it. */
+  var scrollTop = document.getElementById('scroll-top');
+  if (scrollTop) {
+    var threshold = window.innerHeight * 0.6;
+    var ticking = false;
+
+    function updateScrollTop() {
+      scrollTop.hidden = window.scrollY <= threshold;
+      ticking = false;
+    }
+
+    updateScrollTop();
+    window.addEventListener('scroll', function () {
+      if (!ticking) {
+        window.requestAnimationFrame(updateScrollTop);
+        ticking = true;
+      }
+    }, { passive: true });
+    window.addEventListener('resize', function () {
+      threshold = window.innerHeight * 0.6;
+      updateScrollTop();
+    });
+    scrollTop.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 })();

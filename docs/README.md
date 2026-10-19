@@ -176,5 +176,7 @@ The site was checked for horizontal overflow at 320, 360, 390, 768, 1024 and
 1440 px across every page; keep it that way.
 
 [`assets/js/site.js`](assets/js/site.js) is progressive enhancement only — theme
-toggle, mobile nav, table of contents, catalog filters. Every page is fully
+toggle, mobile nav, table of contents, catalog filters, and mariadb.org's
+scroll-to-top button (shown once the page is scrolled past 60% of the viewport
+height, so short pages never get it). Every page is fully
 readable with JavaScript disabled.
