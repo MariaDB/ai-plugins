@@ -235,13 +235,15 @@ CREATE OR REPLACE TABLE `notes_app`.`user` (
         <h3>{{ site.tool_count }} MCP tools</h3>
         <p>
           A live connection to a MariaDB server. The agent can list schemas, describe
-          objects, run SQL and scripts, manage versioned schema projects, and deploy a
-          throwaway server instance to try something dangerous on first.
+          objects, run SQL and scripts, manage versioned schema projects, deploy a
+          throwaway server instance to try something dangerous on first, and dump,
+          load or copy data between servers.
         </p>
         <ul>
           <li><code>db.*</code> — connections, schemas, objects, SQL</li>
           <li><code>msm.*</code> — versioned schema projects and releases</li>
           <li><code>sandbox.*</code> — local throwaway MariaDB instances</li>
+          <li><code>util.*</code> — dumps, loads and copies between servers</li>
         </ul>
         <a class="btn btn--secondary" href="{{ '/mcp-tools/' | relative_url }}">Tool reference</a>
       </div>

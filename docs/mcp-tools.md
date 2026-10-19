@@ -5,12 +5,11 @@ subtitle: >-
   Every tool the mariadb-shell MCP server exposes, what it takes, and the
   behaviour that is not obvious from the name.
 permalink: /mcp-tools/
-description: Reference for the mariadb-shell MCP server tools — db.*, msm.*, sandbox.*, the optional migrator.* group and the newer rest.* group.
+description: Reference for the mariadb-shell MCP server tools — db.*, msm.*, sandbox.*, util.* and the optional migrator.* group.
 ---
 
-The server exposes **{{ site.tool_count }} tools in three groups**, plus an optional fourth
-that only appears when the migration tooling is installed, and a fifth for REST
-Daemons in mariadb-shell releases newer than 26.10.1.
+The server exposes **{{ site.tool_count }} tools in four groups**, plus an optional fifth
+that only appears when the migration tooling is installed.
 
 <div class="table-wrap" markdown="1">
 
@@ -19,16 +18,16 @@ Daemons in mariadb-shell releases newer than 26.10.1.
 | [`db.*`](#db--connections-and-sql) | 8 | List connections and schemas, describe objects, run SQL |
 | [`msm.*`](#msm--schema-management) | 12 | Versioned schema projects, releases, deployments |
 | [`sandbox.*`](#sandbox--throwaway-servers) | 8 | List deployable server versions; deploy, start, stop and delete local instances |
+| [`util.*`](#util--dumps-loads-and-copies) | 12 | Dump, load, export, import and copy data between servers, as background tasks |
 | [`migrator.*`](#migrator--mysql-to-mariadb) | 4 | MySQL-to-MariaDB migration — **optional, not counted above** |
-| [`rest.*`](#rest--rest-daemons) | 5 | Set up, start, stop and delete MariaDB REST Daemons — **mariadb-shell newer than 26.10.1, not counted above** |
 
 </div>
 
 A server in **multi-tenant mode** (`mcp setup --multiTenant=true`, mariadb-shell
-26.10.0 and later) serves only the `db.*` and `msm.*` groups: the `sandbox.*`, `migrator.*` and
-`rest.*` tools run local servers, daemons and long jobs on the server's own
-machine and are not offered to tenants. The plugins' launchers start a single-tenant
-server, which serves every group.
+26.10.0 and later) serves only the `db.*` group — 26.10.0 and 26.10.1 served
+`msm.*` too. The other groups run local servers and long jobs, or read and write
+files, on the server's own machine and are not offered to tenants.
+The plugins' launchers start a single-tenant server, which serves every group.
 
 <div class="callout" markdown="1">
 Arguments below are named as the tools take them. `connection_id` always comes
@@ -171,6 +170,61 @@ on Windows). Instances create a `root@'%'` account and listen on all interfaces,
 so they are a development tool and not something to leave running on an untrusted
 network.
 
+## `util.*` — dumps, loads and copies
+
+The shell's dump, load, export, import and copy utilities, as tools. **Use them
+instead of piping `mariadb-dump` into another client** — the plugins' CLI guard
+blocks that and points here. Offered only together with the `db.*` group, since
+every one of them works on a connection from `db.connect`.
+
+<div class="table-wrap" markdown="1">
+
+| Tool | Arguments | Notes |
+| --- | --- | --- |
+| `util.dump_instance` | `connection_id`, `output_url`, `options=None` | The whole server. `output_url` must not exist or be empty. |
+| `util.dump_schemas` | `connection_id`, `schemas`, `output_url`, `options=None` | The named schemas. |
+| `util.dump_tables` | `connection_id`, `schema`, `tables`, `output_url`, `options=None` | Tables and views of one schema. `tables=[]` with `{"all": true}` dumps every one. |
+| `util.export_table` | `connection_id`, `table`, `output_url`, `options=None` | One table's rows to one file. `table` is `t` or `schema.t`. |
+| `util.load_dump` | `connection_id`, `url`, `options=None` | Loads a dump made by any of the three dump tools. **The server needs `local_infile` on.** |
+| `util.import_table` | `connection_id`, `urls`, `options=None` | A file, or a list of files, into a table that **must already exist**. Wildcards `*` and `?` work. Needs `local_infile`. |
+| `util.copy_instance` | `connection_id`, `target_connection_id`, `options=None` | Dumps from the source and loads into the target at once, **no files written**. The target must be another server with `local_infile` on. |
+| `util.copy_schemas` | `connection_id`, `schemas`, `target_connection_id`, `options=None` | The same, for the named schemas. |
+| `util.copy_tables` | `connection_id`, `schema`, `tables`, `target_connection_id`, `options=None` | The same, for tables of one schema. `{"schema": "other"}` loads them into another schema. |
+| `util.get_task` | `task_id`, `since=0`, `wait_ms=0` | A task's `status`, stages, current `progress` (with `percent`, `throughput`, `eta_seconds`), the messages after `since`, `next_since`, and its `result` or `error` once it ended. `wait_ms` (at most 30000) waits for news instead of answering at once. |
+| `util.list_tasks` | — | This client's tasks, without their messages. |
+| `util.cancel_task` | `task_id` | Interrupts the utility as Ctrl+C would; the task ends `cancelled`. |
+
+</div>
+
+**Every utility runs as a background task.** The tool returns a `task_id` at
+once, with `status` `pending` or `running`; follow it with `util.get_task`,
+passing the last `next_since` back as `since` to get only new messages, and
+`wait_ms` to avoid a tight polling loop. A task ends `completed`, `failed` or
+`cancelled`, and is kept for an hour after that (at most 100 of them). A client
+can have **at most four tasks running** at once — a dump opens a session per
+thread.
+
+`options` takes the utility's own options with their camelCase names —
+`{"threads": 8}`, `{"ddlOnly": true}`, `{"loadUsers": false}`. `session`,
+`progressCallback` and `showProgress` are set by the tool and refused, and so is
+`outputUrl` for `dump_schemas` and `dump_tables`: use `output_url`.
+
+<div class="callout" markdown="1">
+**Each task runs in a mariadb-shell process of its own**, logged in with the
+URI and stored password of the `db.connect` connection. The password goes to
+the process on stdin, never on its command line. The connection itself is not
+locked, so the agent can keep running SQL on it while a dump runs. A load whose
+process crashes is **resumed from its progress file**, up to three more times;
+`cancel_task` on a load leaves that file too, so loading the same dump again
+picks up where it stopped. Tasks are stopped when the MCP server ends.
+</div>
+
+Local paths in `output_url`, `url` and `urls`, and in file options such as
+`progressFile`, must be on the allowed-paths list. A URL with another scheme
+(`https://…`), or a prefix in an object storage bucket (`s3BucketName`,
+`osBucketName`, `azureContainerName`), is not a local path and goes to the
+utility unchecked.
+
 ## `migrator.*` — MySQL to MariaDB
 
 **Optional and not part of the {{ site.tool_count }}.** These four tools are registered only when
@@ -199,32 +253,6 @@ pass it only to `resume`, and check that every step says `DONE` — never trust
 `succeeded` on its own.
 </div>
 
-## `rest.*` — REST Daemons
-
-**Needs a mariadb-shell newer than 26.10.1, and not part of the {{ site.tool_count }}.**
-These five tools set up and run the MariaDB REST Daemon, `mariadb-restd`, which
-serves the REST services defined in a server's REST metadata. See
-[Tutorial 8]({{ '/tutorials/rest-endpoints/' | relative_url }}) for defining them.
-
-<div class="table-wrap" markdown="1">
-
-| Tool | Arguments | Notes |
-| --- | --- | --- |
-| `rest.configure_restd` | `connection_id`, `password`, `sandbox_port`, `sandbox_dir`, `port`, `metadata_schema`, `restd_path` | Sets a daemon up for a server and starts it. Uses the connection's stored password when none is given; picks the server's only REST metadata schema, **refuses to guess between several**, and runs `CONFIGURE REST METADATA` when there is none. **Installs `mariadb-restd` if it is missing — after you confirm.** Offered only with the `db.*` group. |
-| `rest.start_restd` | `directory`, `restd_path` | Starts a deployment's daemon. A no-op when it is running. |
-| `rest.stop_restd` | `directory` | Stops it; killed after 30 seconds. A no-op when it is stopped. |
-| `rest.delete_restd_config` | `directory`, `connection_id`, `drop_accounts=True` | Stops the daemon, drops the account the setup generated and its `rest_daemon` row, and deletes the folder. `drop_accounts=False` deletes only the folder. |
-| `rest.get_restd_status` | — | Every deployment: folder, server, `port`, `url`, `status`, `pid`, `log_path`, `metadata_schema`, `connection_uri`, `sandbox_port`. |
-
-</div>
-
-A sandbox's deployment lives in `<sandboxDir>/<port>/mariadb-restd`, any other
-server's in `~/.mariadb-restd/<host>_<port>`; each daemon listens on the first
-free port from 8443 up. Both serve HTTPS with a self-signed certificate, and **the
-daemon outlives the MCP server**. A sandbox's daemon follows its sandbox:
-`sandbox.start` starts it after the server, `sandbox.stop` and `sandbox.kill`
-stop it first, and `sandbox.delete` stops it before the folder goes.
-
 ## Error messages you will meet
 
 <div class="table-wrap" markdown="1">
@@ -234,6 +262,10 @@ stop it first, and `sandbox.delete` stops it before the folder goes.
 | *not a configured connection* | The URI is not on the allow-list, or asks for more than was configured (a schema, an option). | `mariadb-shell -- mcp setup`, or drop the extra part from the URI. |
 | A call that never returns | A path is not on the allowed-paths list, and the guard fell back to a prompt nothing can answer. | Add the directory with `mcp setup`. |
 | *There is no object registered under name 'mcp'* | The shell cannot find its plugins — usually a relocated or broken config home. | Check `~/.mariadb-shell/plugins/`. |
+| No `util.*` tools at all | The server does not serve the `db.*` group, or runs in multi-tenant mode. | Serve `db` too; a multi-tenant server never offers them. |
+| *The MariaDB Shell binary to run the utility in was not found* | A `util.*` tool could not find `mariadb-shell` to run the task in. | Put `mariadb-shell` on the `PATH`. |
+| *Already 4 tasks are running* | The client's limit of running `util.*` tasks. | Wait for one with `util.get_task`, or `util.cancel_task` one. |
+| A load or copy fails on `local_infile` | The target server has `local_infile` off. | `SET GLOBAL local_infile = ON` on the target. |
 | No `migrator.*` tools at all | The migration tooling is not installed, or the server has not been restarted since it was. | `mcp setup --installMigrator`, then restart. |
 | *No module named 'pywintypes'* (Windows) | The Windows shell packages do not yet bundle pywin32. | `pip install pywin32` into the shell's bundled Python. |
 

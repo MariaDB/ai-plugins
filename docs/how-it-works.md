@@ -18,7 +18,7 @@ which is which explains most of what happens when something does not work.
 | Part | What it is | Needs |
 | --- | --- | --- |
 | **Skills** | {{ site.skill_count }} Markdown documents vendored into the plugin. The agent reads the ones whose `description` matches what you asked. | Nothing. They work on a fresh install, offline. |
-| **MCP server** | {{ site.tool_count }} tools that talk to a real MariaDB server, in three groups: `db.*`, `msm.*`, `sandbox.*`. | A one-time `mcp setup`, and a server to talk to. |
+| **MCP server** | {{ site.tool_count }} tools that talk to a real MariaDB server, in four groups: `db.*`, `msm.*`, `sandbox.*`, `util.*`. | A one-time `mcp setup`, and a server to talk to. |
 | **`mariadb-shell`** | MariaDB's command-line shell (a port of MySQL Shell). The MCP server runs **inside** it as a plugin. | Installed automatically on first use. |
 
 </div>
