@@ -8,8 +8,9 @@ mariadb-shell floor are independent.** Through 26.9.5 every release set both to 
 <version> [shell-version]` now checks the plugin version against this repo's tags and moves the
 floor only when a shell version is given. 26.10.0 is planned on top of the current floor 26.9.5.
 
-## Landed on `main` (through PR #55)
+## Landed on `main` (through PR #56)
 
+**#56** `2a90ebf` (2026-10-19) was release 26.10.4 (below).
 **#55** `67d3424` (2026-10-18) added the **CLI guard**: every MCP-bearing plugin blocks a shell
 command that uses `mariadb`/`mysql`/`mariadb-shell`/`mysqlsh`/`mariadb-dump` for what an MCP
 tool covers and names the tool instead (`MARIADB_PLUGIN_ALLOW_CLI=1` turns it off) — a
@@ -95,7 +96,19 @@ overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-op
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
 
-## Release v26.10.4 (2026-10-19) — PR about to open
+## Release v26.10.4 (2026-10-19) — SHIPPED
+
+- **PR #56**, squash `2a90ebf` (merged head `d3805c2`, the checkpoint commit included this
+  time). **Annotated tag `v26.10.4` = object `cca0c4e`**, one-line subject so the summary is all
+  in `%(contents:body)`, pushed to `origin` and `fork` as the same object; **prerelease on both
+  repos**. Fork's `main` fast-forwarded `2206a90` → `2a90ebf` (= `origin/main`, diff empty).
+  `wip/26.10.4` deleted locally (head = `headRefOid`); GitHub had removed it on `origin`.
+- Tag notes state the floor move to 26.10.2, the CLI guard (incl. `mariadb-guard` for Hermes)
+  and the re-vendor.
+- **`/release` updated for the guard plugin** (on the checkpoint PR #57): fourteen CHANGELOGs (the
+  `skills-source.json` files stay thirteen — the guard vendors no skills), the guard's section is
+  a version bump alone when nothing in it changed, and the file-count reference now names
+  26.10.4's 39 / 25.
 
 - `/release 26.10.4`, no floor given, but **mariadb-shell `v26.10.2` was published 2026-10-17**
   (built from `a4352a5`), so the command asked and the user chose **floor 26.10.1 → 26.10.2**.

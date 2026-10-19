@@ -2,7 +2,7 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
-- **Release 26.10.4 — in progress** (branch `wip/26.10.4`, PR about to open): shell floor 26.10.1 → **26.10.2**, plugin version 26.10.4, a re-vendor that changed `review-shell-change` (contributor), and the first release of #55's CLI guard (incl. the new `hermes/guard-plugin`). Static tier green. See [release history](release-history.md).
+- **Release 26.10.4 — SHIPPED** (PR #56, squash `2a90ebf`; tag `v26.10.4` = object `cca0c4e`, prerelease on both repos; fork fast-forwarded to `2a90ebf`): shell floor 26.10.1 → **26.10.2**, plugin version 26.10.4, a re-vendor that changed `review-shell-change` (contributor), and the first release of #55's CLI guard (incl. the new `hermes/guard-plugin`). See [release history](release-history.md).
 - **CLI guard — merged as PR #55** (`67d3424`): MCP-bearing plugins block the MariaDB CLIs where an MCP tool does the job; Hermes gets it via the separate `hermes/guard-plugin`.
 - **Release 26.10.3 — SHIPPED** (PR #52, squash `43a33cb`; tag `v26.10.3` = object `65b8865`, prerelease on both repos; fork fast-forwarded to `43a33cb`): plugin version 26.10.3, floor stays 26.10.1, ships Hermes Agent's first release (#47), the REST 5.0.0 skills (#50) and the sudo-free connector skills re-vendored in #47. See [release history](release-history.md).
 - **Hermes Agent — merged as PR #47** (`ee00bf4`): fifth harness, `hermes/{dev,sql,contributor}-plugin` + `hermes/dev-plugin-tests` (static, db, opt-in e2e). Installs with `--enable` only — no `--force` since the re-vendored skills pass Hermes' install scan.
