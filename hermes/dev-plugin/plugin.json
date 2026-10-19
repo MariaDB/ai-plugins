@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "mariadb-dev",
-  "version": "26.10.3",
+  "version": "26.10.4",
   "description": "MariaDB skills and the native mariadb-shell MCP server for Hermes Agent.",
   "author": { "name": "MariaDB Corporation", "url": "https://mariadb.com" },
   "homepage": "https://github.com/mariadb/ai-plugins",

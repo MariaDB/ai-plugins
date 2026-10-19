@@ -1,6 +1,6 @@
 # MariaDB guard plugin for Hermes Agent
 
-Version **26.10.3**
+Version **26.10.4**
 
 A companion to the [`mariadb-dev`](../dev-plugin/README.md) and
 [`mariadb-sql`](../sql-plugin/README.md) plugins. It stops the agent from using

@@ -8,8 +8,16 @@ mariadb-shell floor are independent.** Through 26.9.5 every release set both to 
 <version> [shell-version]` now checks the plugin version against this repo's tags and moves the
 floor only when a shell version is given. 26.10.0 is planned on top of the current floor 26.9.5.
 
-## Landed on `main` (through PR #52)
+## Landed on `main` (through PR #55)
 
+**#55** `67d3424` (2026-10-18) added the **CLI guard**: every MCP-bearing plugin blocks a shell
+command that uses `mariadb`/`mysql`/`mariadb-shell`/`mysqlsh`/`mariadb-dump` for what an MCP
+tool covers and names the tool instead (`MARIADB_PLUGIN_ALLOW_CLI=1` turns it off) — a
+`PreToolUse` hook in Claude Code and Codex, the extension in Pi, `plugins/mariadb-guard.ts` in
+OpenCode, and a new separate **`hermes/guard-plugin`** (`mariadb-guard`, the 14th plugin, with
+its own CHANGELOG; `set-plugin-version.sh` now updates its `plugin.yaml`). One case list,
+`tests/cli-guard-cases.json`, drives all three implementations. `56a9629` made `/release` ask
+before keeping the floor when a newer shell exists. **#53** `2206a90` was the 26.10.3 checkpoint.
 **#52** `43a33cb` (2026-10-15) was release 26.10.3 (below).
 **#51** `4747939` (2026-10-15) moved `docs-ref/content/mariadb-ai-plugins/` to
 `content/community/mariadb-ai-plugins/` (mariadb.com/docs now lists the plugins under
@@ -86,6 +94,23 @@ version-comparison tutorial), **#13** `c5759e5` (mariadb-migrator split into an
 overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-open
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
+
+## Release v26.10.4 (2026-10-19) — PR about to open
+
+- `/release 26.10.4`, no floor given, but **mariadb-shell `v26.10.2` was published 2026-10-17**
+  (built from `a4352a5`), so the command asked and the user chose **floor 26.10.1 → 26.10.2**.
+  Branch `wip/26.10.4` off `67d3424` (#55).
+- `d6f430e` floor → 26.10.2 (**39 files**: 31 + 8 Hermes). `114d17c` plugin version → 26.10.4
+  (**25 files**: 23 + the guard plugin's `README.md` and `plugin.yaml`).
+- `26ba6d4` re-vendor (17 files): mariadb-docs `cc8dd40` → `a439473` with nothing under
+  `agent-skills/` changed; mariadb-shell `37cb1d3` → `a4352a5`, **`review-shell-change`** changed
+  (§1.1 unreachable scenarios are not findings; §7 out-of-change defects go to a follow-up list)
+  in the four contributor plugins. Counts 85 / 47 / 3.
+- `397c6ac` CHANGELOGs, now **fourteen** (`hermes/guard-plugin` is new): #55's `[Unreleased]`
+  CLI-guard entries folded into `[26.10.4]`, the guard plugin's first release, the floor line in
+  the nine MCP-bearing plugins.
+- Static tier green: claude 807, codex 811, hermes 902, opencode 689, pi 693 (JUnit counts;
+  the guard tests from #55 raised them).
 
 ## Release v26.10.3 (2026-10-15) — SHIPPED
 
