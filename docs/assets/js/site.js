@@ -19,24 +19,48 @@
   'use strict';
 
   /* --- Theme toggle ------------------------------------------------------ */
-  /* One per header layout (desktop, its narrow fallback, the mobile menu). */
-  Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), function (toggle) {
+  /* mariadb.org's switch: pressed means dark. */
+  var toggles = document.querySelectorAll('[data-theme-toggle]');
+  var showTheme = function () {
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    Array.prototype.forEach.call(toggles, function (t) { t.setAttribute('aria-pressed', String(dark)); });
+  };
+  Array.prototype.forEach.call(toggles, function (toggle) {
     toggle.addEventListener('click', function () {
       var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       try { localStorage.setItem('mdb-theme', next); } catch (e) { /* private mode */ }
+      showTheme();
     });
   });
+  showTheme();
 
-  /* --- Mobile nav -------------------------------------------------------- */
+  /* --- Menu drawer (599px and below) ---------------------------------------- */
+  /* Closes from its button, the dimmed page around it, Escape, or the window
+     growing past the breakpoint, where the CSS hides it but the page would
+     stay locked. Focus moves into it and back to the menu button. */
   var navToggle = document.getElementById('nav-toggle');
-  var navLinks = document.getElementById('nav-links');
-  if (navToggle && navLinks) {
-    navToggle.addEventListener('click', function () {
-      var open = navToggle.getAttribute('aria-expanded') === 'true';
-      navToggle.setAttribute('aria-expanded', String(!open));
-      navLinks.hidden = open;
-    });
+  var drawer = document.getElementById('nav-links');
+  if (navToggle && drawer) {
+    var closeButton = drawer.querySelector('[data-menu-close]');
+    var setOpen = function (open) {
+      drawer.hidden = !open;
+      navToggle.setAttribute('aria-expanded', String(open));
+      document.body.classList.toggle('menu-open', open);
+      if (open && closeButton) closeButton.focus();
+    };
+    var close = function () {
+      if (drawer.hidden) return;
+      setOpen(false);
+      navToggle.focus();
+    };
+    navToggle.addEventListener('click', function () { setOpen(drawer.hidden); });
+    if (closeButton) closeButton.addEventListener('click', close);
+    drawer.addEventListener('click', function (e) { if (e.target === drawer) close(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    var wide = matchMedia('(min-width: 600px)');
+    var onWide = function () { if (wide.matches && !drawer.hidden) setOpen(false); };
+    if (wide.addEventListener) wide.addEventListener('change', onWide); else wide.addListener(onWide);
   }
 
   /* --- Table of contents, built from the article's own headings ---------- */

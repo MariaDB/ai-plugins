@@ -21,204 +21,194 @@
    ========================================================================== */
 
 /* --- Tokens: light --------------------------------------------------------
-   The palette follows mariadb.org (the twentynineteen-child theme's
-   style.css). Taken from it verbatim: the primary #4e629a (links, footer, the
-   under-menu bar), its light #94adf3 (link hovers on dark, <pre> borders),
-   #7d94d5 (button hover), #1f305f (the featured-post panels), #1a2546 and
-   #445380 (schedule text), #dce0eb (form borders), the #f5f7ff / #eef3ff / #c4d3ff
-   tints, and the #5e7aca / #7d94d5 button blues. The rest are ours, derived
-   from those, and marked where they are not obvious. The spacing, radius,
-   shadow and transition scales predate the re-style and are unchanged.
+   The palette is mariadb.org's (its twentytwentyfive-child theme): background
+   #F7F8F0, primary #355872 (text, links, the header), secondary #7AAACE,
+   tertiary #9CD5FF, accent #964A2C (hovers, the outline button), its
+   --mariadb-card-bg (8% tertiary over the background) for surfaces, its
+   --mariadb-note-bg (40% tertiary) for callouts and its hero's #F08A5D
+   button. The rest are ours, mixed from those and marked where they are not
+   obvious; every text colour keeps 4.5:1 on the background and the cards.
+   The spacing, radius, transition and code scales are unchanged.
    -------------------------------------------------------------------------- */
 :root {
-  --ch-primary: #4e629a;
-  --ch-primary-hover: #445380;
-  --ch-primary-light: #94adf3;
-
-  --ch-bg: #f5f7ff;
-  --ch-bg-surface: #fff;
-  --ch-bg-elevated: #fff;
-  --ch-callout-bg: #fff;
-  --ch-feedback-bg: #f7f9ff;
-
-  --ch-border: #dce0eb;
-  --ch-highlight-bg: #eef3ff;
-  --ch-highlight-border: #c4d3ff;
-  --ch-highlight-link: #445380;
-
-  --ch-on-primary: #fff;
-  /* The "action" colour: the prompt block's label and the outline button.
-     mariadb.org has no red call-to-action, so this is its primary blue too. */
-  --ch-brand-action: #4e629a;
-  --ch-brand-action-hover: #445380;
+  --ch-primary: #355872;
+  --ch-primary-hover: #964A2C;
+  --ch-primary-light: #7AAACE;
+  --ch-bg: #F7F8F0;
+  --ch-bg-surface: #f0f5f1;
+  --ch-bg-elevated: #f0f5f1;
+  --ch-callout-bg: #d3eaf6;
+  --ch-callout-bar: #4A718E;
+  --ch-feedback-bg: #f0f5f1;
+  /* Ours: mariadb.org's footer rule, 40% secondary over the background. */
+  --ch-border: #c5d9e2;
+  --ch-highlight-bg: #e5f1f3;
+  --ch-highlight-border: #b9d1df;
+  --ch-highlight-link: #355872;
+  --ch-on-primary: #F7F8F0;
+  /* The "action" colour: the prompt block's label and the outline button —
+     mariadb.org's accent, and its 18%-black hover. */
+  --ch-brand-action: #964A2C;
+  --ch-brand-action-hover: #7b3d24;
+  --ch-on-action: #F7F8F0;
   --ch-accent-btn: var(--ch-brand-action);
   --ch-accent-btn-hover: var(--ch-brand-action-hover);
   --ch-action-outline: var(--ch-brand-action);
   --ch-action-outline-text: var(--ch-brand-action);
-
-  /* mariadb.org's filled button, in its own blues: #7d94d5 (its button hover)
-     into #5e7aca (its newsletter headings), with the primary as the hover. Its
-     lighter #869ef5 → #718cf0 gradient is not used: the white label is only
-     2.6:1 at the top of it. This one keeps 3:1 or better everywhere. */
-  --ch-btn-fill: linear-gradient(180deg, #7d94d5 0%, #5e7aca 100%);
-  --ch-btn-fill-hover: #4e629a;
-  --ch-btn-focus-rgb: 148, 173, 243;
-
-  --ch-text: #3c4560;
-  --ch-text-heading: #1a2546;
-  --ch-text-muted: #525b75;
-  --ch-text-faint: #626a82;
-
+  /* mariadb.org's hero "Download" button: #F08A5D under a #1B3C53 label and
+     border. Its #E8794A hover leaves the label at 4.0:1, so ours lightens
+     instead (5.6:1). */
+  --ch-btn-fill: #F08A5D;
+  --ch-btn-fill-hover: #F5A07B;
+  --ch-btn-text: #1B3C53;
+  --ch-btn-focus-rgb: 240, 138, 93;
+  --ch-text: #355872;
+  --ch-text-heading: #1B3C53;
+  --ch-text-muted: #527085;
+  --ch-text-faint: #547286;
   --ch-amber: #c9a227;
   --ch-amber-ink: #8c6c08;
-  --ch-red: #d92a27;
-  --ch-orange: #b15919;
+  --ch-red: #c0392b;
+  --ch-orange: #964A2C;
   --ch-yellow: #916b0c;
-  --ch-green: #6a780d;
+  --ch-green: #4f6b12;
   --ch-aqua: #287f5e;
-  --ch-blue: #496bd2;
-  --ch-purple: #7b5ea7;
-
-  /* A step lighter than the site footer's #4e629a band below it, so the two
-     read apart; white stays at 4.98:1 on it. */
-  --ch-footer-bg: #5a6ea6;
-  --ch-footer-link: #fff;
-  --ch-footer-link-hover: #94adf3;
-  --ch-footer-text: #eef1fa;
-
+  --ch-blue: #355872;
+  --ch-purple: #6b4f96;
+  --ch-footer-link: var(--ch-primary);
+  --ch-footer-link-hover: var(--ch-primary-hover);
+  --ch-footer-text: var(--ch-text);
   --ch-spacing-xs: clamp(.5rem, .4rem + .3vw, 1rem);
   --ch-spacing-sm: clamp(1rem, .8rem + .5vw, 1.5rem);
   --ch-spacing-md: clamp(1.5rem, 1.2rem + .8vw, 2rem);
   --ch-spacing-lg: clamp(2rem, 1.5rem + 1.5vw, 3rem);
   --ch-spacing-xl: clamp(3rem, 2.5rem + 1.5vw, 4rem);
   --ch-spacing-2xl: clamp(4rem, 3rem + 2vw, 5rem);
-
   --ch-section-sm: clamp(3rem, 2.5rem + 2vw, 5rem);
   /* Tightened from the reference's clamp(5rem, 4rem + 3vw, 7rem): the sections
      here carry less per-section content, so that much air read as drift. Kept
      above --ch-section-sm at every width so the scale stays in order. */
   --ch-section-md: clamp(3.5rem, 2.8rem + 2.2vw, 5rem);
   --ch-section-lg: clamp(7rem, 6rem + 4vw, 10rem);
-
   --ch-radius-sm: .5rem;
   --ch-radius-md: .75rem;
   --ch-radius-lg: 1rem;
   --ch-radius-xl: 1.5rem;
   --ch-radius-full: 9999px;
-
-  --ch-shadow-sm: 0 1px 3px rgba(26, 37, 70, .06);
-  --ch-shadow-md: 0 4px 12px rgba(26, 37, 70, .08);
-  --ch-shadow-lg: 0 8px 24px rgba(26, 37, 70, .1);
-
+  /* mariadb.org's --mariadb-card-shadow-color, rgba(27, 60, 83, .18), at three depths. */
+  --ch-shadow-sm: 0 1px 3px rgba(27, 60, 83, .08);
+  --ch-shadow-md: 0 4px 12px rgba(27, 60, 83, .12);
+  --ch-shadow-lg: 0 4px 14px rgba(27, 60, 83, .18);
   --ch-transition-fast: .15s ease;
   --ch-transition-normal: .25s ease;
-
-  /* The hero is mariadb.org's own "space" banner (the one its home page puts in
-     .image-banner-picture), under a scrim that darkens the left, where the
-     text sits. The gradient underneath is what shows while the image loads,
-     and matches its darkest corners. */
-  --ch-hero-image: url("../img/Banner_BG_space_2_3200.webp");
-  --ch-hero-gradient: linear-gradient(135deg, #0b1230 0%, #1f305f 100%);
-  --ch-hero-scrim: linear-gradient(90deg, rgba(8, 11, 32, .72) 0%, rgba(8, 11, 32, .45) 55%, rgba(8, 11, 32, .2) 100%);
-  --ch-hero-text: #fff;
-  --ch-hero-muted: #d3dbf5;
-  --ch-hero-accent: #b4c6f7;
-  --ch-hero-badge-bg: rgba(16, 22, 52, .6);
-  --ch-hero-badge-border: rgba(148, 173, 243, .38);
-
-  /* Ours: the headline's accent text, the banner image's own three hues —
-     its blue nodes on the left, violet in the middle, orange on the right. */
-  --ch-hero-text-gradient: linear-gradient(90deg, #94adf3 0%, #c49af7 50%, #ffa25e 100%);
-  --ch-bg-dim: #e8ecf8;
-
+  /* The hero is mariadb.org's: a 135deg gradient from primary to secondary.
+     Its own hero centres a headline; ours sets a paragraph on the left, where
+     the light end would drop the text to 2.3:1, so a scrim darkens the left
+     and keeps it above 4.5:1. The CTA band is mariadb.org's "Get involved"
+     band, a flat primary. */
+  --ch-hero-base: #355872;
+  --ch-hero-gradient: linear-gradient(135deg, #355872 0%, #7AAACE 100%);
+  --ch-hero-scrim: linear-gradient(90deg, rgba(27, 60, 83, .6) 0%, rgba(27, 60, 83, .35) 55%, rgba(27, 60, 83, 0) 100%);
+  --ch-hero-text: #F7F8F0;
+  --ch-hero-muted: #eef2ea;
+  --ch-hero-accent: #F7F8F0;
+  --ch-hero-badge-bg: rgba(27, 60, 83, .35);
+  --ch-hero-badge-border: rgba(247, 248, 240, .45);
+  /* Ours: the headline's accent line, tertiary into the dark theme's cream. */
+  --ch-hero-text-gradient: linear-gradient(90deg, #9CD5FF 0%, #F3E9DD 100%);
+  --ch-cta-bg: #355872;
+  --ch-cta-text: #F7F8F0;
+  --ch-cta-muted: #eef2ea;
+  --ch-bg-dim: #eceee3;
   /* Ours: code. The reference renders code BLOCKS with the One Dark prism
      theme in both site themes, so --ch-code-* is identical in the dark block.
      Inline code is a separate, light treatment there (--ifm-code-background). */
   --ch-code-bg: hsl(220, 13%, 18%);
   --ch-code-text: hsl(220, 14%, 71%);
   --ch-code-border: hsl(220, 13%, 26%);
-  --ch-inline-code-bg: #f3f5fb;
-  --ch-inline-code-border: rgba(26, 37, 70, .1);
-
+  --ch-inline-code-bg: #f0f5f1;
+  --ch-inline-code-border: rgba(53, 88, 114, .15);
   /* Ours: layout constants the reference has no token for. */
   --ch-wave-h: clamp(48px, 5vw, 80px);
-  /* The sticky header's height: mariadb.org's 88px desktop masthead, or its
-     108px mobile one (68px logo cap + 40px title row) below 1112px. */
+  /* The sticky header's height: 108px while the menu sits under the logo. */
   --ch-navbar-h: 88px;
-  /* The header's own palette: mariadb.org's white, #4e629a band and black
-     links; dark mode below swaps in the old navbar's dark values. */
-  --ch-header-bg: #ffffff;
-  --ch-header-band: #4e629a;
-  --ch-header-link: #000000;
-  --ch-header-link-hover: #94adf3;
-  --ch-header-on-band: #ffffff;
+  --ch-header-bg: var(--ch-bg);
+  --ch-header-link: var(--ch-primary);
+  --ch-header-link-hover: var(--ch-primary-hover);
+  /* mariadb.org's theme switch: the track is its secondary, the thumb its background. */
+  --ch-toggle-track: #7AAACE;
   --ch-maxw: 1200px;
 }
 
 /* --- Tokens: dark ---------------------------------------------------------
-   mariadb.org has no dark theme, so this one is ours: the same navy family as
-   its #1f305f / #1a2546 panels, with #94adf3 standing in as the primary. The
-   hero, the filled button and the code colours are shared with light.
+   mariadb.org's own dark theme (its dark-mode.css): background #1B3C53,
+   primary #F3E9DD, secondary #D2C1B6, tertiary #456882, accent #D08C72, the
+   card background (40% tertiary) and its #2B5470 band, and its hero's radial
+   glow. The accent is a hover colour only here: as a fill it would leave a
+   #1B3C53 label at 4.2:1, so filled accent buttons take a deeper navy.
    -------------------------------------------------------------------------- */
 html[data-theme="dark"] {
-  --ch-primary: #94adf3;
-  --ch-primary-hover: #b4c6f7;
-  --ch-primary-light: #5e7aca;
-  --ch-on-primary: #111830;
+  --ch-primary: #F3E9DD;
+  --ch-primary-hover: #D08C72;
+  --ch-primary-light: #D2C1B6;
+  --ch-on-primary: #1B3C53;
 
-  --ch-brand-action: #94adf3;
-  --ch-brand-action-hover: #b4c6f7;
+  --ch-brand-action: #D08C72;
+  --ch-brand-action-hover: #dca38c;
+  --ch-on-action: #102331;
   --ch-accent-btn: var(--ch-brand-action);
   --ch-accent-btn-hover: var(--ch-brand-action-hover);
-  --ch-action-outline: var(--ch-brand-action);
-  --ch-action-outline-text: #eef1fa;
+  --ch-action-outline: #D2C1B6;
+  --ch-action-outline-text: #F3E9DD;
 
-  --ch-bg: #111830;
-  --ch-bg-dim: #0b1024;
-  --ch-bg-surface: #18213d;
-  --ch-bg-elevated: #1f2a4a;
-  --ch-callout-bg: #18213d;
-  --ch-feedback-bg: #161f3a;
+  --ch-bg: #1B3C53;
+  --ch-bg-dim: #163246;
+  --ch-bg-surface: #2c4e66;
+  --ch-bg-elevated: #2c4e66;
+  --ch-callout-bg: #2B5470;
+  --ch-callout-bar: #9CD5FF;
+  --ch-feedback-bg: #2c4e66;
 
-  --ch-border: #2e3b63;
-  --ch-highlight-bg: #1c2647;
-  --ch-highlight-border: #34467a;
-  --ch-highlight-link: #94adf3;
+  --ch-border: #456882;
+  --ch-highlight-bg: #2B5470;
+  --ch-highlight-border: #456882;
+  --ch-highlight-link: #F3E9DD;
 
-  --ch-text: #d6dbe8;
-  --ch-text-heading: #eef1fa;
-  --ch-text-muted: #aab3c9;
-  --ch-text-faint: #959eb6;
+  --ch-text: #F3E9DD;
+  --ch-text-heading: #F3E9DD;
+  --ch-text-muted: #d3cfc8;
+  --ch-text-faint: #bfbfbc;
 
   --ch-red: #e98e90;
-  --ch-orange: #e69875;
+  --ch-orange: #D08C72;
   --ch-yellow: #dbbc7f;
   --ch-amber-ink: #d9b860;
   --ch-green: #a7c080;
   --ch-aqua: #83c092;
-  --ch-blue: #94adf3;
+  --ch-blue: #9CD5FF;
   --ch-purple: #c0a8d6;
 
-
-  /* The header, as the old navbar had it: surface navy, muted links, and the
-     #4e629a band a step darker so it does not glare on the dark page. */
-  --ch-header-bg: var(--ch-bg-surface);
-  --ch-header-band: #283558;
-  --ch-header-link: var(--ch-text-muted);
-  --ch-header-link-hover: var(--ch-primary);
-
-  --ch-footer-bg: var(--ch-bg-dim);
-  --ch-footer-link: #d6dbe8;
-  --ch-footer-link-hover: #94adf3;
-  --ch-footer-text: var(--ch-text);
+  --ch-hero-base: #1B3C53;
+  --ch-hero-gradient: radial-gradient(ellipse 70% 90% at 50% 45%, #3D6684 0%, #2B5470 45%, #1B3C53 100%);
+  --ch-hero-scrim: linear-gradient(transparent, transparent);
+  --ch-hero-text: #F3E9DD;
+  --ch-hero-muted: #e6ddd2;
+  --ch-hero-accent: #F3E9DD;
+  --ch-hero-badge-bg: rgba(27, 60, 83, .55);
+  --ch-hero-badge-border: rgba(210, 193, 182, .45);
+  --ch-cta-bg: #456882;
+  --ch-cta-text: #F3E9DD;
+  --ch-cta-muted: #F3E9DD;
+  --ch-toggle-track: #D2C1B6;
 
   --ch-shadow-sm: 0 1px 3px rgba(0, 0, 0, .25);
-  --ch-shadow-md: 0 4px 12px rgba(0, 0, 0, .35);
-  --ch-shadow-lg: 0 8px 24px rgba(0, 0, 0, .45);
+  --ch-shadow-md: 0 4px 12px rgba(0, 0, 0, .3);
+  /* mariadb.org's dark card shadow: an accent glow. */
+  --ch-shadow-lg: 0 4px 14px rgba(208, 140, 114, .35);
 
   /* Ours: inline code only — the code blocks stay One Dark in both themes. */
-  --ch-inline-code-bg: rgba(255, 255, 255, .08);
-  --ch-inline-code-border: rgba(255, 255, 255, .12);
+  --ch-inline-code-bg: rgba(243, 233, 221, .08);
+  --ch-inline-code-border: rgba(243, 233, 221, .14);
 }
 
 /* --- Base ---------------------------------------------------------------- */
@@ -230,12 +220,15 @@ body {
   margin: 0;
   background: var(--ch-bg);
   color: var(--ch-text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell,
-               "Noto Sans", Helvetica, Arial, sans-serif;
+  font-family: Manrope, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu,
+               Cantarell, "Noto Sans", Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.7;
-  -webkit-font-smoothing: antialiased;
+  /* mariadb.org's body tracking, inherited by everything set in Manrope. */
+  letter-spacing: -0.1px;
 }
+/* Monospace keeps its own grid: aligned output must not drift. */
+code, pre, kbd, samp { letter-spacing: normal; }
 
 h1, h2, h3, h4 { color: var(--ch-text-heading); line-height: 1.25; font-weight: 700; }
 
@@ -270,164 +263,142 @@ hr { border: 0; border-top: 1px solid var(--ch-border); margin: 2rem 0; }
 .skip-link:focus { left: 0; }
 
 /* --- Header --------------------------------------------------------------
-   mariadb.org's masthead, its rules carried over with their own values and
-   breakpoints (twentynineteen-child/style.css). It keeps mariadb.org's colours
-   in light mode; every colour goes through the --ch-header-* tokens so dark mode
-   can repaint it. The waves are masks filled with the band colour, not
-   background images, for the same reason.
+   mariadb.org's header (twentytwentyfive-child): the page background, primary
+   links that turn accent on hover, its light and dark logos, GitHub icon and
+   theme switch, and its menu drawer. Kept to the height of the header it
+   replaced, so our menu sits beside the logo where mariadb.org has its search
+   field, in one 88px row. Where the menu no longer fits beside the logo, the
+   logo shrinks to mariadb.org's narrow 150px and the whole menu moves under
+   it, still one line and left-aligned, in a 108px header; at 599px and below,
+   where that line does not fit either, mariadb.org's menu button takes its
+   place beside the logo.
    -------------------------------------------------------------------------- */
 .masthead {
   position: sticky; top: 0; z-index: 50;
-  font-family: 'Roboto', arial, sans-serif;
+  background: var(--ch-header-bg);
+  /* A hairline under it that adds no height: the header stays 88px. */
+  box-shadow: 0 1px 0 var(--ch-border);
 }
-.masthead a:hover { text-decoration: underline; }
+.masthead__bar {
+  display: flex; align-items: center; gap: 2rem;
+  height: 88px; max-width: 1400px; margin: 0 auto; padding: 0 1.5rem;
+}
+.masthead__logo { display: block; flex: none; line-height: 0; }
+.masthead__logo img { width: 200px; height: auto; }
+.masthead__logo-dark { display: none; }
+html[data-theme="dark"] .masthead__logo-light { display: none; }
+html[data-theme="dark"] .masthead__logo-dark { display: block; }
 
-/* Desktop: five columns, each two 44px rows. */
-.top-header-container.desktop-version {
-  display: flex; flex-flow: row nowrap; height: 88px; width: 100%; background-color: var(--ch-header-bg);
+.masthead__nav { flex: 1 1 auto; min-width: 0; }
+/* One line, never wrapped; mariadb.org's 19.2px between its menu links. */
+.masthead__nav ul {
+  display: flex; flex-wrap: nowrap; gap: 1.2rem; margin: 0; padding: 0; list-style: none;
 }
-.top-header-column.column-1 { flex: 0 auto; }
-.top-header-column.column-2 { flex: 0 auto; }
-.top-header-column.column-3 { flex: 1 auto; }
-.top-header-column.column-4 { flex: 0 auto; }
-.top-header-column.column-5 { flex: 0 auto; background-color: var(--ch-header-band); }
-
-/* One logo file for both themes; in dark mode drop-shadow traces its shape,
-   so the blue lifts off the dark band. */
-html[data-theme="dark"] .header-logo { filter: drop-shadow(0 0 2px rgba(0, 0, 0, .45)) drop-shadow(0 0 15px rgba(0, 0, 0, .2)); }
-.featured-header-image a:first-child { display: block; }
-.featured-header-image a:last-child { display: none; }
-.featured-header-image img { display: block; height: 68px; width: auto; margin: 5px 0; }
-.under-header-image { height: 10px; background-color: var(--ch-header-band); }
-
-.wavy-line-1 { height: 44px; background-color: var(--ch-header-bg); }
-.under-wavy-line-1, .wavy-line-2 {
-  height: 44px; width: 200px; background-color: var(--ch-header-band);
-  -webkit-mask: var(--wave) no-repeat 0 0 / 100% 100%; mask: var(--wave) no-repeat 0 0 / 100% 100%;
+.masthead__nav li { line-height: 1.4; }
+.masthead__nav a {
+  color: var(--ch-header-link); font-size: 18px; font-weight: 400; white-space: nowrap;
 }
-.under-wavy-line-1 { --wave: url("../img/wave-left-200px.svg"); }
-.wavy-line-2 { --wave: url("../img/wave-right-200px.svg"); }
-.under-wavy-line-2 { height: 44px; background-color: var(--ch-header-band); }
-
-.navigation-menu-item { height: 44px; }
-.header-navigation-menu {
-  height: 44px; overflow: hidden; text-align: center; padding: 0; margin: 0;
-  list-style: none; line-height: 48px;
-}
-.header-navigation-menu li {
-  display: inline; padding: 0 10px; border-right: 1px solid var(--ch-header-link); margin-left: -5px;
-}
-.header-navigation-menu li:last-child { border-right: 0; }
-.header-navigation-menu li a { font-size: 16px; color: var(--ch-header-link); font-weight: 300; }
-.header-navigation-menu li a:hover { color: var(--ch-header-link-hover); text-decoration: underline; }
-.header-navigation-menu li a[aria-current="page"] { text-decoration: underline; }
-
-.under-menu-nav { background-color: var(--ch-header-band); height: 44px; text-align: center; overflow: hidden; }
-.under-menu-nav p {
-  color: var(--ch-header-on-band); font-size: 14px; line-height: 44px; font-weight: 300; margin: auto; max-width: 800px;
-}
-.under-menu-nav p a { color: var(--ch-header-on-band); font-size: 14px; line-height: 44px; font-weight: 700; margin: 0; }
-.under-menu-nav p a:hover { color: var(--ch-header-link-hover); }
-
-.header-social-links {
-  background: var(--ch-header-band); height: 44px; padding: 5px 10px;
-  display: flex; justify-content: center; align-items: center; gap: 8px;
-}
-.under-social-nav { background-color: var(--ch-header-band); height: 44px; }
-
-/* The theme toggle and the GitHub link, drawn like mariadb.org's white
-   circled social icons. */
-.header-icon {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 25px; height: 25px; padding: 0; border-radius: 50%;
-  border: 1.5px solid var(--ch-header-on-band); background: transparent; color: var(--ch-header-on-band); cursor: pointer;
-}
-.header-icon:hover { opacity: .6; }
-.header-icon svg { width: 13px; height: 13px; }
-html[data-theme="dark"] .theme-icon--dark { display: none; }
-html:not([data-theme="dark"]) .theme-icon--light { display: none; }
-
-/* Column 4's copy of the icons only shows once column 5 folds away. */
-.under-wavy-line-2 .header-icon { display: none; }
-
-@media only screen and (max-width: 1592px) {
-  .wavy-line-2 { --wave: url("../img/wave-right-100px.svg"); width: 100px; }
-  .under-wavy-line-1 { --wave: url("../img/wave-left-100px.svg"); width: 100px; }
-}
-@media only screen and (max-width: 1404px) {
-  .featured-header-image a:first-child { display: none; }
-  .featured-header-image a:last-child { display: block; }
-}
-@media only screen and (max-width: 1292px) {
-  .under-menu-nav p, .under-menu-nav p a { font-size: 15px; }
-  .top-header-column.column-5 { display: none; }
-  .under-wavy-line-2 {
-    display: flex; justify-content: center; align-items: center; gap: 8px;
-  }
-  .under-wavy-line-2 .header-icon { display: inline-flex; }
+.masthead__nav a:hover { color: var(--ch-header-link-hover); text-decoration: none; }
+.masthead__nav a[aria-current="page"] {
+  text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px;
 }
 
-/* Mobile: the logo in a white cap over a blue title row, and a full-screen menu. */
-.top-header-container.mobile-version { display: none; }
-.mobile-menu { position: relative; }
-.top-header-row.row-1 { background-color: var(--ch-header-band); }
-.top-header-row .mobile-featured-image {
-  background-color: var(--ch-header-bg); height: 68px; text-align: center;
-  border-bottom-left-radius: 50%; border-bottom-right-radius: 50%;
-}
-.mobile-featured-image a { display: block; width: 194px; height: 100%; margin: auto; }
-.mobile-featured-image img { display: block; height: 100%; width: auto; }
-.top-header-row.row-2 {
-  height: 40px; background-color: var(--ch-header-band); text-align: center;
-  color: var(--ch-header-on-band); font-size: 26px; font-weight: 500; line-height: 40px;
-  padding: 0 16px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
-}
-.hamburger-menu-icon {
-  position: absolute; top: 30px; right: 20px;
-  padding: 0; border: 0; background: none; cursor: pointer;
-}
-.hamburger-menu-icon svg { display: block; width: 41px; height: 41px; }
-.hamburger-menu-icon circle { fill: var(--ch-header-band); }
-.hamburger-menu-icon circle, .hamburger-menu-icon path { stroke: var(--ch-header-on-band); }
+.masthead__actions { display: flex; align-items: center; gap: 1.25rem; flex: none; margin-left: auto; }
+.masthead__icon { display: inline-flex; color: var(--ch-header-link); }
+.masthead__icon:hover { color: var(--ch-header-link-hover); }
+.masthead__icon svg { width: 22px; height: 22px; }
 
-.mobile-navigation {
-  position: fixed; z-index: 800; top: 108px; bottom: 0; width: 100%;
-  display: flex; flex-flow: column; background-color: var(--ch-header-band);
+/* mariadb.org's switch: a 40x22 track, an 18px thumb that carries the sun, and
+   moves right and shows the moon in dark mode. */
+.theme-toggle { display: inline-flex; padding: 0; border: 0; background: none; cursor: pointer; color: var(--ch-primary); }
+.theme-toggle__track {
+  position: relative; display: inline-block; width: 40px; height: 22px;
+  border-radius: 999px; background: var(--ch-toggle-track); transition: background .2s ease;
 }
-.mobile-navigation .main-navigation { overflow-y: auto; flex: 1 1 auto; padding-top: 1rem; }
-.mobile-navigation-menu { text-align: center; padding: 0; margin: 0; list-style: none; }
-.mobile-navigation-menu li { display: block; line-height: 2.4; }
-.mobile-navigation-menu li a { font-size: 18px; color: var(--ch-header-on-band); font-weight: 300; }
-.mobile-navigation-menu li a[aria-current="page"] { font-weight: 500; }
-.mobile-sub-menu { text-align: center; color: var(--ch-header-on-band); font-size: 14px; margin: 1rem 0; }
-.mobile-sub-menu a { color: var(--ch-header-on-band); font-weight: 700; }
-.mobile-header-social-links {
-  background: var(--ch-header-band); display: flex; justify-content: center; gap: 12px; margin: 0 0 30px;
+.theme-toggle__thumb {
+  position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ch-bg); color: var(--ch-primary); transition: transform .2s ease;
 }
-.mobile-header-social-links .header-icon { width: 40px; height: 40px; }
-.mobile-header-social-links .header-icon svg { width: 20px; height: 20px; }
+.theme-toggle__thumb svg { width: 12px; height: 12px; }
+.theme-toggle__moon { display: none; }
+html[data-theme="dark"] .theme-toggle__thumb { transform: translateX(18px); }
+html[data-theme="dark"] .theme-toggle__sun { display: none; }
+html[data-theme="dark"] .theme-toggle__moon { display: block; }
+.theme-toggle:focus-visible { outline: 2px solid var(--ch-primary-hover); outline-offset: 3px; border-radius: 999px; }
 
-@media only screen and (max-width: 1112px) {
+/* mariadb.org's menu button, beside the logo, at 599px and below only. */
+.masthead__menu-button {
+  display: none; align-items: center; flex: none; padding: .25rem; margin-left: -.75rem;
+  border: 0; background: transparent; color: var(--ch-primary); cursor: pointer;
+}
+.masthead__menu-button:hover { color: var(--ch-primary-hover); }
+.masthead__menu-button svg { width: 24px; height: 24px; }
+
+/* mariadb.org's drawer: the page dimmed behind a panel that slides in from the left. */
+.menu-drawer { position: fixed; inset: 0; z-index: 800; display: flex; background: rgba(0, 0, 0, .5); }
+.menu-drawer__panel {
+  position: relative; box-sizing: border-box; min-width: 16rem; max-width: 85vw; height: 100%;
+  overflow-y: auto; overscroll-behavior: contain; padding: 3.5rem 1.5rem 2rem;
+  background: var(--ch-bg); border-right: 1px solid var(--ch-primary-light);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, .35); animation: menu-drawer-in .2s ease-out;
+}
+@keyframes menu-drawer-in { from { transform: translateX(-100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .menu-drawer__panel { animation: none; } }
+.menu-drawer__close {
+  position: absolute; top: 1rem; right: 1rem; display: inline-flex; padding: .25rem;
+  border: 0; background: transparent; color: var(--ch-primary); cursor: pointer;
+}
+.menu-drawer__close:hover { color: var(--ch-primary-hover); }
+.menu-drawer__close svg { width: 24px; height: 24px; }
+.menu-drawer__list { margin: 0; padding: 0; list-style: none; }
+.menu-drawer__list li { margin: 0 0 .9rem; }
+.menu-drawer__list a { color: var(--ch-primary); font-size: 20px; font-weight: 500; }
+.menu-drawer__list a:hover { color: var(--ch-primary-hover); text-decoration: none; }
+.menu-drawer__list a[aria-current="page"] {
+  text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px;
+}
+/* The drawer is the narrow layout's alone; a wide window never shows it. */
+@media (min-width: 600px) { .menu-drawer { display: none !important; } }
+body.menu-open { overflow: hidden; }
+
+/* The menu under the logo: a two-row grid, 108px tall. */
+@media only screen and (min-width: 600px) and (max-width: 939px) {
   :root { --ch-navbar-h: 108px; }
-  .top-header-container.desktop-version { display: none; }
-  .top-header-container.mobile-version { display: block; width: 100%; }
+  .masthead__bar {
+    display: grid; grid-template-columns: auto 1fr auto;
+    grid-template-areas: "logo . actions" "nav nav nav";
+    align-content: center; row-gap: 6px; height: 108px;
+  }
+  .masthead__logo { grid-area: logo; }
+  .masthead__logo img { width: 150px; }
+  .masthead__actions { grid-area: actions; }
+  .masthead__nav { grid-area: nav; }
+}
+@media only screen and (max-width: 599px) {
+  .masthead__nav { display: none; }
+  .masthead__menu-button { display: inline-flex; }
+}
+@media only screen and (max-width: 520px) {
+  .masthead__bar { gap: 1rem; padding: 0 1rem; }
+  .masthead__logo img { width: 150px; }
+  .masthead__menu-button { margin-left: -.5rem; }
+  .masthead__actions { gap: 1rem; }
 }
 
 /* --- Hero ---------------------------------------------------------------- */
 .hero { position: relative; padding: var(--ch-section-sm) 0 0; }
-/* The banner photo, as mariadb.org's .image-banner-picture sets it: pinned to
-   all four edges and cropped to cover. It runs on under the wave, which is why
-   the bottom inset is negative — but stops 2px short of the wave's bottom edge:
-   --ch-wave-h is a fractional pixel height (5vw), and when both edges land on
-   the same fractional pixel its anti-aliasing lets the dark photo bleed through
-   as a hairline below the wave on the light page. The scrim is a second layer on top of it, not a
-   pseudo-element, so the photo and its darkening can never drift apart. */
+/* mariadb.org's hero gradient, pinned to all four edges. It runs on under the
+   wave, which is why the bottom inset is negative — but stops 2px short of the
+   wave's bottom edge: --ch-wave-h is a fractional pixel height (5vw), and when
+   both edges land on the same fractional pixel its anti-aliasing lets the
+   gradient bleed through as a hairline below the wave on the light page. The
+   scrim is a second layer on top of it, so the two can never drift apart. */
 .hero__bg {
   position: absolute; inset: 0 0 calc(2px - var(--ch-wave-h)); z-index: 0;
-  background-color: #0b1230;
-  background-image: var(--ch-hero-scrim), var(--ch-hero-image), var(--ch-hero-gradient);
-  background-size: cover, cover, cover;
-  background-position: center, center, center;
+  background-color: var(--ch-hero-base);
+  background-image: var(--ch-hero-scrim), var(--ch-hero-gradient);
+  background-size: cover, cover;
   background-repeat: no-repeat;
 }
 .hero__inner {
@@ -440,7 +411,7 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
   color: var(--ch-hero-text); margin: 0 0 1.25rem;
   font-size: clamp(1.65rem, 1.2rem + 1.8vw, 2.4rem); line-height: 1.2;
 }
-/* Paints the headline's last line in the banner's own hues. Guarded: without background-clip support the transparent fill leaves the text
+/* Paints the headline's last line in the hero's lightest hues. Guarded: without background-clip support the transparent fill leaves the text
    invisible rather than merely flat, which is a much worse failure. */
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .text-hero-gradient {
@@ -470,12 +441,13 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
    because it always sits on the dark hero. Every colour is a local custom
    property so the whole treatment retunes from this one block. */
 .hero__card {
-  --card-edge: linear-gradient(125deg, #5e9bff 0%, #7d6cf5 36%, #b25ef0 66%, #ff8a3d 100%);
-  --card-bg: #1a2349;
+  /* mariadb.org's tertiary and secondary into its cream and its hero button's orange. */
+  --card-edge: linear-gradient(125deg, #9CD5FF 0%, #7AAACE 38%, #F3E9DD 68%, #F08A5D 100%);
+  --card-bg: #1B3C53;
   --card-line: rgba(255, 255, 255, .09);
   /* The panels sit darker than the card, not lighter, so they read as insets. */
-  --card-fill: rgba(8, 11, 32, .58);
-  --card-inset: rgba(8, 11, 32, .46);
+  --card-fill: rgba(12, 30, 43, .58);
+  --card-inset: rgba(12, 30, 43, .46);
 
   position: relative;
   padding: 1.15rem 1.1rem 1.35rem;
@@ -626,36 +598,17 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
 .btn:hover { text-decoration: none; transform: translateY(-1px); }
 .btn svg { width: 16px; height: 16px; }
 
-/* mariadb.org's filled button (.button-item / the newsletter submit): a soft
-   blue gradient, a white label and a small lift of shadow. Its 60px height,
-   fixed width and 10px radius stay ours. A background-image cannot be
-   animated, so the hover colour is laid over it by a ::before overlay that
-   fades in; `isolation` keeps the overlay's negative z-index between the
-   button's own background and its label. */
+/* mariadb.org's hero "Download" button: an orange fill, a navy label and
+   border, and its card shadow. */
 .btn--primary {
-  position: relative;
-  isolation: isolate;
-  color: #fff;
-  background-color: #5e7aca;
-  background-image: var(--ch-btn-fill);
-  box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, .15);
-}
-.btn--primary::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: var(--ch-btn-fill-hover);
-  opacity: 0;
-  transition: opacity var(--ch-transition-fast);
+  color: var(--ch-btn-text);
+  background: var(--ch-btn-fill);
+  border: 1px solid var(--ch-btn-text);
+  box-shadow: var(--ch-shadow-lg);
 }
 .btn--primary:hover,
 .btn--primary:focus-visible,
-.btn--primary:active { color: #fff; }
-.btn--primary:hover::before,
-.btn--primary:focus-visible::before,
-.btn--primary:active::before { opacity: 1; }
+.btn--primary:active { color: var(--ch-btn-text); background: var(--ch-btn-fill-hover); }
 .btn--primary:focus-visible {
   outline: 0;
   box-shadow: 0 0 0 .25rem rgba(var(--ch-btn-focus-rgb), .5);
@@ -666,13 +619,13 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
   background: transparent; color: var(--ch-action-outline-text);
   border: 1.5px solid var(--ch-action-outline);
 }
-.btn--outline:hover { background: var(--ch-accent-btn); border-color: var(--ch-accent-btn); color: var(--ch-on-primary); }
+.btn--outline:hover { background: var(--ch-accent-btn); border-color: var(--ch-accent-btn); color: var(--ch-on-action); }
 
 .btn--ghost {
   background: transparent; color: var(--ch-hero-accent);
   border: 1.5px solid var(--ch-hero-badge-border);
 }
-.btn--ghost:hover { background: rgba(255, 255, 255, .10); color: #fff; }
+.btn--ghost:hover { background: rgba(247, 248, 240, .12); color: var(--ch-hero-text); }
 
 .btn--secondary {
   background: transparent; color: var(--ch-primary); border: 2px solid var(--ch-primary);
@@ -850,9 +803,10 @@ html:not([data-theme="dark"]) .theme-icon--light { display: none; }
 .filter-empty { color: var(--ch-text-faint); font-size: .9rem; padding: 2rem 0; }
 
 /* --- Callouts ------------------------------------------------------------ */
+/* mariadb.org's note: --mariadb-note-bg under a --mariadb-note-bar edge. */
 .callout {
-  border-left: 3px solid var(--ch-primary);
-  background: color-mix(in srgb, var(--ch-primary) 6%, var(--ch-bg-surface));
+  border-left: 3px solid var(--ch-callout-bar);
+  background: var(--ch-callout-bg);
   border-radius: 0 var(--ch-radius-sm) var(--ch-radius-sm) 0;
   padding: .9rem 1.1rem; margin: 1.5rem 0; font-size: .9rem;
 }
@@ -980,6 +934,11 @@ pre code { background: none; border: 0; padding: 0; font-size: inherit; color: i
   border-left: 3px solid var(--ch-border); color: var(--ch-text-muted);
 }
 .prose img { border-radius: var(--ch-radius-sm); }
+/* Text and links share mariadb.org's primary, so a link in running text is
+   underlined, as on mariadb.org, and turns accent on hover. */
+.prose a:not(.btn), .callout a {
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .18em;
+}
 
 /* Numbered steps inside a tutorial: h2 gets a counter bubble and a rail. */
 .step-content { counter-reset: step-counter; }
@@ -1060,16 +1019,14 @@ pre code { background: none; border: 0; padding: 0; font-size: inherit; color: i
 }
 
 /* --- CTA band ------------------------------------------------------------ */
-/* The hero's banner again, scrim and all, so the page closes as it opened. */
+/* mariadb.org's "Get involved" band: flat primary, tertiary in dark mode. */
 .cta {
-  background-color: #0b1230;
-  background-image: var(--ch-hero-scrim), var(--ch-hero-image), var(--ch-hero-gradient);
-  background-size: cover; background-position: center; background-repeat: no-repeat;
-  color: var(--ch-hero-text);
+  background: var(--ch-cta-bg);
+  color: var(--ch-cta-text);
   padding: var(--ch-section-sm) 0; text-align: center;
 }
-.cta h2 { color: var(--ch-hero-text); font-size: 1.4rem; margin: 0 0 .75rem; }
-.cta p { color: var(--ch-hero-muted); font-size: .95rem; max-width: 620px; margin: 0 auto 1.5rem; }
+.cta h2 { color: var(--ch-cta-text); font-size: 1.4rem; margin: 0 0 .75rem; }
+.cta p { color: var(--ch-cta-muted); font-size: .95rem; max-width: 620px; margin: 0 auto 1.5rem; }
 .cta__actions { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; }
 
 /* --- Skill catalog ------------------------------------------------------- */
@@ -1085,83 +1042,33 @@ pre code { background: none; border: 0; padding: 0; font-size: inherit; color: i
   background: var(--ch-inline-code-bg); border: 1px solid var(--ch-inline-code-border); color: var(--ch-text);
 }
 
-/* --- Footer -------------------------------------------------------------- */
-.footer { background: var(--ch-footer-bg); color: var(--ch-footer-text); padding: 3rem 0; }
-.footer__inner { max-width: var(--ch-maxw); margin: 0 auto; padding: 0 1.5rem; }
-.footer__grid { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 2rem; }
-.footer__grid > * { min-width: 0; }
-.footer__brand-name { color: #fff; font-weight: 700; font-size: 1rem; margin-bottom: .4rem; }
-.footer__tagline { font-size: .85rem; color: var(--ch-footer-text); opacity: .8; line-height: 1.6; max-width: 320px; }
-.footer h4 { color: #fff; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; margin: 0 0 .75rem; }
-.footer ul { list-style: none; margin: 0; padding: 0; }
-.footer li { margin-bottom: .4rem; }
-.footer a { color: var(--ch-footer-link); font-size: .85rem; }
-.footer a:hover { color: var(--ch-footer-link-hover); }
-@media (max-width: 800px) { .footer__grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 520px) { .footer__grid { grid-template-columns: 1fr; } }
-
-/* --- Site footer ---------------------------------------------------------
-   mariadb.org's #colophon, its twentynineteen-child rules carried over with
-   their own values, plus the WordPress core column rules its sponsor banner
-   relies on (2em gaps, every column stacked full-width below 782px). The band
-   follows the header's --ch-header-band so the two darken together; the
-   sponsor banner stays white in both themes because the logos need it.
+/* --- Footer --------------------------------------------------------------
+   mariadb.org's footer (twentytwentyfive-child): link columns on the page
+   background with 18px bold headings, the logo on the right, and a bottom line
+   under a hairline of 40% secondary.
    -------------------------------------------------------------------------- */
-.site-footer {
-  display: flow-root; background-color: var(--ch-header-band);
-  font-family: 'Roboto', arial, sans-serif;
+.site-footer { background: var(--ch-bg); color: var(--ch-footer-text); padding: 3rem 0 2rem; }
+.site-footer__inner { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; }
+.site-footer__columns { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem 3rem; }
+.site-footer__column { flex: 1 1 10rem; min-width: 0; }
+.site-footer h3 { color: var(--ch-primary); font-size: 18px; font-weight: 700; margin: 0 0 .9rem; }
+.site-footer ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .35rem; }
+.site-footer a { color: var(--ch-footer-link); font-size: .9rem; }
+.site-footer a:hover { color: var(--ch-footer-link-hover); }
+.site-footer__logo { flex: none; align-self: flex-start; line-height: 0; }
+.site-footer__logo img { width: 175px; height: auto; }
+.site-footer__logo-dark { display: none; }
+html[data-theme="dark"] .site-footer__logo-light { display: none; }
+html[data-theme="dark"] .site-footer__logo-dark { display: block; }
+.site-footer__bottom {
+  margin-top: 2.5rem; padding-top: 1rem; font-size: .8rem;
+  border-top: 1px solid color-mix(in srgb, var(--ch-primary-light) 40%, transparent);
 }
-.site-footer .site-info {
-  margin: 2% 5%; font-size: 18px; font-weight: 300; line-height: 1.8; color: #ffffff;
+.site-footer__bottom p { margin: 0; }
+.site-footer__bottom code { background: none; border: 0; padding: 0; color: inherit; font-size: inherit; white-space: nowrap; }
+@media (max-width: 700px) {
+  .site-footer__logo { order: -1; flex-basis: 100%; }
 }
-.site-footer .site-info a { color: inherit; }
-.site-footer .site-info a:hover { color: #94adf3; text-decoration: underline; }
-.site-footer ul { list-style: none; margin: 0; padding: 0; }
-.screen-reader-text {
-  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
-  overflow: hidden; clip-path: inset(50%); border: 0; white-space: nowrap;
-}
-
-.footer-social-links-container { text-align: center; }
-.footer-social-links-title {
-  display: inline-block; height: 25px; padding: 0 .3em; border-right: 1px solid #ffffff;
-  vertical-align: middle; line-height: 25px;
-}
-.footer-social-navigation { display: inline-block; text-align: left; vertical-align: middle; }
-.footer-social-navigation ul.social-links-menu { display: inline-block; line-height: 0; }
-.footer-social-navigation li { display: inline-block; vertical-align: middle; line-height: 0; }
-.footer-social-navigation li:nth-child(n+2) { margin-left: .1em; }
-.footer-social-navigation li a { display: inline-block; }
-.footer-social-navigation li a:hover { opacity: .6; }
-.social-media-icon { display: inline-block; width: 25px; height: 25px; background-size: 25px 25px; }
-.social-media-icon.youtube  { background-image: url("https://mariadb.org/wp-content/themes/twentynineteen-child/icons/youtube_pict_white.svg"); }
-.social-media-icon.twitter  { background-image: url("https://mariadb.org/wp-content/themes/twentynineteen-child/icons/twitter_pict_white.svg"); }
-.social-media-icon.linkedin { background-image: url("https://mariadb.org/wp-content/themes/twentynineteen-child/icons/linkedIn_pict_white.svg"); }
-.social-media-icon.reddit   { background-image: url("https://mariadb.org/wp-content/themes/twentynineteen-child/icons/reddit_pict_white.svg"); }
-.social-media-icon.mastodon { background-image: url("https://mariadb.org/wp-content/themes/twentynineteen-child/icons/mastodon_pict_white.svg"); }
-
-.footer-navigation { display: block; text-align: center; margin: 20px 0 35px; }
-.footer-navigation ul.footer-menu li {
-  display: inline-block; margin: 0 0 0 -5px; padding: 0 6.6px; /* mariadb.org: .3rem of its 22px root */
-  border-right: 1px solid #ffffff; line-height: 25px; hyphens: none;
-}
-.footer-navigation ul.footer-menu li:last-child { border-right: 0; }
-
-.footer-sponsor-banner {
-  display: flex; flex-flow: column; background-color: #ffffff; border-radius: 10px;
-  padding: 10px 0; box-shadow: 0 0 4px 5px rgba(0, 0, 0, .2);
-}
-.footer-sponsor-banner .wp-block-columns { display: flex; flex-wrap: nowrap; align-items: center; gap: 2em; }
-.footer-sponsor-banner .wp-block-column { flex: 1 1 0; min-width: 0; margin: 0; }
-.footer-sponsor-banner .wp-block-column.is-vertically-aligned-bottom { align-self: flex-end; }
-.footer-sponsor-banner .wp-block-image { display: flex; align-items: center; justify-content: center; margin: 0 auto; }
-.footer-sponsor-banner .wp-block-image img { display: block; max-width: 100%; height: auto; }
-.sponsor-footer-amazon img { margin-top: 14px; }
-@media only screen and (max-width: 781px) {
-  .footer-sponsor-banner .wp-block-columns { flex-wrap: wrap; }
-  .footer-sponsor-banner .wp-block-column { flex-basis: 100%; }
-}
-
 
 /* --- Utilities ----------------------------------------------------------- */
 .stack > * + * { margin-top: var(--ch-spacing-sm); }

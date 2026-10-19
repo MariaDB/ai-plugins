@@ -73,15 +73,13 @@ than producing a half-built site.
 docs/
 ├── _config.yml               # site config; `url` + `baseurl` are the only env-specific bits
 ├── _data/
-│   ├── nav.yml               # the header's top-row links
-│   ├── subnav.yml            # the header's second-row links (external, absolute urls)
-│   ├── sponsors.yml          # mariadb.org's footer sponsor banner (images hot-linked, never copied)
+│   ├── nav.yml               # the header's menu links
 │   ├── paths.yml             # learning paths (each `steps` entry is a tutorial `slug`)
 │   └── skills.yml            # GENERATED — see below
 ├── _includes/                # navbar, footer, hero wave, the two card partials
 ├── _layouts/                 # default → home | page | tutorial
 ├── _tutorials/               # the tutorial collection, one file per tutorial
-├── assets/{css,js,img}/      # one stylesheet, one script, the header artwork + favicon
+├── assets/{css,js,img}/      # one stylesheet, one script, mariadb.org's two logos + favicon
 ├── serve.sh                  # local preview (npm run docs)
 ├── index.html                # home
 ├── get-started.md            # install + MCP setup + the working example
@@ -158,8 +156,10 @@ and read from Liquid, so a change is a single edit.
 The stylesheet is a small token system in
 [`assets/css/style.css`](assets/css/style.css) — `--ch-*` custom properties for
 colour, spacing, radius and shadow, redefined once under
-`html[data-theme="dark"]`. Nothing else in the file hardcodes a colour, so a
-palette change is confined to the two token blocks at the top.
+`html[data-theme="dark"]`. The colours are mariadb.org's (its
+twentytwentyfive-child theme, light and dark), the font its Manrope, and the
+header and footer follow its layout. Nothing else in the file hardcodes a colour,
+so a palette change is confined to the two token blocks at the top.
 
 Two things worth knowing before editing:
 

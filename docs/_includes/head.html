@@ -18,10 +18,10 @@
 {%- endcomment -%}
 <link rel="icon" href="{{ '/assets/img/favicon.ico' | relative_url }}" sizes="48x48">
 <link rel="icon" href="{{ '/assets/img/favicon.svg' | relative_url }}" type="image/svg+xml">
-<!-- Roboto, the face mariadb.org's header is set in; only the header uses it. -->
+<!-- Manrope, the face mariadb.org's twentytwentyfive-child theme sets the whole site in: its variable font, weights 200 to 800. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap">
 {%- comment -%} ?v= busts the browser cache on every build, so a changed stylesheet or script is never paired with a stale one. {%- endcomment -%}
 <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 
