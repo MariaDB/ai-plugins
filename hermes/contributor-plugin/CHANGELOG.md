@@ -4,6 +4,13 @@ All notable changes to the MariaDB contributor Hermes Agent plugin are documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- The `LICENSE` file is updated to include the licenses of the latest
+  third-party components.
+
 ## [26.10.4] - 2026-10-19
 
 ### Changed
