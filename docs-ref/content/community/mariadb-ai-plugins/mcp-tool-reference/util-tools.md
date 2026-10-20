@@ -5,6 +5,13 @@ description: >-
 
 # util Tools
 
+<!--
+  SYNCED: this page is maintained in mariadb-corporation/ai-plugins, under docs-ref/content/,
+  and copied one way into mariadb-docs (tools/community/mariadb-ai-plugins/).
+  Make every change in mariadb-corporation/ai-plugins. A change made in mariadb-docs or in the
+  GitBook editor is overwritten by the next sync.
+-->
+
 The `util.*` tools run MariaDB Shell's dump, load, export, import, and copy utilities. Each utility runs as a background task, and the `util.get_task`, `util.list_tasks`, and `util.cancel_task` tools track the tasks and stop them.
 
 {% hint style="info" %}
@@ -233,3 +240,5 @@ Returns the task's state, as `util.get_task` returns it, without `messages` and 
 | A tool refuses an option. | The option is one that the tool sets itself. See [Options and Paths](#options-and-paths). |
 | A load, import, or copy fails because of `local_infile`. | The server that the data goes into has `local_infile` disabled. |
 | A dump fails because the output directory isn't empty. | `output_url` names a directory that already holds files. Use a new directory. |
+
+<sub>_This page is licensed: GPLv2_</sub>
