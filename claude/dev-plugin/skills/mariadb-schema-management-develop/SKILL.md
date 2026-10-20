@@ -48,23 +48,31 @@ released version and deployment scripts are always fully inlined.
 SOURCE '<relative-or-absolute-path>'[<start>:<end>]; -- optional comment
 ```
 
-- The `[start:end]` **slice is required** and is a character-offset slice of the
-  referenced file's content (Python-style). Use `[0:]` for the whole file. `[:]`
-  makes `prepare_release` fail, and a `SOURCE` line without a slice is copied
-  into the release verbatim, so the deployment fails with a syntax error:
-  - `[53:]` — drop the first 53 characters (e.g. a one-line copyright header).
-  - `[663:-115]` — drop a 663-char header **and** the last 115 chars (footer).
-  - `[:200]` — keep only the first 200 characters.
+- The `[start:end]` slice is optional and selects the part of the referenced
+  file to inline; without it (or with `[:]`) the whole file is inlined. Each
+  bound is empty, a **line number** `lnN`, or a **character offset**, and the two
+  kinds mix freely:
+  - `[ln4:]` — from line 4 on (drop a three-line copyright header).
+  - `[ln4:ln-4]` — lines 4 through the 4th-last (drop the last three too).
+    Lines count from 1, the end line is included, `ln-1` is the last line.
+  - `[53:]` — drop the first 53 characters (Python slice; negative counts from
+    the end, so `[663:-115]` also drops a 115-character footer).
+- Line numbers and the optional slice need a MariaDB Shell newer than 26.10.2
+  (its `msm_plugin` with mariadb-shell-plugins PR #60). With 26.10.2 or older,
+  always give a slice of character offsets: there a `SOURCE` line without a
+  slice is copied into the release verbatim and fails the deployment, and `[:]`
+  makes `prepare_release` fail.
 - Relative paths resolve against the **development/** folder (where `_next.sql`
   lives), so use `'./sections/...'`.
 - The leading indentation of the `SOURCE` line is applied to every inlined line.
 
-### Why the slice offsets
+### Why the slice
 
 Each breakout file is a **standalone, valid SQL file** with its own copyright
 header (and optionally a footer). The slice strips that header/footer so only the
-object definitions are inlined into `_next.sql`. Pick the offset to match your
-header length (count the characters up to the first real statement).
+object definitions are inlined into `_next.sql`. Prefer line numbers: `[ln4:]`
+stays right when the header's text changes but not its line count, while a
+character offset must be recounted whenever the header is edited.
 
 ### Example
 

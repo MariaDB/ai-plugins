@@ -56,9 +56,11 @@ not a diff. The diff lives in the update script, which is the next step.
 
 <div class="callout callout--tip" markdown="1">
 **When a section grows past comfortable, break it out.** MSM supports
-`SOURCE './sections/tables.sql'[53:];` inside a section — a **character-offset**
-slice, relative to `development/`, used to strip each file's own copyright header
-and footer. The files are inlined when the release is prepared, so they are a
+`SOURCE './sections/tables.sql'[53:];` inside a section — a slice of the file,
+relative to `development/`, used to strip each file's own copyright header and
+footer. The bounds are character offsets, or line numbers such as `[ln4:]` with a
+MariaDB Shell newer than 26.10.2, which also takes `SOURCE` without a slice for
+the whole file. The files are inlined when the release is prepared, so they are a
 development convenience and never appear in a release. The
 `mariadb-schema-management-develop` skill has the offset conventions.
 </div>
