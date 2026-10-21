@@ -1,6 +1,6 @@
 # MariaDB contributor plugin for Hermes Agent
 
-Version **26.10.4**
+Version **26.10.5**
 
 Skills for **contributing to MariaDB tooling**, for
 [Hermes Agent](https://hermes-agent.nousresearch.com/). Unlike the `mariadb-dev`

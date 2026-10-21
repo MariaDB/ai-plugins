@@ -4,7 +4,7 @@ All notable changes to the MariaDB Hermes Agent plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [26.10.5] - 2026-10-21
 
 ### Added
 
@@ -23,6 +23,19 @@ project adheres to [Semantic Versioning](https://semver.org/).
   raised), and how to reconnect afterwards.
 - The `LICENSE` file is updated to include the licenses of the latest
   third-party components.
+- `MARIADB_SHELL_VERSION`, the *minimum* `mariadb-shell` the launcher accepts,
+  now defaults to `26.10.3`, the newest published `mariadb-shell` release and
+  the first with `mariadb-lsp`. An install already at or above that version is
+  still used as-is; only a machine below it fetches anything.
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `12d4cd3` (synced 2026-10-21). The upstream default branch moved on, but
+  nothing under `agent-skills/` did, so the vendored skills are unchanged.
+- `mariadb-schema-management-develop`: a `SOURCE` line's slice is now optional
+  (without one the whole file is inlined), and its bounds may be line numbers
+  (`[ln4:]`, `[ln4:ln-4]`) as well as character offsets. Both need a MariaDB
+  Shell newer than 26.10.2; the skill says to keep giving character offsets on
+  26.10.2 or older. The plugin keeps its 85 skills.
+- Version bumped to 26.10.5 to stay in lockstep with the other plugins.
 
 ## [26.10.4] - 2026-10-19
 

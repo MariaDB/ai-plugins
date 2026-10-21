@@ -7,9 +7,21 @@ mariadb-shell floor are independent.** Through 26.9.5 every release set both to 
 (the ai-plugins release matched a mariadb-shell release); that is no longer required. `/release
 <version> [shell-version]` now checks the plugin version against this repo's tags and moves the
 floor only when a shell version is given. 26.10.0 is planned on top of the current floor 26.9.5.
+**Since #67 (2026-10-21)** both arguments are optional (`/release [version|-] [shell-version|-]`,
+ported from the vscode-extension's `/release`): no version → the next `YY.MM.x` from today's date
+and the month's tags; no floor → the latest published shell when it is newer than the floor.
+Anything suggested is confirmed in one summary before anything changes.
 
-## Landed on `main` (through PR #65)
+## Landed on `main` (through PR #67)
 
+**#67** `4d90709` (2026-10-21): `/release` suggests the next version and the latest shell floor
+(see the policy note above). The user remembered making this change here; it had only ever been
+made in the vscode-extension repo (`49420be`, 2026-10-18), so it was ported, not restored.
+**#66** `f54afd5` (2026-10-21): the **SQL language server** — floor → **26.10.3** (the first shell
+with `mariadb-lsp`), `mariadb-lsp-launcher.{sh,cmd}` in claude/opencode/hermes dev+sql (Claude
+`.lsp.json`, OpenCode `lsp` block, Hermes README snippet), extensionless launchers so Claude Code
+and OpenCode work on native Windows, the MCP-timeout hint, `sql.*` tool docs. It raised the floor
+on `main` without a CHANGELOG line for it; the 26.10.5 CHANGELOGs carry that line.
 **#65** `473389b` (2026-10-21): `docs-ref/scripts/generate-skill-pages.py` code-quotes a word
 holding a `<placeholder>` and escapes `*` in skill descriptions (they rendered as
 `development/_next.sql`, `auto//scripts/_norecord.py`, stray italics), and now writes #64's
@@ -113,6 +125,23 @@ version-comparison tutorial), **#13** `c5759e5` (mariadb-migrator split into an
 overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-open
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
+
+## Release v26.10.5 (2026-10-21) — IN PROGRESS (PR about to open)
+
+- The first bare `/release` (#67): version **26.10.5** suggested (tags `v26.10.0`–`v26.10.4`),
+  floor **26.10.3** kept — already on `main` since #66 and the newest shell (`v26.10.3`,
+  2026-10-20). User confirmed the summary. Branch `wip/26.10.5` off `4d90709` (#67).
+- No floor script run (floor already at target). `e4cdee3` plugin version → 26.10.5 (**25 files**,
+  same as 26.10.4).
+- `e8ba295` re-vendor, **provenance only** (13 `skills-source.json`): mariadb-docs `a439473` →
+  `12d4cd3`, mariadb-shell `a4352a5` → `1413abd`. Counts 85 / 47 / 3.
+- `8053417` CHANGELOGs (fourteen): `[Unreleased]` (#66 LSP + Windows launchers + MCP-timeout hint,
+  #62 LICENSE) folded into `[26.10.5]`; the floor line **26.10.3** in the nine MCP-bearing plugins
+  (moved since v26.10.4, by #66); #61's `mariadb-schema-management-develop` change (optional
+  `SOURCE` slice, `lnN` bounds) in the five dev plugins, which #61 had left without an entry.
+- Static tier green: claude 830, codex 811, hermes 904, opencode 689, pi 693.
+- Note: the first draft of the re-vendor commit message swapped the two upstream commits
+  (`git diff` lists `claude/contributor-plugin` before `claude/dev-plugin`); amended before push.
 
 ## Release v26.10.4 (2026-10-19) — SHIPPED
 

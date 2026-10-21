@@ -4,12 +4,15 @@ All notable changes to the MariaDB guard plugin for Hermes Agent are documented
 here. The format is based on [Keep a Changelog](https://keepachangelog.com/), and
 this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [26.10.5] - 2026-10-21
 
 ### Changed
 
 - The `LICENSE` file is updated to include the licenses of the latest
   third-party components.
+- Version bumped to 26.10.5 to stay in lockstep with the other plugins. This
+  plugin has neither skills nor an MCP server, so the skills re-vendor and the
+  `MARIADB_SHELL_VERSION` floor do not apply here.
 
 ## [26.10.4] - 2026-10-19
 
