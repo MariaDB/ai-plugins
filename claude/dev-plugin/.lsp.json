@@ -1,0 +1,13 @@
+{
+  "mariadb": {
+    "command": "${CLAUDE_PLUGIN_ROOT}/scripts/mariadb-lsp-launcher",
+    "args": [],
+    "extensionToLanguage": {
+      ".sql": "sql"
+    },
+    "env": {
+      "MARIADB_SHELL_VERSION": "26.10.3"
+    },
+    "startupTimeout": 240000
+  }
+}

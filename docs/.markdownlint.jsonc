@@ -1,0 +1,19 @@
+// markdownlint settings for the DevHub (Jekyll with kramdown).
+//
+// The site's Markdown carries kramdown and theme markup that markdownlint reads
+// as mistakes; these settings allow exactly that markup.
+{
+  // Prose is wrapped by hand near 80 columns, but Liquid tags such as
+  // {{ site.tool_count }} make a source line longer than the text it renders.
+  // Tables and code blocks can't be wrapped.
+  "MD013": { "line_length": 100, "tables": false, "code_blocks": false },
+  // Headings: a kramdown attribute line, {: #id}, sets a heading's anchor and
+  // has to follow the heading directly, with no blank line in between.
+  "MD022": { "lines_below": -1 },
+  // Inline HTML: <div markdown="1"> wraps tables and callouts, <h2 class=…>
+  // closes a tutorial without a step number, and <a class="btn"> is a button.
+  "MD033": { "allowed_elements": ["div", "h2", "a"] },
+  // Emphasis used as a heading: the bold "Where to go next" label that ends
+  // every tutorial is a label, not a section of its own.
+  "MD036": false
+}

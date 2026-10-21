@@ -49,6 +49,7 @@ Check that the harness loaded the plugin:
 ## The MCP Server Doesn't Start
 
 * The first start downloads MariaDB Shell, which can take a minute. Check the harness's MCP log; the launcher writes all of its messages to standard error.
+* Claude Code waits 30 seconds for an MCP server to connect. When the first download takes longer, `/mcp` lists the `mariadb` server as failed, but the installation continues. Reconnect the server from `/mcp` when the installation is complete, or start a new session. To allow more time, set `MCP_TIMEOUT`. See [Claude Code](installation/claude-code.md#first-start).
 * To use a MariaDB Shell you installed yourself, set `MARIADB_SHELL_BIN`. See [Configuration Reference](configuration-reference.md).
 * For Codex, register the server manually. See [Codex](installation/codex.md#register-the-mcp-server-manually).
 * For Pi, the server requires Pi 1.0 or later and the built-in MCP support of Pi. An installed `pi-mcp-adapter` replaces the built-in support, so the `mariadb` server never connects. Remove the adapter and turn the built-in `mcp` back on. See [Pi](installation/pi.md#upgrade-from-pi-mcp-adapter).

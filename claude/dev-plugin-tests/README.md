@@ -66,6 +66,17 @@ the test can connect to verify and stop it for teardown. Sandbox connection knob
 one), `E2E_SANDBOX_USER` (root), `E2E_SANDBOX_PASSWORD` (test), `E2E_MODEL`,
 `E2E_TIMEOUT`.
 
+`test_e2e_lsp_claude.py` checks the SQL language server from a clean install. It
+loads the plugin with `--plugin-dir`, so its `.lsp.json` and `.mcp.json` apply,
+and gives the run an empty `MARIADB_SHELL_BINDIR`/`MARIADB_SHELL_PREFIX` and a
+`PATH` without any `mariadb-shell` or `mariadb-lsp`. The MCP launcher then
+downloads the package while the LSP launcher waits for it, and the test checks
+that exactly one package was installed, that Claude Code initialized the
+language server without a timeout, and that an `LSP` tool call
+(`ENABLE_LSP_TOOL=1`) returned the tables of the file the model wrote. It needs
+network access to the mariadb-shell releases, and only allows the `Write` and
+`LSP` tools.
+
 By default (`pytest`) the eval tier is deselected, so `static` + `db` run when a
 DB is reachable (and `db` cases self-skip when it isn't).
 
@@ -100,6 +111,7 @@ claude/dev-plugin-tests/
 ├── test_structure.py        # Tier 1
 ├── test_statements_sql.py   # Tier 2 runner
 ├── test_e2e_claude.py       # Tier 4 (real `claude` CLI + plugin + MCP server)
+├── test_e2e_lsp_claude.py   # Tier 4 (the SQL language server from a clean mariadb-shell install)
 ├── fixtures/<skill>.yaml     # Tier 2 golden cases (create-database & create-table filled; rest stubbed)
 └── evals/                   # Tier 3 (test_behavioral.py + cases/)
 ```

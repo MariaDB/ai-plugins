@@ -289,7 +289,10 @@ def test_skills_root_holds_only_skills_and_its_manifests():
     assert not offenders, f"unexpected entries under skills/: {offenders}"
 
 
-@pytest.mark.parametrize("script", ["mariadb-mcp-launcher.sh", "mariadb-mcp-launcher.cmd"])
+@pytest.mark.parametrize(
+    "script",
+    ["mariadb-mcp-launcher.sh", "mariadb-mcp-launcher.cmd", "mariadb-lsp-launcher.sh", "mariadb-lsp-launcher.cmd"],
+)
 def test_shipped_scripts_are_present(script: str):
     path = skills.PLUGIN_ROOT / "scripts" / script
     assert path.is_file(), f"missing {path.relative_to(skills.REPO_ROOT)}"
@@ -297,6 +300,8 @@ def test_shipped_scripts_are_present(script: str):
         assert os.access(path, os.X_OK), f"{script} is not executable"
 
 
+# The LSP launchers' copies are compared in the claude suite, with every
+# plugin that ships them.
 @pytest.mark.parametrize("script", ["mariadb-mcp-launcher.sh", "mariadb-mcp-launcher.cmd"])
 def test_launcher_is_the_shared_launcher(script: str):
     """The launchers are one script copied into every plugin; keep this copy current."""

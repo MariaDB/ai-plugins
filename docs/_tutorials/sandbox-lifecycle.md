@@ -120,6 +120,7 @@ agent to be able to use the server it just made.
   `mariadb-shell -- mcp setup` and add the directory.
 - **It fails on TLS.** You asked for TLS on a machine with no `openssl`. Ask
   again without it.
+
 </div>
 
 Because a sandbox listens on all interfaces with a `root` account that can

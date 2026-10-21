@@ -153,15 +153,23 @@ class TemporaryProfile:
         """Run `hermes -p <this profile> <args…>`."""
         return _run(["-p", self.name, *args], timeout=timeout, cwd=cwd)
 
-    def install_plugin(self, staging: Path) -> subprocess.CompletedProcess:
+    def install_plugin(self, staging: Path, mcp_env: dict | None = None) -> subprocess.CompletedProcess:
         """Install the working tree's dev plugin the way users do, from a git URL.
 
         `staging` becomes a one-commit git repository with the plugin at the same
         subdirectory it has in this repo, so the install exercises the
         `<url>#hermes/dev-plugin` subdirectory form the README documents.
+        `mcp_env` is merged into the staged mcp.json's `env`: Hermes passes an MCP
+        server only that and a few safe variables, so this is how a test points the
+        MCP launcher at a clean install directory.
         """
         target = staging / "hermes" / "dev-plugin"
         shutil.copytree(PLUGIN_ROOT, target, ignore=shutil.ignore_patterns(".DS_Store"))
+        if mcp_env:
+            mcp_json = target / "mcp.json"
+            config = json.loads(mcp_json.read_text(encoding="utf-8"))
+            config["mcpServers"][SERVER_NAME].setdefault("env", {}).update(mcp_env)
+            mcp_json.write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
         for git_args in (
             ["init", "-q"],
             ["add", "-A"],
@@ -240,11 +248,12 @@ class HermesRun:
 
 
 def run_hermes(profile: TemporaryProfile, prompt: str, *, project: Path, timeout: int,
-               max_turns: int = 30) -> HermesRun:
+               max_turns: int = 30, env: dict | None = None) -> HermesRun:
     """Run one single-query `hermes chat` in `project` against the temporary profile.
 
     ``--yolo`` because there is nobody to approve terminal or file actions in a
     test, and ``--in`` so file tools resolve against the project directory.
+    ``env`` replaces the inherited environment of the hermes process.
     """
     cmd = [
         hermes_bin(), "-p", profile.name, "chat",
@@ -263,6 +272,7 @@ def run_hermes(profile: TemporaryProfile, prompt: str, *, project: Path, timeout
             text=True,
             timeout=timeout,
             stdin=subprocess.DEVNULL,
+            env=env,
         )
     except subprocess.TimeoutExpired as exc:
         run.timed_out = True

@@ -6,8 +6,21 @@ project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- The MariaDB SQL language server launcher, `scripts/mariadb-lsp-launcher.sh`
+  (`.cmd` on Windows), for `mariadb-lsp` from mariadb-shell 26.10.3 and later.
+  Hermes plugins cannot register a language server, so the README gives the
+  `lsp.servers` entry to add to `~/.hermes/config.yaml`. The launcher never
+  installs anything: it waits for the MCP launcher's install, so the package
+  is downloaded once.
+
 ### Changed
 
+- When the MCP launcher starts a first install of mariadb-shell, it now says
+  on stderr that the install still finishes if the harness gives up on the
+  server meanwhile (Claude Code waits 30 seconds unless `MCP_TIMEOUT` is
+  raised), and how to reconnect afterwards.
 - The `LICENSE` file is updated to include the licenses of the latest
   third-party components.
 

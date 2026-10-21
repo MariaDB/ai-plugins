@@ -56,7 +56,7 @@ rem                             GITHUB_TOKEN are consulted too, then
 rem                             `gh auth token` -- install.ps1's own order.
 rem ============================================================================
 
-if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.10.2"
+if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.10.3"
 if not defined MARIADB_SHELL_REPO set "MARIADB_SHELL_REPO=mariadb-corporation/mariadb-shell"
 if not defined MARIADB_SHELL_BINDIR set "MARIADB_SHELL_BINDIR=%LOCALAPPDATA%\Programs\mariadb-shell\bin"
 
@@ -114,6 +114,7 @@ set "INSTALL_FAILED=0"
 set "PS_INSTALLER=%TEMP%\mariadb-shell-install-%RANDOM%.ps1"
 
 echo mariadb-mcp-launcher: no suitable mariadb-shell found; installing from %MARIADB_SHELL_REPO% ... 1>&2
+echo mariadb-mcp-launcher: a first install can take a minute. If the harness gives up on this server meanwhile (Claude Code waits 30 s unless MCP_TIMEOUT is raised), the install still finishes: reconnect the server then (/mcp in Claude Code), or start a new session. 1>&2
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ErrorActionPreference='Stop'; $ProgressPreference='SilentlyContinue';" ^
   "try{ [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 }catch{};" ^

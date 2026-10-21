@@ -5,10 +5,10 @@ subtitle: >-
   Every tool the mariadb-shell MCP server exposes, what it takes, and the
   behaviour that is not obvious from the name.
 permalink: /mcp-tools/
-description: Reference for the mariadb-shell MCP server tools — db.*, msm.*, sandbox.*, util.* and the optional migrator.* group.
+description: Reference for the mariadb-shell MCP server tools — db.*, msm.*, sandbox.*, util.*, sql.* and the optional migrator.* group.
 ---
 
-The server exposes **{{ site.tool_count }} tools in four groups**, plus an optional fifth
+The server exposes **{{ site.tool_count }} tools in five groups**, plus an optional sixth
 that only appears when the migration tooling is installed.
 
 <div class="table-wrap" markdown="1">
@@ -19,6 +19,7 @@ that only appears when the migration tooling is installed.
 | [`msm.*`](#msm--schema-management) | 12 | Versioned schema projects, releases, deployments |
 | [`sandbox.*`](#sandbox--throwaway-servers) | 8 | List deployable server versions; deploy, start, stop and delete local instances |
 | [`util.*`](#util--dumps-loads-and-copies) | 12 | Dump, load, export, import and copy data between servers, as background tasks |
+| [`sql.*`](#sql--check-outline-and-format-sql) | 3 | Check, outline and format SQL text with MariaDB's grammar — no server needed |
 | [`migrator.*`](#migrator--mysql-to-mariadb) | 4 | MySQL-to-MariaDB migration — **optional, not counted above** |
 
 </div>
@@ -225,6 +226,40 @@ Local paths in `output_url`, `url` and `urls`, and in file options such as
 `osBucketName`, `azureContainerName`), is not a local path and goes to the
 utility unchecked.
 
+## `sql.*` — check, outline and format SQL
+
+The core of the [SQL language server]({{ '/how-it-works/#the-sql-language-server' | relative_url }}),
+as tools: they run `mariadb-lsp` on SQL text with the MariaDB server's own
+grammar. **Nothing is executed and no connection is needed**, so the agent can
+check a script before it runs it — and this works in **every** harness, including
+Codex and Pi, which have no language-server support of their own. mariadb-shell
+26.10.3 and later.
+
+<div class="table-wrap" markdown="1">
+
+| Tool | Arguments | Notes |
+| --- | --- | --- |
+| `sql.check` | `sql` or `file_path`, `source_dir=None`, `sql_mode=None`, `delimiter=None`, `version_id=None`, `max_errors=100` | `valid`, `statements`, and per error its `start` (line, column), `message`, the failing `token` and the tokens the grammar `expected` there. |
+| `sql.outline` | `sql` or `file_path`, `source_dir=None`, `sql_mode=None`, `delimiter=None`, `version_id=None` | Applies the `CREATE`/`ALTER`/`DROP`/`RENAME`/`USE` statements in order and lists what results: schemas, tables with columns, indexes, keys and checks, views, routines, triggers, events, sequences, REST objects. |
+| `sql.format` | `sql` or `file_path`, `line_width=80`, `keyword_case="upper"`, `indent="2"`, `sql_mode=None`, `delimiter=None`, `version_id=None` | Returns the laid-out `sql`; **a file is not changed**. Statements that don't parse are left as they are, comments kept. |
+
+</div>
+
+Pass the SQL inline (`sql`) **or** as a `.sql` file (`file_path`, on the
+allowed-paths list) — exactly one, at most 10 MB. `check` and `outline` follow
+Schema Management's `SOURCE '<path>'[<start>:<end>];` directives, expanded by
+the server with the same path checks as `db.execute_sql_script`, so an error in
+an included section is reported in that file, at its line. Lines and columns
+count from 1, as an editor shows them.
+
+<div class="callout" markdown="1">
+**The group appears only where `mariadb-lsp` is found** — the one
+`mcp setup --lspPath=PATH` names, else the one next to the running
+`mariadb-shell` (the release packages install it there), else the `PATH`, else
+`~/.local/bin`. A shell from the native `.deb`/`.rpm` packages has none, and a
+multi-tenant server never offers the group.
+</div>
+
 ## `migrator.*` — MySQL to MariaDB
 
 **Optional and not part of the {{ site.tool_count }}.** These four tools are registered only when
@@ -262,6 +297,7 @@ pass it only to `resume`, and check that every step says `DONE` — never trust
 | *not a configured connection* | The URI is not on the allow-list, or asks for more than was configured (a schema, an option). | `mariadb-shell -- mcp setup`, or drop the extra part from the URI. |
 | A call that never returns | A path is not on the allowed-paths list, and the guard fell back to a prompt nothing can answer. | Add the directory with `mcp setup`. |
 | *There is no object registered under name 'mcp'* | The shell cannot find its plugins — usually a relocated or broken config home. | Check `~/.mariadb-shell/plugins/`. |
+| No `sql.*` tools at all | The server found no `mariadb-lsp`, runs in multi-tenant mode, or is older than 26.10.3. | Use a shell from the release packages, or point `mcp setup --lspPath` at a `mariadb-lsp`. |
 | No `util.*` tools at all | The server does not serve the `db.*` group, or runs in multi-tenant mode. | Serve `db` too; a multi-tenant server never offers them. |
 | *The MariaDB Shell binary to run the utility in was not found* | A `util.*` tool could not find `mariadb-shell` to run the task in. | Put `mariadb-shell` on the `PATH`. |
 | *Already 4 tasks are running* | The client's limit of running `util.*` tasks. | Wait for one with `util.get_task`, or `util.cancel_task` one. |

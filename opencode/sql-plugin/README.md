@@ -29,6 +29,11 @@ directory:
 export MARIADB_SQL_PLUGIN=/path/to/ai-plugins/opencode/sql-plugin
 ```
 
+On Windows, write the path with forward slashes, for example
+`setx MARIADB_SQL_PLUGIN C:/path/to/ai-plugins/opencode/sql-plugin`. OpenCode pastes the
+value into the JSON text before parsing it, and backslashes there make the
+whole config invalid (`InvalidEscapeCharacter`).
+
 **2. Make the skills discoverable.** OpenCode loads skills one directory deep from
 `.opencode/skills/`, `~/.config/opencode/skills/`, `.claude/skills/`, and
 `.agents/skills/`. Symlink (or copy) the flat `skills/` dir into one of those:
@@ -55,8 +60,8 @@ Configured in [opencode.json](opencode.json):
   "mcp": {
     "mariadb": {
       "type": "local",
-      "command": ["{env:MARIADB_SQL_PLUGIN}/scripts/mariadb-mcp-launcher.sh"],
-      "environment": { "MARIADB_SHELL_VERSION": "26.10.2" },
+      "command": ["{env:MARIADB_SQL_PLUGIN}/scripts/mariadb-mcp-launcher"],
+      "environment": { "MARIADB_SHELL_VERSION": "26.10.3" },
       "enabled": true
     }
   }
@@ -69,7 +74,7 @@ is started.
 
 The launcher ([scripts/mariadb-mcp-launcher.sh](scripts/mariadb-mcp-launcher.sh)):
 
-- Resolves the minimum version from `MARIADB_SHELL_VERSION` (default `26.10.2`).
+- Resolves the minimum version from `MARIADB_SHELL_VERSION` (default `26.10.3`).
 - Runs the first `mariadb-shell` that meets it: `$MARIADB_SHELL_BIN`, then one on
   `PATH`, then a local install at `~/.local/bin/mariadb-shell`
   (`%LOCALAPPDATA%\Programs\mariadb-shell\bin\mariadb-shell.cmd` on Windows).
@@ -84,9 +89,11 @@ The launcher ([scripts/mariadb-mcp-launcher.sh](scripts/mariadb-mcp-launcher.sh)
   MCP transport alone, so the launcher's own messages — and the installer's — go
   to stderr.
 
-**Windows:** the `.sh` launcher works on macOS/Linux and under Git-Bash; native
-Windows users should point the `command` at
-[scripts/mariadb-mcp-launcher.cmd](scripts/mariadb-mcp-launcher.cmd).
+**Windows:** `opencode.json` cannot branch per OS, so it names the extensionless
+launchers `scripts/mariadb-mcp-launcher` and `scripts/mariadb-lsp-launcher`. On
+macOS and Linux each is a shell script that hands over to its `.sh` twin; on
+native Windows, OpenCode resolves the name through `%PATHEXT%` and runs the
+`.cmd` launcher next to it, so no edit is needed.
 
 **Private repository:** while `mariadb-shell` is private, set `GH_TOKEN` (or
 `MARIADB_SHELL_TOKEN`, or simply run `gh auth login`). The token is needed twice:
@@ -148,6 +155,47 @@ every other client. A client is caught behind a path, `env`, a pipe, `&&`,
 `sh -c "..."` or `$(...)`. The model is told which tool to use instead. To let
 the agent run the clients regardless, start it with `MARIADB_PLUGIN_ALLOW_CLI=1`
 in its environment; the model cannot set that itself.
+
+## The SQL language server
+
+`mariadb-lsp`, the MariaDB SQL language server, ships in the `mariadb-shell`
+packages from 26.10.3 on. OpenCode feeds its diagnostics back to the model after
+each edit of a `.sql` file. Configured in [opencode.json](opencode.json), next to
+the MCP server:
+
+```json
+{
+  "lsp": {
+    "mariadb": {
+      "command": ["{env:MARIADB_SQL_PLUGIN}/scripts/mariadb-lsp-launcher"],
+      "extensions": [".sql"],
+      "env": { "MARIADB_SHELL_VERSION": "26.10.3" }
+    }
+  }
+}
+```
+
+OpenCode leaves every language server off while `lsp` is missing from its
+config. This entry turns them on: its own built-in servers as well as this one.
+To keep them off, leave the `lsp` key out of what you merge into your config.
+
+OpenCode gives a language server 45 seconds to start, a limit it has no setting
+for, and skips a server that misses it for the rest of the session. On a first
+start the language server waits for the MCP launcher to download mariadb-shell;
+if that takes longer, restart OpenCode once the download is done.
+
+The launcher ([scripts/mariadb-lsp-launcher.sh](scripts/mariadb-lsp-launcher.sh))
+**never installs anything**. Installing `mariadb-shell` is left to the MCP launcher
+alone, so starting both servers at once downloads the package once. It:
+
+- Finds the `mariadb-shell` the MCP launcher would run (`$MARIADB_SHELL_BIN`, one
+  on `PATH`, or `~/.local/bin/mariadb-shell`, at `MARIADB_SHELL_VERSION` or newer)
+  and starts the `mariadb-lsp` packaged with it, as `mariadb-lsp lsp`.
+- When there is no such shell yet, as on a first start, waits for the MCP
+  launcher's install (`MARIADB_LSP_WAIT` seconds, default 180), then looks again.
+- Falls back to any `mariadb-lsp` on `PATH` or in `~/.local/bin`. The native
+  `.deb` and `.rpm` packages of the shell do not include it yet.
+- Takes `MARIADB_LSP_BIN` to run a binary of your own instead.
 
 ## Skills
 

@@ -37,6 +37,7 @@ GROUP BY u.id, u.display_name
 ORDER BY notes DESC
 LIMIT 20;
 ```
+
 </div>
 
 ## Read the schema first

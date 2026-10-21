@@ -62,7 +62,7 @@
 
 set -euo pipefail
 
-VERSION="${MARIADB_SHELL_VERSION:-26.10.2}"
+VERSION="${MARIADB_SHELL_VERSION:-26.10.3}"
 REPO="${MARIADB_SHELL_REPO:-mariadb-corporation/mariadb-shell}"
 BINDIR="${MARIADB_SHELL_BINDIR:-$HOME/.local/bin}"
 INSTALLER_URL="https://raw.githubusercontent.com/$REPO/main/install.sh"
@@ -186,6 +186,10 @@ run_installer() {
 }
 
 log "no suitable mariadb-shell found; installing from $REPO ..."
+# A harness that stops waiting for the server (Claude Code gives up after 30 s
+# unless MCP_TIMEOUT is raised) signals this script, but the installer it runs
+# finishes regardless — so say how to pick the install up afterwards.
+log "a first install can take a minute. If the harness gives up on this server meanwhile (Claude Code waits 30 s unless MCP_TIMEOUT is raised), the install still finishes: reconnect the server then (/mcp in Claude Code), or start a new session."
 if fetch "$INSTALLER_URL" "$TMP/install.sh"; then
   # Prereleases: wanted when they are all there is, but not preferred over a
   # stable release. install.sh skips them exactly as /releases/latest does, so a

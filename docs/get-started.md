@@ -31,6 +31,12 @@ MariaDB tooling itself). Unless you know you want otherwise, install `dev`.
 On first start the plugin downloads and extracts the `mariadb-shell` package
 unless a suitable one is already installed. Depending on your connection this
 can take a minute. It only happens once.
+
+Claude Code waits 30 seconds for an MCP server to connect. If the download takes
+longer, `/mcp` shows the `mariadb` server as failed, but the install keeps going
+— reconnect the server from `/mcp` when it is done. To give it more time, set
+`MCP_TIMEOUT` (milliseconds) in `~/.claude/settings.json`:
+`{ "env": { "MCP_TIMEOUT": "120000" } }`.
 </div>
 
 ### Claude Code
@@ -94,7 +100,8 @@ Then start a new Hermes session — MCP servers connect at session start.
 the flag, run `hermes plugins enable mariadb-dev` afterwards.
 
 The `sql` and `contributor` plugins install the same way from
-`#hermes/sql-plugin` and `#hermes/contributor-plugin`. Later, `hermes plugins update mariadb-dev` updates the plugin and
+`#hermes/sql-plugin` and `#hermes/contributor-plugin`. Later,
+`hermes plugins update mariadb-dev` updates the plugin and
 `hermes plugins remove mariadb-dev` removes it.
 
 **On native Windows**, the plugin's `mcp.json` cannot switch to the `.cmd`
@@ -204,7 +211,8 @@ That is the whole tutorial in one paragraph — but the tutorial walks through
 what the agent does at each step, what to check, and what to do when something
 refuses.
 
-<a class="btn btn--primary" href="{{ '/tutorials/notes-app-sandbox/' | relative_url }}">Start Tutorial 1 &rarr;</a>
+<a class="btn btn--primary"
+   href="{{ '/tutorials/notes-app-sandbox/' | relative_url }}">Start Tutorial 1 &rarr;</a>
 
 ## What to ask for
 

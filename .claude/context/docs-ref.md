@@ -156,3 +156,7 @@ what is NOT in it.
   `build/tools/community/…` (no `docs/` dir in `build/`).
 - Prism `batch` must be in `additionalLanguages` (added in #36) or Windows
   fences render unhighlighted.
+
+## Markdownlint (since #65)
+
+`content/.markdownlint.jsonc` holds the folder's exceptions, each with its reason: MD013 off (GitBook writes one line per paragraph; tables can't wrap), MD024 `siblings_only` (the landing page repeats its H1 as an H2), MD031 off (GitBook puts fences directly inside `{% tab %}`; the user chose this over adding blank lines), MD033 `<sub>` only (the docs team's licence footer), MD036 off (the footer is an emphasised paragraph), MD049 underscore (GitBook's own style, ~6:1 in mariadb-docs). Check with `npx -y markdownlint-cli2@0.18.1 "**/*.md"` from `content/` → 0 findings. To prove a Markdown change keeps the display, diff the article HTML of a preview build before/after.

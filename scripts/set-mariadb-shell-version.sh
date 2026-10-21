@@ -53,9 +53,10 @@ Arguments:
               a *minimum*: each launcher accepts any install at or above it.
 
 Updates, across claude/, codex/, opencode/, pi/ and hermes/:
-  - MARIADB_SHELL_VERSION in each plugin's MCP config (.mcp.json, opencode.json,
-    mcp.json)
-  - the fallback default in the launchers (mariadb-mcp-launcher.sh / .cmd)
+  - MARIADB_SHELL_VERSION in each plugin's MCP and LSP config (.mcp.json,
+    .lsp.json, opencode.json, mcp.json)
+  - the fallback default in the launchers (mariadb-mcp-launcher.sh / .cmd and
+    mariadb-lsp-launcher.sh / .cmd)
   - the version the setup-*-mcp scripts write (codex, pi)
   - the MARIADB_SHELL_VERSION shown in each plugin README
 
@@ -98,7 +99,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 command -v perl >/dev/null 2>&1 || { echo "error: perl is required" >&2; exit 1; }
 
-# Collect the files that carry the version: launcher scripts (all variants) and
+# Collect the files that carry the version: launcher scripts (MCP and LSP) and
 # the MCP config files, across every *-plugin dir (excludes *-plugin-test dirs).
 files=()
 while IFS= read -r f; do files+=("$f"); done < <(
@@ -108,11 +109,12 @@ while IFS= read -r f; do files+=("$f"); done < <(
        "$REPO_ROOT"/pi/*-plugin \
        "$REPO_ROOT"/hermes/*-plugin \
        -type f \( \
-         -name 'mariadb-mcp-launcher.sh' -o \
-         -name 'mariadb-mcp-launcher.cmd' -o \
+         -name 'mariadb-*-launcher.sh' -o \
+         -name 'mariadb-*-launcher.cmd' -o \
          -name 'setup-codex-mcp.sh' -o \
          -name 'setup-codex-mcp.cmd' -o \
          -name '.mcp.json' -o \
+         -name '.lsp.json' -o \
          -name 'mcp.json' -o \
          -name 'opencode.json' -o \
          -name 'README.md' \
@@ -130,12 +132,23 @@ while IFS= read -r f; do files+=("$f"); done < <(
 DOCS_CONFIG="$REPO_ROOT/docs/_config.yml"
 [ -f "$DOCS_CONFIG" ] && files+=("$DOCS_CONFIG")
 
+# The reference docs (docs-ref/) quote the floor in two places: the default in
+# the Configuration Reference's variable table, and the installation
+# requirements. Release notes and worked examples name past versions on purpose
+# and are left alone.
+DOCS_REF="$REPO_ROOT/docs-ref/content/community/mariadb-ai-plugins"
+for f in "$DOCS_REF/configuration-reference.md" "$DOCS_REF/installation/README.md"; do
+  [ -f "$f" ] && files+=("$f")
+done
+
 # Shapes the version appears in:
 #   JSON MCP config / README example:  "MARIADB_SHELL_VERSION": "<v>"
 #   bash launcher:                     VERSION="${MARIADB_SHELL_VERSION:-<v>}"
 #   cmd launcher:                      set "MARIADB_SHELL_VERSION=<v>"
 #   README prose:                      `MARIADB_SHELL_VERSION` (default `<v>`)
 #   docs/_config.yml:                  shell_floor: "<v>"
+#   docs-ref variable table:           | `MARIADB_SHELL_VERSION` | `<v>` |
+#   docs-ref installation requirement: unless MariaDB Shell <v> or later is
 V="$VERSION" perl -i -pe '
   my $v = $ENV{V};
   s/("MARIADB_SHELL_VERSION"\s*:\s*")[^"]*(")/${1}${v}${2}/g;
@@ -144,9 +157,11 @@ V="$VERSION" perl -i -pe '
   s/^(SHELL_VERSION=")[^"]*(")/${1}${v}${2}/g;
   s/(MARIADB_SHELL_VERSION` \(default `)[^`]*(`\))/${1}${v}${2}/g;
   s/^(shell_floor:\s*")[^"]*(")/${1}${v}${2}/g;
+  s/^(\| `MARIADB_SHELL_VERSION` \| `)[^`]*(` \|)/${1}${v}${2}/g;
+  s/(unless MariaDB Shell )[0-9][0-9.]*( or later is)/${1}${v}${2}/g;
 ' "${files[@]}"
 
 echo "Set MARIADB_SHELL_VERSION -> $VERSION in ${#files[@]} file(s):"
-grep -rn 'SHELL_VERSION\|shell_floor' "${files[@]}" \
-  | grep -E "\-${VERSION}\}|=\"?${VERSION}\"|: \"${VERSION}\"" \
+grep -rn 'SHELL_VERSION\|shell_floor\|MariaDB Shell [0-9]' "${files[@]}" \
+  | grep -E "\-${VERSION}\}|=\"?${VERSION}\"|: \"${VERSION}\"|\`${VERSION}\`|Shell ${VERSION} or later" \
   | sed 's/^/  /'

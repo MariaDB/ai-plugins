@@ -6,10 +6,31 @@ project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- The MariaDB SQL language server, `mariadb-lsp`, for `.sql` files, registered
+  in `.lsp.json`. It ships in mariadb-shell 26.10.3 and later. Its launcher,
+  `scripts/mariadb-lsp-launcher.sh` (`.cmd` on Windows), never installs
+  anything: it waits for the MCP launcher's install, so the package is
+  downloaded once.
+
 ### Changed
 
+- When the MCP launcher starts a first install of mariadb-shell, it now says
+  on stderr that the install still finishes if the harness gives up on the
+  server meanwhile (Claude Code waits 30 seconds unless `MCP_TIMEOUT` is
+  raised), and how to reconnect afterwards.
 - The `LICENSE` file is updated to include the licenses of the latest
   third-party components.
+
+### Fixed
+
+- The plugin now works on native Windows without editing its config:
+  `.mcp.json` and `.lsp.json` name the extensionless `scripts/mariadb-mcp-launcher`
+  and `scripts/mariadb-lsp-launcher`, which Claude Code resolves to the `.cmd`
+  launchers on Windows and which hand over to the `.sh` launchers elsewhere.
+  Before, Claude Code ran the `.sh` launchers through `bash`, which native
+  Windows usually lacks, so neither server started.
 
 ## [26.10.4] - 2026-10-19
 

@@ -2,7 +2,9 @@
 # line continuations in an LF-only .cmd, both of which the MCP launcher uses.
 *.cmd text eol=crlf
 
-# The extensionless launcher Codex resolves must stay LF: it is a shell script
-# run through its shebang on macOS/Linux, and CRLF would make the kernel look
-# for an interpreter named "bash\r". It matches no *.sh rule, hence this one.
+# The extensionless launchers (Codex's MCP one, Claude Code's MCP and LSP ones)
+# must stay LF: each is a shell script run through its shebang on macOS/Linux,
+# and CRLF would make the kernel look for an interpreter named "bash\r". They
+# match no *.sh rule, hence these.
 mariadb-mcp-launcher text eol=lf
+mariadb-lsp-launcher text eol=lf

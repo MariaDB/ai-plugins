@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# Copyright (c) 2026, MariaDB plc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2.0,
+# as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+# the GNU General Public License, version 2.0, for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# mariadb-mcp-launcher — the extensionless name the plugin's config uses, so
+# that ONE command works on macOS, Linux and native Windows alike: a JSON config
+# cannot branch per OS, and Windows cannot run a .sh.
+#
+#   * On macOS and Linux the kernel runs THIS file through the shebang above,
+#     and it hands over to mariadb-mcp-launcher.sh.
+#   * On Windows, Claude Code and OpenCode resolve the command through
+#     %PATHEXT% and land on mariadb-mcp-launcher.cmd next to it; this file,
+#     having no extension, is not a program there. (Given a .sh command, they
+#     run it through bash, which native Windows usually doesn't have on PATH.)
+#
+# The same device as Codex's mariadb-mcp-launcher. Verified on Windows 11
+# ARM64 with Claude Code 2.1.306 and OpenCode 1.19.3.
+exec "$(dirname "$0")/mariadb-mcp-launcher.sh" "$@"

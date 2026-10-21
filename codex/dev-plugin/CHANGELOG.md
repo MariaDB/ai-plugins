@@ -8,6 +8,10 @@ project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- When the MCP launcher starts a first install of mariadb-shell, it now says
+  on stderr that the install still finishes if the harness gives up on the
+  server meanwhile (Claude Code waits 30 seconds unless `MCP_TIMEOUT` is
+  raised), and how to reconnect afterwards.
 - The `LICENSE` file is updated to include the licenses of the latest
   third-party components.
 

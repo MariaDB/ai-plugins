@@ -18,7 +18,7 @@ which is which explains most of what happens when something does not work.
 | Part | What it is | Needs |
 | --- | --- | --- |
 | **Skills** | {{ site.skill_count }} Markdown documents vendored into the plugin. The agent reads the ones whose `description` matches what you asked. | Nothing. They work on a fresh install, offline. |
-| **MCP server** | {{ site.tool_count }} tools that talk to a real MariaDB server, in four groups: `db.*`, `msm.*`, `sandbox.*`, `util.*`. | A one-time `mcp setup`, and a server to talk to. |
+| **MCP server** | {{ site.tool_count }} tools that talk to a real MariaDB server, in five groups: `db.*`, `msm.*`, `sandbox.*`, `util.*`, `sql.*`. | A one-time `mcp setup`, and a server to talk to. |
 | **`mariadb-shell`** | MariaDB's command-line shell (a port of MySQL Shell). The MCP server runs **inside** it as a plugin. | Installed automatically on first use. |
 
 </div>
@@ -70,6 +70,31 @@ Upgrade by raising the floor, by deleting the managed install, or by running
 The launcher writes every message it produces to **stderr**, because stdout *is*
 the MCP JSON-RPC transport. A single stray byte on stdout breaks the protocol,
 which is why the installer's output is redirected too.
+
+## The SQL language server
+
+From `mariadb-shell` 26.10.3 on, the shell's package also carries `mariadb-lsp`,
+a language server that parses `.sql` files with the MariaDB server's own
+grammar. Where the harness supports language servers, the `dev` and `sql`
+plugins wire it up, and the agent sees MariaDB's syntax errors right after it
+writes a SQL file — before it runs anything:
+
+<div class="table-wrap" markdown="1">
+
+| Harness | How it is registered |
+| --- | --- |
+| Claude Code | Automatically, by the plugin's `.lsp.json`. Set `ENABLE_LSP_TOOL=1` to also give the agent the `LSP` tool (symbols, hover, definitions, references). |
+| OpenCode | The `lsp` block of the plugin's `opencode.json`, merged into yours. |
+| Hermes Agent | An `lsp.servers` entry you add to `config.yaml` — plugins cannot register one. |
+| Codex, Pi | No language server — neither runs one. The agent gets the same checks through the MCP server's [`sql.*` tools](../mcp-tools/#sql--check-outline-and-format-sql) instead. |
+
+</div>
+
+It has a launcher of its own, `mariadb-lsp-launcher.sh`, with one rule: it
+**never installs anything**. It finds the shell the MCP launcher would use and
+runs the `mariadb-lsp` next to it. On a first start it simply waits for the MCP
+launcher's download to finish, so starting both servers at once still fetches
+the package exactly once.
 
 ## The security model
 

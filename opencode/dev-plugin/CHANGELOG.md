@@ -6,10 +6,32 @@ project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- The MariaDB SQL language server, `mariadb-lsp`, for `.sql` files, as an `lsp`
+  entry in `opencode.json`. It ships in mariadb-shell 26.10.3 and later. Its
+  launcher, `scripts/mariadb-lsp-launcher.sh` (`.cmd` on Windows), never
+  installs anything: it waits for the MCP launcher's install, so the package
+  is downloaded once.
+
 ### Changed
 
+- When the MCP launcher starts a first install of mariadb-shell, it now says
+  on stderr that the install still finishes if the harness gives up on the
+  server meanwhile (Claude Code waits 30 seconds unless `MCP_TIMEOUT` is
+  raised), and how to reconnect afterwards.
 - The `LICENSE` file is updated to include the licenses of the latest
   third-party components.
+
+### Fixed
+
+- The plugin now works on native Windows without editing `opencode.json`: its
+  `mcp` and `lsp` commands name the extensionless `scripts/mariadb-mcp-launcher`
+  and `scripts/mariadb-lsp-launcher`, which OpenCode resolves to the `.cmd`
+  launchers on Windows and which hand over to the `.sh` launchers elsewhere.
+  The README also says to give `MARIADB_DEV_PLUGIN` forward slashes on Windows: OpenCode
+  pastes it into the JSON before parsing, and backslashes made the config
+  invalid.
 
 ## [26.10.4] - 2026-10-19
 

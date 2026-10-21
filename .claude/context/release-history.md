@@ -8,8 +8,26 @@ mariadb-shell floor are independent.** Through 26.9.5 every release set both to 
 <version> [shell-version]` now checks the plugin version against this repo's tags and moves the
 floor only when a shell version is given. 26.10.0 is planned on top of the current floor 26.9.5.
 
-## Landed on `main` (through PR #56)
+## Landed on `main` (through PR #65)
 
+**#65** `473389b` (2026-10-21): `docs-ref/scripts/generate-skill-pages.py` code-quotes a word
+holding a `<placeholder>` and escapes `*` in skill descriptions (they rendered as
+`development/_next.sql`, `auto//scripts/_norecord.py`, stray italics), and now writes #64's
+SYNCED comment and GPLv2 footer itself — every regeneration used to delete them. New
+`docs-ref/content/.markdownlint.jsonc` (MD013/MD031/MD036 off, MD024 `siblings_only`, MD033
+`<sub>` only, MD049 underscore; body `*x*` → `_x_`). Preview HTML byte-identical except the
+three generated pages that were wrong.
+**#64** `848bd08` (2026-10-20): a SYNCED warning comment (below the H1) and the docs team's
+`<sub>_This page is licensed: GPLv2_</sub>` footer on every synced docs-ref page.
+**#63** `b9949ef`: language fixes on the util tools page.
+**#62** `9d38919`: one third-party LICENSE list shared by mariadb-shell, mariadb-shell-plugins,
+lsp-server, vscode-extension and ai-plugins.
+**#61** `fc3e9bf`: MSM skills — `SOURCE` slices by line number (`lnN`), no slice for a whole
+file (mariadb-shell-plugins #60); shells ≤ 26.10.2 still need character offsets.
+**#60** `c98c925` / **#59** `9728ee1`: the DevHub follows mariadb.org's new theme
+(twentytwentyfive-child palette, header/footer, scroll-to-top button).
+**#58** `de794e4`: docs for the MCP server's `util.*` group (DevHub + new docs-ref page).
+**#57** `f5fbe88`: checkpoint after release 26.10.4.
 **#56** `2a90ebf` (2026-10-19) was release 26.10.4 (below).
 **#55** `67d3424` (2026-10-18) added the **CLI guard**: every MCP-bearing plugin blocks a shell
 command that uses `mariadb`/`mysql`/`mariadb-shell`/`mysqlsh`/`mariadb-dump` for what an MCP
