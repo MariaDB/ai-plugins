@@ -3244,9 +3244,9 @@ Public License instead of this License.
 
 Bundled JavaScript packages
 
-The MariaDB for VS Code extension bundles its dependencies into the JavaScript
-it ships, and the following third-party packages are included in that bundle.
-The copyright notice for each is given beside its name.
+The MariaDB Shell for VS Code extension bundles its dependencies into the
+JavaScript it ships, and the following third-party packages are included in
+that bundle. The copyright notice for each is given beside its name.
 
 MIT License
 -----------
