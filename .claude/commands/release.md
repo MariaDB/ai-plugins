@@ -1,18 +1,25 @@
 ---
-description: Cut an ai-plugins release, optionally raising the mariadb-shell floor, PR it, then sync the fork. Usage: /release <version> [shell-version]
+description: Cut an ai-plugins release, suggesting its next YY.MM.x version and raising the mariadb-shell floor to the latest shell release where there is a newer one, PR it, then sync the fork. Usage: /release [version|-] [shell-version|-]
 ---
 
 # Release Command
 
 Arguments as typed: `$ARGUMENTS`
 
-Split that string on whitespace. The first word is the plugin version
-(required), the second is the new mariadb-shell floor (optional). From here
-on, "the plugin version" and "the floor" mean those two words; `<version>`
-and `<floor>` stand for them in the commands below. If the first word is
-missing, ask for the version before doing anything else. If a third word is
-present, stop and ask what it means. Both versions
-must be a bare `MAJOR.MINOR.PATCH` such as `26.10.0` — no `v` prefix. The
+Split that string on whitespace. The first word is the plugin version, the
+second is the new mariadb-shell floor. Both are optional, so a bare `/release`
+works. A `-` in a position means "not given", so the floor can be given without
+the version (`/release - 26.10.3`). What is not given is suggested in step 2:
+
+- the plugin version: the next `YY.MM.x` version (see step 2);
+- the floor: the latest published mariadb-shell release, when it is newer than
+  the current floor. Otherwise it stays where it is.
+
+From here on, "the plugin version" and "the floor" mean the two versions this
+release ships, given or suggested; `<version>` and `<floor>` stand for them in
+the commands below. If a third word is present, stop and ask what it means.
+
+Both versions must be a bare `MAJOR.MINOR.PATCH` such as `26.10.0` — no `v` prefix. The
 version *inside* this repo (manifests, CHANGELOG headings) is bare; only the git
 tag carries the `v` (`v26.10.0`). Strip a leading `v` if one was given and say so.
 
@@ -21,7 +28,7 @@ manifests, the CHANGELOG headings and the tag. The floor is the `MARIADB_SHELL_V
 floor, the oldest mariadb-shell the launchers accept. Through 26.9.5 the two were
 always equal; that is no longer required. With no floor given it stays where it is
 and the release ships on top of the current shell version — unless a newer shell
-release exists, in which case step 2 asks whether to raise the floor to it.
+release exists, in which case step 2 suggests raising the floor to it.
 
 Read `.claude/PROJECT_CONTEXT.md`, then `.claude/context/release-history.md` and
 `.claude/context/repo-conventions.md` before starting: the previous release's
@@ -38,12 +45,33 @@ remote has gone missing before. If either is missing, stop and report it.
   and report rather than stashing or resetting anything.
 - `v<version>` must not already exist as a tag locally or on either remote
   (`git ls-remote --tags <remote>`, once per remote — `ls-remote` takes one
-  remote and would read `fork` as a pattern). If it does, stop.
+  remote and would read `fork` as a pattern). If it does, stop. When the
+  version is suggested, check this in step 2, once it is known.
 
 ## 2. Check the versions
 
+Do all of this before changing anything, and report what you find in one
+summary: the plugin version and the floor, each with its current value, the
+value this release ships, and whether that was given or suggested.
+
+**When anything was suggested, stop and ask the user to confirm the summary.**
+They may accept it, or change either version, for example to keep the current
+floor although a newer shell exists. Run the checks below again for what they
+changed. When both were given, report the summary and go on.
+
 **The plugin version.** List this repo's tags (`git tag -l 'v*' | sort -V`) and
-take the highest. The plugin version must sort above it, or stop. Report the previous version.
+take the highest. Report it as the previous version.
+
+- **None given:** suggest `YY.MM.x` from today's date (`date +%y.%-m`): `YY` is
+  the year's last two digits, `MM` the month without a leading zero (`26.9.0`,
+  never `26.09.0`: semver forbids leading zeros), and `x` counts the releases
+  of that month. It is `0` for the month's first release, and one more than the
+  highest `x` among the tags that start with `vYY.MM.` otherwise. If the
+  suggestion does not sort above the highest tag (one from a later month
+  exists), stop and report it. Check that `v<suggestion>` is not a tag, locally
+  or on either remote.
+- **One given:** it must sort above the highest tag, or stop. If it does not
+  follow `YY.MM.x` for this month, say so and ask whether to use it anyway.
 
 **The current shell floor** is `shell_floor` in `docs/_config.yml`; it also
 appears as the launchers' fallback (`VERSION="${MARIADB_SHELL_VERSION:-<v>}"`).
@@ -59,15 +87,17 @@ gh release list --repo mariadb-corporation/mariadb-shell --exclude-drafts --limi
 
 Sort the `tagName`s as versions (strip the `v`; `sort -V`), not by date.
 
-- **No floor given:** the floor would stay at the last release's shell version.
-  Check that this is still the latest published shell release (the highest
-  `tagName`). If it is, continue with the floor unchanged. If a newer one exists,
-  the user most likely just forgot to pass it: **stop and ask explicitly**
-  whether to keep the current floor or raise it to the latest shell release,
-  naming both versions and the latest one's publish date. Do not go on until
-  they answer. If they choose to raise it, take the latest shell release as the
-  floor and continue as if it had been given (the checks below then pass
-  trivially); if they keep it, continue with the floor unchanged.
+- **The current floor itself is not in the list** (it was raised on `main`
+  ahead of the shell release) → stop, whatever was given. A release must not
+  ship a floor no launcher can install. Say whether the floor's release is
+  still to come or whether the floor should go back to a published one, and
+  let the user decide. A floor given here that *is* published resolves it.
+- **No floor given:** check whether the current floor is still the latest
+  published shell release (the highest `tagName`). If it is, the floor stays
+  unchanged. If a newer one exists, suggest raising the floor to it, naming
+  both versions and the latest one's publish date, and continue with it as if
+  it had been given (the checks below then pass trivially). The confirmation
+  of the summary settles it.
 - **A floor given:**
   - `v<floor>` is not in the list → stop. The shell floor must never sit above a
     published release, or every launcher would demand a binary that does not
