@@ -12,8 +12,9 @@ ported from the vscode-extension's `/release`): no version → the next `YY.MM.x
 and the month's tags; no floor → the latest published shell when it is newer than the floor.
 Anything suggested is confirmed in one summary before anything changes.
 
-## Landed on `main` (through PR #67)
+## Landed on `main` (through PR #68)
 
+**#68** `6e63c80` (2026-10-21) was release 26.10.5 (below).
 **#67** `4d90709` (2026-10-21): `/release` suggests the next version and the latest shell floor
 (see the policy note above). The user remembered making this change here; it had only ever been
 made in the vscode-extension repo (`49420be`, 2026-10-18), so it was ported, not restored.
@@ -126,7 +127,18 @@ overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-op
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
 
-## Release v26.10.5 (2026-10-21) — IN PROGRESS (PR about to open)
+## Release v26.10.5 (2026-10-21) — SHIPPED
+
+- **PR #68**, squash `6e63c80` (merged head `025fd13`, checkpoint included). **Annotated tag
+  `v26.10.5` = object `af5dc47`**, pushed to `origin` and `fork` as the same object;
+  **prerelease on both repos**. Fork's `main` fast-forwarded `c98c925` → `6e63c80` (=
+  `origin/main`). `wip/26.10.5` deleted locally; GitHub had removed it on `origin`.
+- Tag subject is `Release 26.10.5`, not the `MariaDB AI Plugins 26.10.x` of earlier tags — left as
+  is rather than force-push a published tag. Use `MariaDB AI Plugins <version>` next time.
+- Tag notes: floor 26.10.2 → 26.10.3 (vs. v26.10.4), the SQL language server, native-Windows
+  launchers, the MSM `SOURCE` slice change, LICENSE, provenance-only re-vendor.
+- The fork sync's `git fetch fork origin` (two remotes without `--multiple`) failed; the chain
+  still pushed `main` = `origin/main` to `fork` as a fast-forward, the intended result.
 
 - The first bare `/release` (#67): version **26.10.5** suggested (tags `v26.10.0`–`v26.10.4`),
   floor **26.10.3** kept — already on `main` since #66 and the newest shell (`v26.10.3`,

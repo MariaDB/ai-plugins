@@ -2,7 +2,7 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
-- **Release 26.10.5 — IN PROGRESS** on `wip/26.10.5` (PR about to open): plugin version 26.10.5, floor 26.10.3 (moved since v26.10.4 by #66, no script run), provenance-only re-vendor, CHANGELOGs shipping #66's LSP and #61's MSM slice change. First cut with the bare `/release` of #67. See [release history](release-history.md).
+- **Release 26.10.5 — SHIPPED** (PR #68, squash `6e63c80`; tag `v26.10.5` = object `af5dc47`, prerelease on both repos; fork fast-forwarded to `6e63c80`): plugin version 26.10.5, floor 26.10.3 (moved since v26.10.4 by #66, no script run), provenance-only re-vendor, CHANGELOGs shipping #66's LSP and #61's MSM slice change. First cut with the bare `/release` of #67. See [release history](release-history.md).
 - **`/release` suggests versions — merged as PR #67** (`4d90709`).
 - **SQL language server — merged as PR #66 (`f54afd5`).** Floor → **26.10.3** (the first shell with `mariadb-lsp`); `mariadb-lsp-launcher.{sh,cmd}` (never installs, waits for the MCP launcher's download) in claude/opencode/hermes dev+sql; Claude `.lsp.json`, OpenCode `lsp` block, Hermes README snippet; static tests + two clean-install e2e tests (**Claude 4 passed, Hermes 3 passed**); the MCP launcher's first-install timeout hint; docs (docs-ref Features page + install pages + Architecture + Configuration Reference, DevHub how-it-works) and CHANGELOGs; `docs/.markdownlint.jsonc` (0 findings; all 17 DevHub pages render identically). Codex and pi get nothing: no LSP support. See [architecture](architecture.md) and [gotchas](gotchas.md).
 - **docs-ref markdownlint + skill-page fixes — merged as PR #65** (`473389b`). See [release history](release-history.md) and [reference docs](docs-ref.md#markdownlint-since-65).
