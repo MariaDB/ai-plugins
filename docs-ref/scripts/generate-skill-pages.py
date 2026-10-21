@@ -115,7 +115,28 @@ def description(skill_dir):
     desc = (m[1] if m[1] is not None else m[2]).replace('\\"', '"').replace("\\\\", "\\")
     # The trailing "Use when …" sentence is addressed to the agent, not the reader.
     desc = re.split(r"\s+Use (?:when|this)\b", desc, maxsplit=1)[0].strip()
-    return desc.replace("|", "\\|")
+    return _markdown_safe(desc).replace("|", "\\|")
+
+
+# A word holding a placeholder such as <schema>, with any trailing ".", "," or
+# ")" left outside, since it belongs to the sentence.
+PLACEHOLDER_WORD = re.compile(r"\S*<[A-Za-z][\w-]*>\S*?(?=[.,)]*(?:\s|$))")
+
+
+def _markdown_safe(text):
+    """Make a SKILL.md description safe as Markdown prose.
+
+    Descriptions are written for agents, as plain text. Outside the code spans
+    they already have, a placeholder like `<schema>_next.sql` would be read as
+    an HTML tag and dropped by the renderer, so the word holding it is
+    code-quoted; and `*` (as in the optimizer hint `/*+ ... */`) is escaped so
+    it cannot open emphasis.
+    """
+    parts = re.split(r"(`[^`]*`)", text)
+    for i in range(0, len(parts), 2):  # even indexes are outside code spans
+        part = PLACEHOLDER_WORD.sub(lambda m: f"`{m[0]}`", parts[i])
+        parts[i] = re.sub(r"(?<!\\)\*", r"\\*", part)
+    return "".join(parts)
 
 
 def table(rows, with_plugins=True):
@@ -126,14 +147,27 @@ def table(rows, with_plugins=True):
     return head + body
 
 
+# Every synced page carries this warning, below the H1 (above it, Docusaurus no
+# longer takes the page title from the H1), and the MariaDB docs licence footer.
+SYNC_WARNING = """<!--
+  SYNCED: this page is maintained in mariadb-corporation/ai-plugins, under docs-ref/content/,
+  and copied one way into mariadb-docs (tools/community/mariadb-ai-plugins/).
+  Make every change in mariadb-corporation/ai-plugins. A change made in mariadb-docs or in the
+  GitBook editor is overwritten by the next sync.
+-->"""
+LICENSE_FOOTER = "<sub>_This page is licensed: GPLv2_</sub>"
+
+
 def page(title, desc, intro, body):
     return (
         "---\n"
         f"description: >-\n  {desc}\n"
         "---\n\n"
         f"# {title}\n\n"
+        f"{SYNC_WARNING}\n\n"
         f"{intro}\n\n"
-        f"{body}"
+        f"{body.rstrip()}\n\n"
+        f"{LICENSE_FOOTER}\n"
     )
 
 

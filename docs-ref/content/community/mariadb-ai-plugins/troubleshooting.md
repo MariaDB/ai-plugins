@@ -17,11 +17,11 @@ description: >-
 
 | Message or symptom | Cause | Fix |
 | --- | --- | --- |
-| *not a configured connection* | The URI isn't on the allow-list, or asks for more than was configured, such as a default schema or an option. | Add the connection with `mariadb-shell -- mcp setup`, or remove the extra part from the URI. |
+| _not a configured connection_ | The URI isn't on the allow-list, or asks for more than was configured, such as a default schema or an option. | Add the connection with `mariadb-shell -- mcp setup`, or remove the extra part from the URI. |
 | A tool call that never returns | A path isn't on the allowed-paths list, and the MCP server is waiting for a confirmation the agent can't give. | Add the directory with `mcp setup`. |
-| *There is no object registered under name 'mcp'* | MariaDB Shell can't find its plugins, usually because its configuration directory was moved or is unreadable. | Check `~/.mariadb-shell/plugins/`. |
+| _There is no object registered under name 'mcp'_ | MariaDB Shell can't find its plugins, usually because its configuration directory was moved or is unreadable. | Check `~/.mariadb-shell/plugins/`. |
 | No `migrator.*` tools | The migration tooling isn't installed, or the MCP server hasn't restarted since it was. | Run `mariadb-shell -- mcp setup --installMigrator`, then restart the MCP server. |
-| *No module named 'pywintypes'* on Windows | The Windows MariaDB Shell packages don't bundle pywin32. | Install `pywin32` into MariaDB Shell's bundled Python. |
+| _No module named 'pywintypes'_ on Windows | The Windows MariaDB Shell packages don't bundle pywin32. | Install `pywin32` into MariaDB Shell's bundled Python. |
 
 ## The Plugin Doesn't Load
 

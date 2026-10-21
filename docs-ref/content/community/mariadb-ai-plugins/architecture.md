@@ -26,7 +26,7 @@ _A plugin is installed from GitHub (1 and 2), and downloads the native tools pac
 
 ### Coding Agent
 
-The coding agent, which this documentation calls the *harness*, is the AI tool you work with: Claude Code, Codex, OpenCode, Pi, or Hermes Agent. Each coding agent has its own way of installing and loading extensions, so there is a separate MariaDB plugin for each of them.
+The coding agent, which this documentation calls the _harness_, is the AI tool you work with: Claude Code, Codex, OpenCode, Pi, or Hermes Agent. Each coding agent has its own way of installing and loading extensions, so there is a separate MariaDB plugin for each of them.
 
 You install the plugin with the commands of your coding agent (1). In Claude Code, for example, you add the MariaDB marketplace and install the plugin with these commands:
 

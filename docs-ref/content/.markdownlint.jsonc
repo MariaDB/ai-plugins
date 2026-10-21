@@ -1,0 +1,27 @@
+// markdownlint settings for the reference docs (GitBook source).
+//
+// These pages are copied into mariadb-docs and published with GitBook, so they
+// follow GitBook's own Markdown conventions, and a few rules are relaxed here
+// for this folder only. This file sits above community/mariadb-ai-plugins/,
+// the folder that is synced, so it is not copied to mariadb-docs.
+{
+  // Line length: GitBook writes one line per paragraph, as every page in
+  // mariadb-docs does, and table rows cannot be wrapped at all.
+  "MD013": false,
+  // Blank lines around code fences: GitBook writes a fence directly after
+  // {% tab %} and before {% endtab %}, and these pages keep its layout.
+  "MD031": false,
+  // Duplicate headings: the landing page repeats its H1 as the H2 of its first
+  // section, as the mariadb-docs landing pages do. Only sibling headings must
+  // differ.
+  "MD024": { "siblings_only": true },
+  // Inline HTML: the MariaDB docs team's licence footer on every page,
+  //   <sub>_This page is licensed: GPLv2_</sub>
+  // has to stay. Allow <sub> only, so any other HTML is still reported.
+  "MD033": { "allowed_elements": ["sub"] },
+  // Emphasis used as a heading: the footer is an emphasised paragraph of its
+  // own, and the rule has no option that tells it apart from a heading.
+  "MD036": false,
+  // Emphasis style: underscores, as in the footer and in GitBook's own output.
+  "MD049": { "style": "underscore" }
+}
