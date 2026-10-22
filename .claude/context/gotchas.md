@@ -99,3 +99,12 @@
 - **`@opencode/cli` (2.x) is NOT `opencode-ai` (1.x).** The VM had `@opencode/cli@2.1.2`, the rewrite: it accepts the `lsp` config block but has no LSP runtime yet (write/edit tools: "TODO … after LSP runtime exists"), no `debug lsp`, a different `models` CLI, credentials inside `opencode.db`. 1.19.3 refuses that db ("has no session table"): the VM's 2.x db is kept as `~\.local\share\opencode\opencode.db*.v2`; its `serve --service` process had to be killed first.
 - **A multi-line prompt through an npm `.cmd` wrapper (`opencode.cmd`) is cut at the first line break** — keep e2e prompts on Windows to one line.
 - **The Claude LSP e2e on a clean install needs the model to retry the `LSP` tool** while `mariadb-lsp` waits for the download (12 s seen); five retries sometimes ran out, the prompt now allows ten.
+
+## Videos (`videos/`)
+
+- **espeak-ng ignores a data path longer than 160 chars** and falls back to a compiled-in CI path (`/Users/runner/work/espeakng-loader/…` "Error processing file … phontab"); the env var and the parent dir don't help. Fix: the short `videos/.cache/esd` copy `setup.sh` makes.
+- **A moved venv** still runs via `bin/python`, but `bin/pip` keeps the old shebang — call `python -m pip`.
+- **Kokoro pauses at word boundaries**: two-word spellings ("Maria DB", "AI Plugins") get a 60–180 ms gap; a hyphen joins them into one phoneme word. Joining "AI-Plugins" moves the breath to before the word instead. A comma gives ~290 ms, a dash ~310 ms; the user found even 200 ms too long after "MariaDB".
+- **Page engine**: a child with `visibility:visible` shows through a hidden scene (hide scenes with `display:none`); `applyFx` overwrites `transform`, so a CSS `translateX(-50%)` centring on an animated element is lost (anchor with left/right).
+- **macOS `say`** only has robotic standard voices installed here; Premium voices (Ava/Evan) would have to be installed by the user.
+

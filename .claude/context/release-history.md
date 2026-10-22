@@ -12,8 +12,23 @@ ported from the vscode-extension's `/release`): no version → the next `YY.MM.x
 and the month's tags; no floor → the latest published shell when it is newer than the floor.
 Anything suggested is confirmed in one summary before anything changes.
 
-## Landed on `main` (through PR #68)
+## Landed on `main` (through PR #73)
 
+**#73** `10f3095` (2026-10-22): **`videos/`** — a generated SE enablement video (2:11, MariaDB plc
+style from `docs-ref/`), built from source: HTML animation captured in headless Chrome, local
+Kokoro TTS narration, synthesized score/SFX. Tracked: `videos/{setup.sh,requirements.txt,README.md}`
+and `videos/se-enablement/{PLAN.md,build.sh,src/}`; the toolchain cache, intermediates and the
+rendered mp4/srt (`videos/output/`) are gitignored. Not part of any plugin; no CHANGELOG line.
+See [current state](current-state.md) and `videos/se-enablement/PLAN.md`.
+**#72** `3d84ff5` (2026-10-22): DevHub offline page gets direct download links (source archives
+via a new `plugin_version` key in `docs/_config.yml`, shell packages + SHA256SUMS of the floor,
+sandbox server packages from a new `docs/_data/downloads.yml`); `set-plugin-version.sh` sets
+`plugin_version`; `/release` gains a step that updates the download links. The home page shows
+"Version <plugin_version> · MariaDB Shell <shell_floor> or newer" under the hero badges.
+**#71** `0be82e0` (2026-10-22): DevHub `/offline-install/` page for networks without GitHub
+access (shell by hand, plugin from the release archive as a local marketplace, sandbox packages).
+**#70** `6bc03e6` (2026-10-21): LICENSE names the extension "MariaDB Shell for VS Code"
+(vscode-extension#8); same change in every repo sharing the file.
 **#68** `6e63c80` (2026-10-21) was release 26.10.5 (below).
 **#67** `4d90709` (2026-10-21): `/release` suggests the next version and the latest shell floor
 (see the policy note above). The user remembered making this change here; it had only ever been
@@ -296,184 +311,4 @@ at **https://ai-plugins.mariadb.com/**.
   also say the plugin version no longer follows mariadb-shell's numbers and the floor stays at 26.9.5.
 - Static tier green: claude 682, codex 686, opencode 682, pi 691.
 
-## Release v26.9.5 (2026-09-30)
-
-- **Merged as `dec6f52` (#30), tagged `v26.9.5`** (annotated object `c2aa50f`),
-  pushed to both remotes as the same object, **prerelease on both repos**;
-  bodies sha256-identical to the annotation (trailing whitespace stripped).
-  mariadb-shell `v26.9.5` published 2026-09-29.
-- **Fork sync was a force push, not a merge**: the merge conflicted in three
-  `.claude/` files (fallout of the previous cherry-pick sync), so `fork/main`
-  was reset to `dec6f52` with `--force-with-lease` at the user's call. See
-  [repo conventions](repo-conventions.md).
-- Contents: shell floor (33 files), plugin version (17 files), a re-vendor that
-  **did ship content** — docs `878595f` → `3a0974f` (`mariadb-explain` sample
-  output fixed, dev + sql), shell `8adaada` → `938d473` (new contributor skill
-  `split-scripted-test`); counts 85 / 47 / 3. First release to carry the
-  Laravel skills (#28, `9eb9119`, dev 82 → 85) and the `.org`-only DevHub (#29).
-  CHANGELOG `[26.9.5]` in all ten plugins. Static tier green (691 per suite).
-
-## Release v26.9.4 (2026-09-24)
-
-- **Merged as `2bbdb2a` (#26), tagged `v26.9.4`** (annotated object `f0e1c3c`),
-  pushed to both remotes as the same object, **prerelease on both repos**;
-  bodies identical to the annotation bar GitHub's trailing newline. Fork synced
-  by merge as `22bd0be`, `docs/CNAME` still `.org`.
-- Contents: shell floor (33 files), plugin version (17 files), a
-  provenance-only re-vendor (docs `1a89bd3` → `bb6522c`, shell `291bf84` →
-  `8adaada`; counts 82 / 47 / 2), CHANGELOG `[26.9.4]` in all ten plugins.
-  Static tier green (667 per suite). mariadb-shell `v26.9.4` published
-  2026-09-23.
-- **Correction**: 26.9.3's shell-floor step touched 33 files, not the 31 its
-  commit message and the notes below say.
-
-## Release v26.9.3 (2026-09-22)
-
-- **Merged as `b6ed467` (#20), tagged `v26.9.3`** (annotated object `a38774d`),
-  pushed to **both** `origin` and `fork` as the same object, and published as a
-  **prerelease on both repos**. Release bodies checksum identical to the tag
-  annotation once GitHub's appended trailing newline is stripped.
-- Contents: both versions to 26.9.3 (`set-mariadb-shell-version.sh`, 31 files;
-  `set-plugin-version.sh`, 17 files), with mariadb-shell 26.9.3 already released
-  beforehand.
-- **The skills re-vendor was a no-op beyond provenance**: `mariadb-docs`
-  `0e7e033` → `1a89bd3` and the contributor source `1d859c7` → `291bf84`, but no
-  vendored skill content changed — only the ten `skills-source.json` files.
-  Counts held at 82 dev / 47 sql / 2 contributor. **Check `git status` after a
-  sync rather than assuming it shipped something.**
-- **CHANGELOG entries for 26.9.3 and, retroactively, 26.9.2**, so all ten
-  plugins now run continuously from 26.9.0. The 26.9.2 entry was reconstructed
-  from `d5e2bfc`, not invented.
-- Also carried the logo SVG re-export (Affinity Studio; `serif:` → `affinity:`),
-  which was found already modified in the working tree and kept as its own
-  commit.
-
-## Release v26.9.2 (2026-09-12, tagged retroactively 2026-09-22)
-
-- **Merged as `d5e2bfc` (#16) on 2026-09-12 but never tagged at the time.** The
-  annotated tag `v26.9.2` (tag object `a5c2928`) was created on 2026-09-22 and
-  pushed to **both** `origin` and `fork` as the same object, verified with
-  `git ls-remote --tags`. Tags are continuous again: v26.9.0 → v26.9.1 → v26.9.2.
-- **No GitHub release accompanies the tag** — unlike v26.9.1 and v26.9.0, which
-  were published as prereleases on both repos. See next steps.
-- **Its CHANGELOG entries were also added retroactively**, in the 26.9.3 release
-  (PR #20): all ten plugins had gone straight from 26.9.1 to 26.9.3. The entry
-  was reconstructed from the commit, not invented.
-- Contents: the `mariadb-migrator` split into an overview plus six topic skills
-  (dev 76 → 82 skills; sql unchanged at 47), a skills re-vendor to `0e7e033`,
-  and both versions moved to 26.9.2. The DevHub also went live in this window,
-  but that is `docs/` only and ships inside no plugin.
-
-## Release v26.9.1 (2026-09-08)
-
-- **Annotated tag `v26.9.1`** (tag object `2056cfa` → commit `4003d0d`), pushed to
-  **both** `origin` and `fork` — the *same* object on each, verified with
-  `git ls-remote --tags`, not two separately created tags.
-- **Prerelease on both repos from the start**, unlike v26.9.0 which was published
-  stable by mistake and edited afterwards: `gh release create v26.9.1 --repo <r>
-  --title v26.9.1 --notes-file … --prerelease --verify-tag`. Notes are the tag
-  annotation's body, extracted with `git tag -l --format='%(contents:body)'`
-  because `gh` refuses `--notes-from-tag` together with `--repo`; both bodies
-  checksummed identical afterwards.
-- `releases/latest` still **404s** on both repos — every release is a prerelease
-  and the endpoint excludes those. Nothing consumes it.
-- Contents: the `mariadb-migrator` skill, the docs re-vendor, the plugin package
-  bump to 26.9.1 (PR #11), and — merged earlier, direct to `main` — the
-  `MARIADB_SHELL_VERSION` floor bump to 26.9.1 (`a693a28`).
-
-## Release v26.9.0 (2026-09-02) — the repo's first tag and first release
-
-- **Annotated tag `v26.9.0`** (tag object `5e360ac` → commit `80a4a6a`), pushed to
-  **both** `origin` and `fork`; the same tag object, not two separately created
-  ones. There were **no tags at all before this**, so 26.7.0 and 26.8.0 cannot be
-  reached by tag name, and `v`-prefixed is now the convention (user's choice,
-  matching `mariadb-shell`'s own `v26.9.0`/`v26.8.1` while the version *inside*
-  this repo — manifests, CHANGELOG headings — stays bare `26.9.0`).
-- **GitHub Releases published on both repos**, titled `v26.9.0`, notes taken from
-  the tag annotation. Published **without** the prerelease flag by mistake and
-  **flagged prerelease afterwards (2026-09-03)** with `gh release edit v26.9.0
-  --repo <org>/ai-plugins --prerelease --verify-tag` — the flag *is* editable
-  after publishing (only an **immutable** release is frozen; `gh release view
-  --json isImmutable` says which, and both were `false`). Tag, title and the
-  322-byte notes were untouched by the edit.
-- **Consequence of that flag**, the same one `mariadb-shell` has:
-  `repos/<org>/ai-plugins/releases/latest` **404s again** on both repos (verified
-  after the edit) because the endpoint excludes prereleases — it had briefly
-  resolved in the window when the release was stable. Nothing consumes it yet.
-
-`main` history, newest first (PR merges are squashes, so branch SHAs do not
-survive — check containment by **tree**, not by ancestry; `git rev-list ^main`
-will report a merged branch's commits as missing):
-
-- `4003d0d` — **`mariadb-migrator` skill + release 26.9.1** (PR #11), tagged
-  `v26.9.1`. The skill covers MySQL→MariaDB migration with the `migrator.*` MCP
-  tools; it lives in a new `additional-skills/migrator/` subfolder, so
-  `sync-skills.sh`'s `ADDITIONAL_SUBDIRS` gained `"migrator"` — without that the
-  file would never be vendored. Dev plugins 75 → **76** skills, sql unchanged at
-  47. Also in it: skills re-vendored (docs `71f3ac5` — r2dbc 1.4.1 → 1.4.2;
-  shell `33b4e3e` — nothing under `.claude/skills/` moved), the package version
-  → 26.9.1 in 17 files, the `[26.9.1]` changelog cut in all 10 plugins, a new
-  repo-root **`CONTRIBUTING.md`** holding the maintainer material that used to be
-  the README's second `#` heading, and README fixes (every harness now points at
-  the MCP-server config step; what `mcp setup` configures; sandboxes need a local
-  MariaDB Server install).
-- `a693a28` *(2026-09-08)* — **mariadb-shell floor → 26.9.1** via
-  `scripts/set-mariadb-shell-version.sh 26.9.1`: 32 of its 35 candidate files
-  changed — the 3 that did not are the **contributor plugins' READMEs**
-  (`{claude,codex,opencode}/contributor-plugin/README.md`), which carry no version
-  site because those variants are skills-only with no MCP server. Note also that
-  `pi/dev-plugin/README.md` has only the JSON `env` site, not the prose
-  `(default …)` one, so it moves by 1 line where the others move by 2.
-  Pushed direct to `main`, no PR, **no CHANGELOG entry
-  and no plugin-version bump** — the plugin package stays 26.9.0. `v26.9.1` was
-  confirmed published (prerelease, 2026-09-07) *before* raising the floor, so the
-  gate does not sit above the newest release. All 606 `test_structure.py` guards
-  pass after the bump.
-- `5bb6282` — PROJECT_CONTEXT only: `v26.9.0` flagged prerelease on both repos.
-- `cf9601e` — PROJECT_CONTEXT only: the v26.9.0 release and the branch cleanup.
-- `6e42fab` — **README restructured** (PR #7, fork PR 2 by @robertsilen): a
-  `# Development and maintenance` rule splits maintainer material from user
-  material, `## Configure the MCP server` promoted to H2, new `## What you can ask
-  for`. Plus the Windows sandbox path (`%USERPROFILE%\MariaDB\mariadb-shell\sandboxes`,
-  which is NOT the config home under `%APPDATA%`) and casing/formatting fixes.
-- `3d8f8ea` — **Codex install commands corrected** (PR #9, fork PR 1 by @lefred):
-  `/plugin` does not exist in Codex (the enum variant is `Plugins`), and `/plugins`
-  takes no arguments (it browses interactively) while `/reload-plugins` does not
-  exist at all — so all four Codex-facing READMEs now document the CLI
-  (`codex plugin marketplace add …` / `codex plugin add …`), verified end to end.
-  Claude Code keeps `/plugin`, which is correct there.
-- `80a4a6a` — mariadb-shell floor → 26.9.0, changelogs cut as `[26.9.0]` (PR #10);
-  tagged `v26.9.0`.
-- `ac55729` — `db.connect` + `sandbox.deploy` connection coverage (PR #8).
-- `014d574` — `sync-skills.sh` stops requiring a token: `mariadb-shell` is public,
-  so the contributor plugins no longer drop out of an unauthenticated sync.
-- `e6db430` — skills re-vendored (docs `ace4f63`, shell `2b2d0aa`); contributor
-  plugins 1 → 2 skills (`review-shell-change`), their first sync in a while.
-- `c5a3a8c` — **Codex registers its own MCP server** (PR #6): relative
-  extensionless `command` + `"cwd": "."`, the `mariadb-mcp-launcher` shim, 4 static
-  guards, and the 26.8.1 / 26.9.0 version bumps.
-- `1615136` — pi test suite + `pi-test.yml` (PR #4).
-- `5905134` — deleted the unread `.codex-plugin/marketplace.json`.
-- `e89fac9` — Codex 0.147 fixes + codex e2e tier (PR #3).
-- `86b6b7d` — plugin version 26.8.0, skills re-synced, `test_additional_skill_matches_its_source`.
-- `fb08a4a` — LICENSE: dropped the Paramiko section (user's own commit).
-- `1c4d422` — GPL-2.0 header on all source files + `SECURITY.md`.
-- `b00fbc3` — install-facing org → `mariadb`.
-- `735f74a` — launcher rewrite: delegate installing to the shell's
-  `install.sh`/`install.ps1`; version gate as a *minimum*; `.gitattributes`.
-- Below that, `7a52cc3` squashes the whole original `wip/AIPL-4` line (REST and MSM
-  skills, the pi harness, `run_tests.py`, the db-tier sandbox); its 16 subjects are
-  listed in that commit's own message.
-
-Versions are two independent things, set by two scripts: plugin package
-(`set-plugin-version.sh`, 17 files) and mariadb-shell floor
-(`set-mariadb-shell-version.sh`, 35 candidate files, 32 of which actually carry a
-version site — the 3 contributor-plugin READMEs have none, being skills-only).
-Both are **26.9.1** as of the 26.9.1 release, but they got there **separately**:
-the floor moved first, direct to `main` on 2026-09-08 (`a693a28`), and the
-package version followed in PR #11 (`4003d0d`). They also coincided at 26.8.0 and at 26.9.0 (PR #10), and
-were 26.9.0 vs 26.8.1 before that — coinciding is always a coincidence of
-release timing, never a rule, so do not infer either from the other. Both
-scripts take `--help` and refuse a non-version argument — before that,
-`set-mariadb-shell-version.sh --help` wrote the literal string `--help` into all
-35 files.
+The 26.9.x release notes (v26.9.0 → v26.9.5) are in [release-history-26.9.md](release-history-26.9.md).
