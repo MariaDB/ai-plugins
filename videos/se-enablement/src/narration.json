@@ -1,0 +1,42 @@
+[
+ {
+  "id": "open",
+  "text": "Your customers aren't just writing code anymore. They're directing AI agents that write it for them. Claude Code. Codex. OpenCode. Pi. Hermes."
+ },
+ {
+  "id": "problem",
+  "text": "But out of the box, an agent doesn't really know Maria-DB. It writes My S Q L syntax. It guesses at indexes instead of reading the plan. It asks for the database password, right in the chat. And it tests its changes on production."
+ },
+ {
+  "id": "reveal",
+  "text": "That's the gap the Maria-DB AI-Plugins close. One install gives the agent three things. Eighty-five skills of real Maria-DB expertise. A native M C P server, with forty-three tools for live database work. And Maria-DB Shell, which installs itself on first run."
+ },
+ {
+  "id": "install",
+  "text": "Installing takes two commands. Add the marketplace, then install the dev plugin. Run M C P setup once, to choose which databases and folders the agent may touch. Passwords go into the shell's secret store. The agent never sees one."
+ },
+ {
+  "id": "notes",
+  "text": "Now watch it work. Ask for a notes app schema. The agent writes it the Maria-DB way, spins up a throwaway sandbox on port thirty-three ten, with no Docker and no admin rights, runs the script, and reads the tables back off the server."
+ },
+ {
+  "id": "slow",
+  "text": "A query takes four seconds? The agent runs EXPLAIN, spots the full table scan, and proves its index on a sandbox, before it ever reaches production."
+ },
+ {
+  "id": "migrate",
+  "text": "Moving off My S Q L? It plans the migration, runs it, and verifies every table, view, and trigger on the target. And with Schema Management, version one point one ships as an in-place upgrade."
+ },
+ {
+  "id": "guard",
+  "text": "And if the agent reaches for a command-line client, the guard blocks it, and points it back to the secure M C P tools."
+ },
+ {
+  "id": "pitch",
+  "text": "Three things to take into your next call. It works with the agents your customers already use. It keeps credentials out of the model's reach. And it lets agents test on throwaway servers, not on production."
+ },
+ {
+  "id": "close",
+  "text": "So when a customer tells you, our developers live in AI agents now, you have the answer. Maria-DB, built right in. Get started at Maria-DB dot com slash docs."
+ }
+]

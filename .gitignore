@@ -33,3 +33,13 @@ docs/vendor/
 docs-ref/build/
 docs-ref/.docusaurus/
 !docs-ref/package-lock.json
+
+# Videos (videos/README.md): the sources are tracked; the shared toolchain, each
+# video's intermediates and narration, and the rendered output are generated.
+videos/.cache/
+videos/*/.work/
+videos/*/src/timeline.js
+videos/*/src/timeline.json
+videos/*/src/vo.wav
+videos/output/*
+!videos/output/.gitkeep

@@ -1,0 +1,814 @@
+<!doctype html>
+<!--
+  Copyright (c) 2026, MariaDB plc.
+  Licensed under the GNU General Public License, version 2.0 — see LICENSE at the repo root.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MariaDB AI Plugins — SE Enablement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+:root{
+  --bg0:#000406; --bg1:#03141a; --bg2:#0f1b1e; --bg3:#162125;
+  --teal:#003545; --blue:#0E6488; --sea:#3782A8;
+  --mint:#96DDCF; --mint2:#599F93; --mint3:#ADC7C1;
+  --ink:#FEFFFF; --muted:#B1B7B9; --faint:#78888A;
+  --warn:#F4E6AB; --danger:#FB7878; --line:rgba(150,221,207,.16);
+  --sans:'Lato',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg0)}
+body{font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:radial-gradient(1400px 900px at 70% 20%,#06303b 0%,#021015 55%,#000406 100%)}
+#bg{position:absolute;inset:0}
+#seal{position:absolute;right:-260px;bottom:-200px;width:1240px;height:900px;background:url(logo.png) no-repeat left center/auto 100%;opacity:.035;filter:blur(.5px)}
+.scene{position:absolute;inset:0;display:none}
+[data-in]{will-change:transform,opacity}
+
+/* chrome */
+#chrome .chap{position:absolute;left:96px;top:56px;font:600 18px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--mint);display:flex;gap:14px;align-items:center}
+#chrome .chap b{color:var(--faint);font-weight:500}
+#chrome .chap i{display:block;width:34px;height:2px;background:var(--mint)}
+#chrome .brand{position:absolute;right:96px;top:44px;height:40px;opacity:.9}
+#chrome .tag{position:absolute;right:96px;top:94px;font:500 13px/1 var(--mono);letter-spacing:.2em;color:var(--faint);text-transform:uppercase}
+#prog{position:absolute;left:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--mint));box-shadow:0 0 18px var(--mint)}
+#cap{position:absolute;left:50%;bottom:40px;transform:translateX(-50%);white-space:nowrap;padding:12px 28px;border-radius:14px;background:rgba(0,4,6,.62);border:1px solid rgba(255,255,255,.06);font:400 30px/1.35 var(--sans);color:#eef6f4;text-align:center;letter-spacing:.005em}
+#flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(150,221,207,.55),transparent 60%);opacity:0;pointer-events:none;mix-blend-mode:screen}
+
+/* type */
+.h1{font:900 92px/1.04 var(--sans);letter-spacing:-.02em}
+.h2{font:900 64px/1.08 var(--sans);letter-spacing:-.015em}
+.h3{font:700 40px/1.15 var(--sans)}
+.kick{font:600 18px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--mint)}
+.grad{background:linear-gradient(100deg,#96DDCF 10%,#7cc3e6 60%,#3782A8 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.dim{color:var(--muted)}
+em{font-style:normal;color:var(--mint)}
+.w{display:inline-block;white-space:pre}
+
+/* panels */
+.panel{position:absolute;background:linear-gradient(180deg,rgba(22,33,37,.92),rgba(10,20,24,.92));border:1px solid var(--line);border-radius:20px;box-shadow:0 40px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.05)}
+.win-bar{height:46px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid rgba(255,255,255,.06);font:500 15px/1 var(--mono);color:var(--faint)}
+.win-bar i{width:12px;height:12px;border-radius:50%;background:#2b3a3f;display:block}
+.win-bar i:nth-child(1){background:#e2665f}.win-bar i:nth-child(2){background:#e7b549}.win-bar i:nth-child(3){background:#5bc26b}
+.win-bar span{margin-left:12px}
+.code{font:400 24px/1.55 var(--mono);color:#dfe9e7;white-space:pre;padding:22px 28px}
+.k{color:var(--mint)} .s{color:var(--warn)} .n{color:#F4B79C} .c{color:var(--faint)} .f{color:#8EC5E8} .p{color:var(--mint);font-weight:600} .r{color:var(--danger)} .ok{color:#8fe3a3}
+[data-caret].typing::after,[data-caret].idle::after{content:'';display:inline-block;width:.55em;height:1.05em;vertical-align:-.15em;background:var(--mint);margin-left:2px}
+[data-caret].idle.blink::after{opacity:0}
+.chip{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:rgba(150,221,207,.08);font:500 20px/1 var(--mono);color:var(--mint)}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font:600 16px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.badge.ok{background:rgba(143,227,163,.12);color:#8fe3a3;border:1px solid rgba(143,227,163,.35)}
+.badge.bad{background:rgba(251,120,120,.12);color:var(--danger);border:1px solid rgba(251,120,120,.4)}
+.badge.info{background:rgba(142,197,232,.1);color:#8EC5E8;border:1px solid rgba(142,197,232,.35)}
+.check{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(143,227,163,.15);color:#8fe3a3;font:700 18px/1 var(--sans)}
+
+/* ---------- open ---------- */
+#s-open .lines{position:absolute;left:0;right:0;top:300px;text-align:center}
+#s-open .l2{margin-top:26px;font:300 64px/1.1 var(--sans);color:var(--muted)}
+#s-open .agents{position:absolute;left:0;right:0;top:600px;display:flex;justify-content:center;gap:26px}
+.agent{position:relative;width:300px;height:190px}
+.agent .panel{inset:0}
+.agent .nm{position:absolute;left:22px;top:62px;font:900 32px/1 var(--sans)}
+.agent .pr{position:absolute;left:22px;top:112px;font:400 17px/1.5 var(--mono);color:var(--muted);white-space:pre}
+.agent .pr b{color:var(--mint);font-weight:500}
+
+/* ---------- problem ---------- */
+#s-problem .title{position:absolute;left:96px;top:150px}
+#s-problem .grid{position:absolute;left:96px;right:96px;top:330px;display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.pcard{position:relative;height:270px}
+.pcard .panel{inset:0;border-color:rgba(251,120,120,.25)}
+.pcard .lab{position:absolute;left:30px;top:26px;display:flex;align-items:center;gap:14px;font:700 28px/1 var(--sans)}
+.pcard .x{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:rgba(251,120,120,.15);color:var(--danger);font:900 22px/1 var(--sans)}
+.pcard .code{position:absolute;left:4px;top:72px;font-size:23px}
+.pcard .note{position:absolute;right:28px;bottom:24px}
+
+/* ---------- reveal ---------- */
+#s-reveal .hero{position:absolute;left:0;right:0;top:330px;text-align:center}
+#s-reveal .hero img{height:150px}
+#s-reveal .hero .ttl{font:900 150px/1 var(--sans);letter-spacing:-.03em;margin-top:18px}
+#s-reveal .hero .sub{font:400 30px/1 var(--mono);color:var(--muted);margin-top:22px;letter-spacing:.06em}
+#s-reveal .sweep{position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);mix-blend-mode:overlay}
+#s-reveal .cols{position:absolute;left:96px;right:96px;top:395px;display:grid;grid-template-columns:repeat(3,1fr);gap:34px}
+.pill{position:relative;height:500px}
+.pill .panel{inset:0}
+.pill .num{position:absolute;left:36px;top:34px;font:900 120px/1 var(--sans)}
+.pill .unit{position:absolute;left:36px;top:168px;font:700 34px/1 var(--sans)}
+.pill .desc{position:absolute;left:36px;right:36px;top:218px;font:400 22px/1.45 var(--sans);color:var(--muted)}
+.marq{position:absolute;left:36px;right:36px;top:300px;bottom:28px;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent,#000 22%,#000 78%,transparent)}
+.marq .in{font:400 19px/1.75 var(--mono);color:var(--mint3)}
+.groups{position:absolute;left:36px;right:36px;top:300px}
+.grp{display:flex;align-items:center;gap:16px;margin-bottom:16px;font:500 19px/1 var(--mono)}
+.grp .nm{width:110px;color:var(--mint)}
+.grp .bar{height:16px;border-radius:8px;background:linear-gradient(90deg,var(--blue),var(--mint));transform-origin:left}
+.grp .ct{color:var(--muted)}
+.shellbox{position:absolute;left:36px;right:36px;top:300px;font:400 19px/1.8 var(--mono);color:var(--muted)}
+.dl{height:10px;border-radius:5px;background:rgba(255,255,255,.08);margin:10px 0 14px;overflow:hidden}
+.dl i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--mint));transform-origin:left}
+
+/* ---------- install ---------- */
+#s-install .title{position:absolute;left:96px;top:150px}
+#s-install .term{left:96px;top:300px;width:1060px;height:420px}
+#s-install .every{position:absolute;left:1200px;top:300px;width:624px}
+#s-install .every .kick{margin-bottom:22px}
+.hcmd{margin-bottom:20px;padding:16px 20px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.hcmd b{display:block;font:700 22px/1 var(--sans);margin-bottom:10px}
+.hcmd code{font:400 16.5px/1.5 var(--mono);color:var(--mint3);white-space:pre}
+#s-install .setup{left:96px;top:300px;width:1060px;height:500px}
+#s-install .vault{position:absolute;left:1220px;top:300px;width:600px;height:250px}
+#s-install .agentv{position:absolute;left:1220px;top:580px;width:600px;height:220px}
+.vbox .panel{inset:0}
+.vbox .ic{position:absolute;left:30px;top:30px;width:70px;height:70px;border-radius:18px;display:grid;place-items:center;background:rgba(150,221,207,.12)}
+.vbox .t1{position:absolute;left:124px;top:34px;font:700 30px/1 var(--sans)}
+.vbox .t2{position:absolute;left:124px;top:76px;font:400 20px/1.4 var(--sans);color:var(--muted);right:30px}
+.vbox .t3{position:absolute;left:30px;right:30px;bottom:28px;font:400 19px/1.5 var(--mono);color:var(--mint3)}
+.dot{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--warn);box-shadow:0 0 16px var(--warn)}
+
+/* ---------- notes ---------- */
+.scen-tag{position:absolute;left:96px;top:150px;display:flex;gap:16px;align-items:center}
+.scen-title{position:absolute;left:96px;top:196px}
+#s-notes .chat{left:96px;top:300px;width:1000px;height:640px}
+.ubub{margin:22px 26px 0;padding:18px 22px;border-radius:16px;background:rgba(55,130,168,.18);border:1px solid rgba(55,130,168,.4);font:400 23px/1.45 var(--sans);color:#e8f2f6}
+.ubub small{display:block;font:700 14px/1 var(--mono);letter-spacing:.14em;color:#8EC5E8;margin-bottom:10px}
+.skills{display:flex;gap:12px;margin:18px 26px 0}
+.skills .chip{font-size:16px;padding:8px 14px}
+.call{display:flex;align-items:center;gap:14px;margin:12px 26px 0;font:400 19px/1.3 var(--mono);color:var(--muted)}
+.call .tl{color:var(--mint);font-weight:600}
+.call .res{margin-left:auto;color:#8fe3a3}
+.file{margin:16px 26px 0;border-radius:12px;background:rgba(0,4,6,.55);border:1px solid rgba(255,255,255,.06)}
+.file .fn{font:500 15px/1 var(--mono);color:var(--faint);padding:12px 16px 0}
+.file .code{font-size:16.5px;line-height:1.5;padding:8px 16px 12px}
+#s-notes .host{position:absolute;left:1150px;top:300px;width:674px;height:640px}
+.server{position:absolute;left:187px;top:60px;width:300px}
+.cyl{position:relative;width:300px;height:250px}
+.cyl .body{position:absolute;left:0;right:0;top:36px;bottom:36px;background:linear-gradient(90deg,#0b4a5f,#1b7896 45%,#0b4a5f);}
+.cyl .top{position:absolute;left:0;right:0;top:0;height:72px;border-radius:50%;background:radial-gradient(ellipse at 50% 40%,#5fc0c9,#1b7896 70%);border:2px solid rgba(150,221,207,.6)}
+.cyl .bot{position:absolute;left:0;right:0;bottom:0;height:72px;border-radius:50%;background:#0b4a5f}
+.cyl .ring{position:absolute;left:0;right:0;height:72px;border-radius:50%;border-bottom:2px solid rgba(150,221,207,.35)}
+.cyl .lbl{position:absolute;left:0;right:0;top:110px;text-align:center;font:900 30px/1 var(--sans)}
+.cyl .lbl small{display:block;font:500 18px/1 var(--mono);color:var(--mint);margin-top:10px}
+.glow{position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;background:radial-gradient(circle,rgba(150,221,207,.25),transparent 65%)}
+.hbad{position:absolute;display:flex;gap:12px}
+.tbl{position:absolute;width:250px;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:rgba(22,33,37,.95);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.tbl h4{font:700 20px/1 var(--mono);padding:12px 16px;background:rgba(150,221,207,.14);color:var(--mint)}
+.tbl p{font:400 16px/1.7 var(--mono);padding:8px 16px;color:var(--muted)}
+.tbl p b{color:var(--warn);font-weight:500}
+.fk{position:absolute;height:3px;background:linear-gradient(90deg,var(--mint),var(--sea));transform-origin:left}
+.flow{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 14px var(--mint)}
+
+/* ---------- slow ---------- */
+#s-slow .q{left:96px;top:300px;width:880px;height:330px}
+#s-slow .q .code{font-size:19px;line-height:1.5}
+.watch{position:absolute;left:96px;top:660px;width:880px;display:flex;align-items:center;gap:26px}
+.watch .big{font:900 120px/1 var(--sans);color:var(--danger);font-variant-numeric:tabular-nums}
+.watch .lab{font:400 24px/1.4 var(--sans);color:var(--muted)}
+#s-slow .plan{left:1016px;top:300px;width:808px;height:290px}
+.ptab{width:100%;border-collapse:collapse;font:400 18px/1 var(--mono)}
+.ptab th{color:var(--faint);font-weight:500;text-align:left;padding:14px 14px 10px}
+.ptab td{padding:12px 14px;border-top:1px solid rgba(255,255,255,.06);color:#dfe9e7}
+.ptab td.r{color:var(--danger);font-weight:600}
+.ptab .hot{background:rgba(251,120,120,.12)}
+.ptab .cool{background:rgba(143,227,163,.10)}
+#s-slow .fix{left:1016px;top:620px;width:808px;height:290px}
+.rowsbar{position:relative;margin:0 26px 10px;height:30px;border-radius:8px;background:rgba(255,255,255,.04);overflow:hidden}
+.rowsbar i{position:absolute;left:0;top:0;bottom:0;transform-origin:left;border-radius:8px}
+.rowslab{display:flex;justify-content:space-between;margin:14px 26px 8px;font:500 16px/1 var(--mono);color:var(--muted)}
+.anno{position:absolute;font:700 20px/1 var(--mono);color:var(--danger);display:flex;align-items:center;gap:10px}
+
+/* ---------- migrate ---------- */
+#s-migrate .src{position:absolute;left:150px;top:330px}
+#s-migrate .dst{position:absolute;left:690px;top:330px}
+#s-migrate .cyl.my .body{background:linear-gradient(90deg,#3c3f47,#6b7080 45%,#3c3f47)}
+#s-migrate .cyl.my .top{background:radial-gradient(ellipse at 50% 40%,#a6abb8,#6b7080 70%);border-color:rgba(255,255,255,.35)}
+#s-migrate .cyl.my .bot{background:#3c3f47}
+#s-migrate .steps{position:absolute;left:150px;top:640px;width:840px}
+.step{display:flex;align-items:center;gap:16px;margin-bottom:14px;font:400 22px/1 var(--mono);color:var(--muted)}
+.step .tl{color:var(--mint);font-weight:600;width:250px}
+.mbar{flex:1;height:12px;border-radius:6px;background:rgba(255,255,255,.06);overflow:hidden}
+.mbar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--mint));transform-origin:left}
+#s-migrate .verify{left:1080px;top:300px;width:744px;height:380px}
+.vt{width:100%;border-collapse:collapse;font:400 20px/1 var(--mono)}
+.vt th{text-align:left;color:var(--faint);font-weight:500;padding:14px 22px 10px}
+.vt td{padding:11px 22px;border-top:1px solid rgba(255,255,255,.06)}
+.vt td:nth-child(2),.vt td:nth-child(3){text-align:right;font-variant-numeric:tabular-nums}
+.vt th:nth-child(2),.vt th:nth-child(3){text-align:right}
+#s-migrate .msm{left:1080px;top:710px;width:744px;height:230px}
+.vline{position:absolute;left:70px;right:70px;top:110px;height:4px;background:rgba(255,255,255,.08);border-radius:2px}
+.vline i{position:absolute;left:0;top:0;bottom:0;right:0;background:linear-gradient(90deg,var(--mint),var(--sea));transform-origin:left}
+.vnode{position:absolute;top:84px;width:56px;height:56px;margin-left:-28px;border-radius:50%;background:var(--bg2);border:3px solid var(--mint);display:grid;place-items:center;font:700 14px/1 var(--mono);color:var(--mint)}
+.vlab{position:absolute;top:156px;transform:translateX(-50%);font:900 30px/1 var(--sans);white-space:nowrap}
+.vlab--right{left:auto;right:42px;text-align:right}
+.vlab.vlab--right small{text-align:right}
+.vlab small{display:block;text-align:center;font:400 15px/1.4 var(--mono);color:var(--muted);margin-top:8px}
+
+/* ---------- guard ---------- */
+#s-guard .term{left:96px;top:300px;width:1728px;height:200px}
+#s-guard .msg{left:96px;top:540px;width:1100px;height:330px;border-color:rgba(251,120,120,.35)}
+#s-guard .msg .code{font-size:19.5px;white-space:pre-wrap;line-height:1.55;color:#e9dede}
+#s-guard .fixed{left:1240px;top:540px;width:584px;height:330px}
+.stamp{position:absolute;left:1180px;top:262px;padding:14px 34px;border:6px solid var(--danger);border-radius:16px;font:900 64px/1 var(--sans);letter-spacing:.08em;color:var(--danger);background:rgba(40,8,8,.75);box-shadow:0 0 60px rgba(251,120,120,.4)}
+
+/* ---------- pitch ---------- */
+#s-pitch .title{position:absolute;left:96px;top:160px}
+#s-pitch .cards{position:absolute;left:96px;right:96px;top:360px;display:grid;grid-template-columns:repeat(3,1fr);gap:34px}
+.tp{position:relative;height:520px}
+.tp .panel{inset:0}
+.tp .no{position:absolute;left:40px;top:34px;font:900 140px/1 var(--sans);color:transparent;-webkit-text-stroke:2px rgba(150,221,207,.55)}
+.tp h3{position:absolute;left:40px;right:40px;top:200px;font:900 44px/1.1 var(--sans)}
+.tp p{position:absolute;left:40px;right:40px;top:322px;font:400 23px/1.5 var(--sans);color:var(--muted)}
+.tp .chips{position:absolute;left:40px;right:40px;bottom:36px;display:flex;flex-wrap:wrap;gap:10px}
+.tp .chips .chip{font-size:15px;padding:7px 12px}
+
+/* ---------- close ---------- */
+#s-close .quote{position:absolute;left:0;right:0;top:270px;text-align:center;font:italic 400 76px/1.15 var(--sans);color:#e8f2f0}
+#s-close .ans{position:absolute;left:0;right:0;top:420px;text-align:center;font:900 54px/1 var(--sans)}
+#s-close .end{position:absolute;left:0;right:0;top:250px;text-align:center}
+#s-close .end img{height:170px}
+#s-close .end .bi{font:900 110px/1 var(--sans);letter-spacing:-.02em;margin-top:24px}
+#s-close .url{position:absolute;left:0;right:0;top:680px;text-align:center}
+#s-close .url .u{display:inline-block;padding:20px 40px;border-radius:18px;border:2px solid var(--mint);font:600 30px/1 var(--mono);color:var(--mint);background:rgba(150,221,207,.07);box-shadow:0 0 50px rgba(150,221,207,.2)}
+#s-close .url .cmds{margin-top:30px;display:flex;justify-content:center;gap:16px}
+#s-close .url .cmds .chip{font-size:18px}
+#s-close .foot{position:absolute;left:0;right:0;top:960px;text-align:center;font:500 16px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+</style>
+</head>
+<body>
+<div id="stage">
+<canvas id="bg" width="1920" height="1080"></canvas>
+<div id="seal"></div>
+
+<!-- 01 OPEN -->
+<section class="scene" id="s-open" data-scene="open" data-chap="01|The shift">
+  <div class="lines" id="openLines">
+    <div class="h1" data-words="open@0">Your customers aren't just writing code anymore.</div>
+    <div class="l2" data-words="open@1">They're directing <em>AI agents</em> that write it for them.</div>
+  </div>
+  <div class="agents">
+    <div class="agent" data-in="open:claude-0.15" data-fx="pop"><div class="panel"><div class="win-bar"><i></i><i></i><i></i></div></div><div class="nm">Claude Code</div><div class="pr"><b>›</b> add a notes table…</div></div>
+    <div class="agent" data-in="open:codex-0.1" data-fx="pop"><div class="panel"><div class="win-bar"><i></i><i></i><i></i></div></div><div class="nm">Codex</div><div class="pr"><b>›</b> why is this slow?</div></div>
+    <div class="agent" data-in="open:opencode-0.1" data-fx="pop"><div class="panel"><div class="win-bar"><i></i><i></i><i></i></div></div><div class="nm">OpenCode</div><div class="pr"><b>›</b> migrate off MySQL</div></div>
+    <div class="agent" data-in="open:pi-0.1" data-fx="pop"><div class="panel"><div class="win-bar"><i></i><i></i><i></i></div></div><div class="nm">Pi</div><div class="pr"><b>›</b> ship schema v1.1</div></div>
+    <div class="agent" data-in="open:hermes-0.1" data-fx="pop"><div class="panel"><div class="win-bar"><i></i><i></i><i></i></div></div><div class="nm">Hermes Agent</div><div class="pr"><b>›</b> build a REST API</div></div>
+  </div>
+</section>
+
+<!-- 02 PROBLEM -->
+<section class="scene" id="s-problem" data-scene="problem" data-chap="02|The problem">
+  <div class="title">
+    <div class="kick" data-in="problem@0" data-fx="left">Out of the box</div>
+    <div class="h2" style="margin-top:18px" data-words="problem@0">Agents don't know MariaDB. <span style="color:var(--danger)">They guess.</span></div>
+  </div>
+  <div class="grid">
+    <div class="pcard" data-in="problem:writes" data-fx="glitch"><div class="panel"></div>
+      <div class="lab"><span class="x">✕</span>MySQL-only syntax</div>
+      <div class="code"><span class="k">SELECT</span> doc<span class="r">-&gt;&gt;</span><span class="s">'$.customer.name'</span>
+  <span class="k">FROM</span> orders;</div>
+      <div class="note badge bad" data-in="problem:syntax" data-fx="pop">ERROR 1064 · syntax</div>
+    </div>
+    <div class="pcard" data-in="problem:guesses" data-fx="glitch"><div class="panel"></div>
+      <div class="lab"><span class="x">✕</span>Indexes by guesswork</div>
+      <div class="code"><span class="c">-- no EXPLAIN, just a hunch</span>
+<span class="k">CREATE INDEX</span> idx_maybe <span class="k">ON</span> note (title);</div>
+      <div class="note badge bad" data-in="problem:plan" data-fx="pop">plan never read</div>
+    </div>
+    <div class="pcard" data-in="problem:asks" data-fx="glitch"><div class="panel"></div>
+      <div class="lab"><span class="x">✕</span>Password in the chat</div>
+      <div class="code">$ mariadb -u admin <span class="r">-p'Pr0d-S3cret!'</span> \
+    -e <span class="s">"SELECT …"</span></div>
+      <div class="note badge bad" data-in="problem:chat" data-fx="pop">→ logs · process list · model</div>
+    </div>
+    <div class="pcard" data-in="problem:tests" data-fx="glitch"><div class="panel"></div>
+      <div class="lab"><span class="x">✕</span>Testing on production</div>
+      <div class="code"><span class="k">ALTER TABLE</span> orders
+  <span class="k">ADD COLUMN</span> region <span class="f">CHAR</span>(<span class="n">2</span>) <span class="k">NOT NULL</span>;</div>
+      <div class="note badge bad" id="prodBadge" data-in="problem:production" data-fx="pop">⚠ prod-db-01</div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 REVEAL -->
+<section class="scene" id="s-reveal" data-scene="reveal" data-chap="03|The answer">
+  <div class="hero" id="revealHero">
+    <div data-in="reveal@0" data-fx="zoom" data-d="0.9"><img src="logo.png" alt=""></div>
+    <div class="ttl grad" data-in="reveal:ai-plugins-0.1" data-fx="blur" data-d="0.8">AI Plugins</div>
+    <div class="sub" data-in="reveal:close" data-fx="up">skills · MCP server · MariaDB Shell — for every AI coding agent</div>
+  </div>
+  <div class="cols">
+    <div class="pill" data-in="reveal@2-0.2" data-fx="up"><div class="panel"></div>
+      <div class="num grad"><span data-count="85" data-in="reveal@2" data-cd="1.4">0</span></div>
+      <div class="unit">Skills</div>
+      <div class="desc">Real MariaDB expertise the agent reads the moment it's relevant.</div>
+      <div class="marq"><div class="in" id="marq"></div></div>
+    </div>
+    <div class="pill" data-in="reveal@3-0.2" data-fx="up"><div class="panel"></div>
+      <div class="num grad"><span data-count="43" data-in="reveal@3" data-cd="1.4">0</span></div>
+      <div class="unit">MCP tools</div>
+      <div class="desc">A native MCP server for live database work, in five groups.</div>
+      <div class="groups">
+        <div class="grp"><span class="nm">db.*</span><i class="bar" style="width:136px" data-in="reveal:native" data-fx="growx"></i><span class="ct">8</span></div>
+        <div class="grp"><span class="nm">msm.*</span><i class="bar" style="width:204px" data-in="reveal:native+0.15" data-fx="growx"></i><span class="ct">12</span></div>
+        <div class="grp"><span class="nm">sandbox.*</span><i class="bar" style="width:136px" data-in="reveal:native+0.3" data-fx="growx"></i><span class="ct">8</span></div>
+        <div class="grp"><span class="nm">util.*</span><i class="bar" style="width:204px" data-in="reveal:native+0.45" data-fx="growx"></i><span class="ct">12</span></div>
+        <div class="grp"><span class="nm">sql.*</span><i class="bar" style="width:51px" data-in="reveal:native+0.6" data-fx="growx"></i><span class="ct">3</span></div>
+      </div>
+    </div>
+    <div class="pill" data-in="reveal@4-0.2" data-fx="up"><div class="panel"></div>
+      <div class="num grad" style="font-size:96px;top:46px">&gt;_</div>
+      <div class="unit">MariaDB Shell</div>
+      <div class="desc">Installs itself on first run. Holds every credential in its secret store.</div>
+      <div class="shellbox">
+        <div data-in="reveal:installs" data-fx="fade">fetching mariadb-shell…</div>
+        <div class="dl"><i data-in="reveal:installs" data-fx="growx" data-d="1.6"></i></div>
+        <div data-in="reveal:run" data-fx="up"><span class="ok">✓</span> MCP server <em>mariadb</em> started</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 INSTALL -->
+<section class="scene" id="s-install" data-scene="install" data-chap="04|Install">
+  <div class="title">
+    <div class="kick" data-in="install@0" data-fx="left">Set up in a minute</div>
+    <div class="h2" style="margin-top:18px" data-in="install@0" data-fx="up">Two commands. <span class="dim">One setup.</span></div>
+  </div>
+  <div class="panel term" data-in="install@0+0.3" data-fx="up" data-out="install@2-0.2">
+    <div class="win-bar"><i></i><i></i><i></i><span>claude — ~/projects/notes-app</span></div>
+    <div class="code" style="font-size:25px"><span class="p">›</span> <span data-type="install:marketplace-0.3" data-cps="34" data-caret>/plugin marketplace add mariadb/ai-plugins</span>
+<span data-in="install:then" data-fx="fade"><span class="ok">✓</span> <span class="dim">Marketplace</span> mariadb <span class="dim">added</span></span>
+
+<span class="p">›</span> <span data-type="install:then+0.2" data-cps="30" data-caret>/plugin install dev@mariadb</span>
+<span data-in="install:plugin+0.3" data-fx="fade"><span class="ok">✓</span> <span class="dim">Installed</span> dev@mariadb
+  <span class="dim">85 skills · MCP server</span> <em>mariadb</em> <span class="dim">· CLI guard</span></span></div>
+  </div>
+  <div class="every" data-out="install@2-0.2">
+    <div class="kick" data-in="install:then" data-fx="fade">Same plugin, every agent</div>
+    <div class="hcmd" data-in="install:then+0.2" data-fx="right"><b>Codex</b><code>codex plugin marketplace add mariadb/ai-plugins
+codex plugin add dev@mariadb</code></div>
+    <div class="hcmd" data-in="install:then+0.45" data-fx="right"><b>Pi</b><code>pi install git:github.com/mariadb/ai-plugins</code></div>
+    <div class="hcmd" data-in="install:then+0.7" data-fx="right"><b>Hermes Agent</b><code>hermes plugins install \
+  mariadb/ai-plugins#hermes/dev-plugin --enable</code></div>
+    <div class="hcmd" data-in="install:then+0.95" data-fx="right"><b>OpenCode</b><code>merge the mcp block into opencode.json</code></div>
+  </div>
+  <div class="panel setup" data-in="install@2-0.1" data-fx="up">
+    <div class="win-bar"><i></i><i></i><i></i><span>zsh — once per machine</span></div>
+    <div class="code" style="font-size:23px">$ <span data-type="install@2+0.1" data-cps="32" data-caret>mariadb-shell -- mcp setup</span>
+<span data-in="install:choose" data-fx="fade"><span class="k">Connections</span>
+  <span class="dim">URI      </span> mcp_reader@db.internal:3306
+  <span class="dim">Password </span> <span class="s" id="pwd">••••••••••••</span>  <span class="ok">✓ verified</span></span>
+<span data-in="install:folders" data-fx="fade"><span class="k">Allowed paths</span>
+  <span class="dim">         </span> ~/projects/notes-app</span>
+<span data-in="install@3" data-fx="fade"><span class="ok">✓</span> <span class="dim">stored in the MariaDB Shell secret store</span></span></div>
+  </div>
+  <div class="vbox vault" data-in="install@3-0.2" data-fx="right"><div class="panel"></div>
+    <div class="ic"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#96DDCF" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+    <div class="t1">Secret store</div>
+    <div class="t2">Each password is verified once, then kept by MariaDB Shell.</div>
+    <div class="t3">mcp_reader@db.internal  <span class="ok">🔒 sealed</span></div>
+  </div>
+  <div class="vbox agentv" data-in="install@4-0.1" data-fx="right"><div class="panel"></div>
+    <div class="ic"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#96DDCF" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18" stroke="#FB7878"/></svg></div>
+    <div class="t1">The agent never sees it</div>
+    <div class="t3">db.connect(<span class="s">"mcp_reader@db.internal"</span>)  <span class="dim">— no password</span></div>
+  </div>
+  <div class="dot" id="pdot1"></div><div class="dot" id="pdot2"></div><div class="dot" id="pdot3"></div>
+</section>
+
+<!-- 05 NOTES -->
+<section class="scene" id="s-notes" data-scene="notes" data-chap="05|In action · build">
+  <div class="scen-tag" data-in="notes@0" data-fx="left"><span class="badge info">Real scenario</span><span class="kick" style="color:var(--faint)">DevHub tutorial 1 · Notes App</span></div>
+  <div class="scen-title h3" data-in="notes@0+0.1" data-fx="up">Schema → sandbox → verified, from one prompt.</div>
+  <div class="panel chat" data-in="notes@0+0.2" data-fx="up">
+    <div class="win-bar"><i></i><i></i><i></i><span>agent session · ~/projects/notes-app</span></div>
+    <div class="ubub" data-in="notes@1-0.2" data-fx="up"><small>YOU</small><span data-type="notes@1" data-cps="70">Create a MariaDB database schema named notes_app for a note-taking app and store it in a notes_app.sql file. Then spin up a sandbox on port 3310, connect to it and run notes_app.sql against it.</span></div>
+    <div class="skills"><span class="chip" data-in="notes:writes" data-fx="pop">skill · mariadb-schema-create-script</span><span class="chip" data-in="notes:writes+0.2" data-fx="pop">skill · mariadb-create-table</span></div>
+    <div class="file" data-in="notes:writes+0.3" data-fx="up"><div class="fn">notes_app.sql</div><div class="code" data-type="notes:writes+0.4" data-cps="150"><span class="k">CREATE DATABASE</span> notes_app <span class="k">CHARACTER SET</span> utf8mb4 <span class="k">COLLATE</span> utf8mb4_uca1400_ai_ci;
+<span class="k">CREATE TABLE</span> notes_app.note (
+  id <span class="f">BIGINT UNSIGNED</span> <span class="k">AUTO_INCREMENT PRIMARY KEY</span>,
+  user_id <span class="f">INT UNSIGNED</span> <span class="k">NOT NULL</span>, title <span class="f">VARCHAR</span>(<span class="n">200</span>) <span class="k">NOT NULL</span>,
+  <span class="k">FOREIGN KEY</span> (user_id) <span class="k">REFERENCES</span> notes_app.`user` (id)
+) <span class="k">ENGINE</span>=InnoDB;</div></div>
+    <div class="call" data-in="notes:sandbox" data-fx="left"><span class="tl">sandbox.deploy</span> port=3310<span class="res" data-in="notes:docker" data-fx="fade">✓ MariaDB 11.8 running</span></div>
+    <div class="call" data-in="notes:runs" data-fx="left"><span class="tl">db.execute_sql_script</span> file_path=notes_app.sql<span class="res" data-in="notes:runs+0.6" data-fx="fade">✓ 3 statements</span></div>
+    <div class="call" data-in="notes:reads" data-fx="left"><span class="tl">db.list_objects</span> schema=notes_app<span class="res" data-in="notes:reads+0.6" data-fx="fade">✓ note, user</span></div>
+  </div>
+  <div class="host">
+    <div class="glow" data-in="notes:sandbox" data-fx="fade" data-d="1.2" style="top:190px"></div>
+    <div class="server" data-in="notes:sandbox" data-fx="zoom" data-d="0.8">
+      <div class="cyl"><div class="body"></div><div class="bot"></div><div class="ring" style="top:70px"></div><div class="ring" style="top:120px"></div><div class="top"></div>
+      <div class="lbl">sandbox<small>localhost:3310</small></div></div>
+    </div>
+    <div class="hbad" style="left:150px;top:350px"><span class="badge ok" data-in="notes:docker" data-fx="pop">no Docker</span><span class="badge ok" data-in="notes:admin" data-fx="pop">no admin rights</span></div>
+    <div class="tbl" style="left:40px;top:430px" data-in="notes:reads+0.5" data-fx="pop"><h4>user</h4><p><b>id</b> · email · display_name</p></div>
+    <div class="tbl" style="left:384px;top:430px" data-in="notes:reads+0.75" data-fx="pop"><h4>note</h4><p><b>id</b> · user_id · title · body</p></div>
+    <i class="fk" style="left:290px;top:478px;width:94px" data-in="notes:reads+1.1" data-fx="growx"></i>
+    <div id="flowbox"></div>
+  </div>
+</section>
+
+<!-- 06 SLOW -->
+<section class="scene" id="s-slow" data-scene="slow" data-chap="06|In action · tune">
+  <div class="scen-tag" data-in="slow@0-0.2" data-fx="left"><span class="badge info">Real scenario</span><span class="kick" style="color:var(--faint)">DevHub tutorial 5 · Diagnose a slow query</span></div>
+  <div class="scen-title h3" data-in="slow@0-0.1" data-fx="up">It reads the plan. Then it proves the fix.</div>
+  <div class="panel q" data-in="slow@0" data-fx="up">
+    <div class="win-bar"><i></i><i></i><i></i><span>query-notes-by-notebook.sql</span></div>
+    <div class="code"><span class="k">SELECT</span> u.display_name, <span class="f">COUNT</span>(*) <span class="k">AS</span> notes
+<span class="k">FROM</span> notes_app.note n
+<span class="k">JOIN</span> notes_app.`user` u <span class="k">ON</span> u.id = n.user_id
+<span class="k">WHERE</span> n.created_at &gt;= <span class="s">'2026-01-01'</span>
+  <span class="k">AND</span> n.notebook_id = ?
+<span class="k">GROUP BY</span> u.id, u.display_name <span class="k">ORDER BY</span> notes <span class="k">DESC LIMIT</span> <span class="n">20</span>;</div>
+  </div>
+  <div class="watch" data-in="slow@0+0.2" data-fx="up"><div class="big"><span data-count="4.0" data-dec="1" data-in="slow@0+0.2" data-cd="1.3">0</span>s</div><div class="lab">in production.<br>Customers notice.</div></div>
+  <div class="panel plan" data-in="slow:explain" data-fx="right">
+    <div class="win-bar"><i></i><i></i><i></i><span>db.execute_sql · EXPLAIN</span></div>
+    <table class="ptab"><tr><th>table</th><th>type</th><th>key</th><th>rows</th><th>Extra</th></tr>
+      <tr id="hotrow"><td>n</td><td class="r">ALL</td><td class="r">NULL</td><td>2,000,000</td><td class="dim">Using where; Using temporary</td></tr>
+      <tr><td>u</td><td>eq_ref</td><td>PRIMARY</td><td>1</td><td></td></tr></table>
+    <div class="anno" style="left:120px;top:226px" data-in="slow:spots" data-fx="left">▲ full table scan</div>
+  </div>
+  <div class="panel fix" data-in="slow:proves-0.1" data-fx="right">
+    <div class="win-bar"><i></i><i></i><i></i><span>sandbox :3311 · same structure · 2M rows</span></div>
+    <div class="code" style="font-size:19px;padding:16px 26px 4px"><span data-type="slow:proves" data-cps="60"><span class="k">CREATE INDEX</span> idx_note_notebook_created
+  <span class="k">ON</span> notes_app.note (notebook_id, created_at);</span></div>
+    <div class="rowslab"><span>rows examined · before</span><span class="r">type ALL</span></div>
+    <div class="rowsbar"><i style="right:0;background:var(--danger)" data-in="slow:sandbox" data-fx="growx"></i></div>
+    <div class="rowslab"><span>rows examined · after</span><span class="ok">type range · idx_note_notebook_created</span></div>
+    <div class="rowsbar"><i style="width:3%;background:#8fe3a3" data-in="slow:sandbox+0.5" data-fx="growx"></i></div>
+  </div>
+  <div style="position:absolute;left:96px;top:830px;display:flex;gap:14px"><span class="badge ok" data-in="slow:production-0.2" data-fx="pop">✓ measured with ANALYZE on the sandbox</span><span class="badge ok" data-in="slow:production+0.2" data-fx="pop">✓ production untouched</span></div>
+</section>
+
+<!-- 07 MIGRATE -->
+<section class="scene" id="s-migrate" data-scene="migrate" data-chap="07|In action · migrate & ship">
+  <div class="scen-tag" data-in="migrate@0-0.2" data-fx="left"><span class="badge info">Real scenario</span><span class="kick" style="color:var(--faint)">DevHub tutorials 7 & 9 · Migrator · MSM</span></div>
+  <div class="scen-title h3" data-in="migrate@0-0.1" data-fx="up">Off MySQL — planned, run, and verified.</div>
+  <div class="src" data-in="migrate@0" data-fx="left"><div class="cyl my"><div class="body"></div><div class="bot"></div><div class="ring" style="top:70px"></div><div class="ring" style="top:120px"></div><div class="top"></div><div class="lbl">MySQL<small>:3307 · shop, billing</small></div></div></div>
+  <div class="dst" data-in="migrate@0+0.25" data-fx="right"><div class="cyl"><div class="body"></div><div class="bot"></div><div class="ring" style="top:70px"></div><div class="ring" style="top:120px"></div><div class="top"></div><div class="lbl">MariaDB<small>:3308 · target</small></div></div></div>
+  <div id="mflow"></div>
+  <div class="steps">
+    <div class="step" data-in="migrate:plans" data-fx="left"><span class="tl">migrator.plan</span><span class="dim">serial streaming copy · 6 steps</span><span style="margin-left:auto" class="ok">✓</span></div>
+    <div class="step" data-in="migrate:runs" data-fx="left"><span class="tl">migrator.run</span><span class="mbar"><i data-in="migrate:runs" data-fx="growx" data-d="2.2"></i></span><span class="ok" data-in="migrate:runs+2" data-fx="fade">✓</span></div>
+    <div class="step" data-in="migrate:verifies" data-fx="left"><span class="tl">verify target</span><span class="dim">row counts · objects · keys</span><span style="margin-left:auto" class="ok">✓</span></div>
+  </div>
+  <div class="panel verify" data-in="migrate:verifies" data-fx="right">
+    <div class="win-bar"><i></i><i></i><i></i><span>source vs. target</span></div>
+    <table class="vt"><tr><th>object</th><th>source</th><th>target</th><th></th></tr>
+      <tr data-in="migrate:verifies+0.2" data-fx="fade"><td>tables</td><td>14</td><td>14</td><td class="ok">✓</td></tr>
+      <tr data-in="migrate:view" data-fx="fade"><td>views</td><td>2</td><td>2</td><td class="ok">✓</td></tr>
+      <tr data-in="migrate:view+0.2" data-fx="fade"><td>routines</td><td>3</td><td>3</td><td class="ok">✓</td></tr>
+      <tr data-in="migrate:trigger" data-fx="fade"><td>triggers</td><td>4</td><td>4</td><td class="ok">✓</td></tr>
+      <tr data-in="migrate:trigger+0.2" data-fx="fade"><td>foreign keys</td><td>9</td><td>9</td><td class="ok">✓</td></tr>
+    </table>
+  </div>
+  <div class="panel msm" data-in="migrate:schema-0.2" data-fx="up">
+    <div class="win-bar"><i></i><i></i><i></i><span>notes_app.msm.project · Schema Management</span></div>
+    <div class="vline"><i data-in="migrate:version" data-fx="growx" data-d="1.4"></i></div>
+    <div class="vnode" style="left:70px">1.0</div>
+    <div class="vnode" style="left:674px" data-in="migrate:version+1.2" data-fx="pop">1.1</div>
+    <div class="vlab" style="left:150px"><span style="font-size:24px">1.0.0</span><small>deployed · live data</small></div>
+    <div class="vlab vlab--right" data-in="migrate:in-place" data-fx="up"><span style="font-size:24px" class="grad">1.1.0 in place</span><small>+ notebook · + tag · no data lost</small></div>
+  </div>
+</section>
+
+<!-- 08 GUARD -->
+<section class="scene" id="s-guard" data-scene="guard" data-chap="08|Built-in safety">
+  <div class="scen-tag" data-in="guard@0-0.3" data-fx="left"><span class="badge info">CLI guard</span><span class="kick" style="color:var(--faint)">PreToolUse hook · every harness</span></div>
+  <div class="scen-title h3" data-in="guard@0-0.2" data-fx="up">Credentials stay out of the conversation.</div>
+  <div class="panel term" id="gterm" data-in="guard@0-0.1" data-fx="up">
+    <div class="win-bar"><i></i><i></i><i></i><span>agent · Bash tool</span></div>
+    <div class="code" style="font-size:28px">$ <span data-type="guard:reaches" data-cps="40" data-caret>mariadb -u root -p'demo-pw' notes_app -e "SELECT * FROM note"</span></div>
+  </div>
+  <div class="stamp" data-in="guard:blocks" data-fx="stamp">BLOCKED</div>
+  <div class="panel msg" data-in="guard:blocks+0.3" data-fx="up">
+    <div class="win-bar"><i></i><i></i><i></i><span>mariadb-cli-guard · permissionDecision: deny</span></div>
+    <div class="code"><span class="r">Blocked:</span> `mariadb` does something the mariadb MCP server's tools do, and a client run from a shell puts database credentials on a command line, in the process list, in logs and in this conversation. <span class="k">Use the MCP tools:</span> run the SQL with db.connect and db.execute_sql …</div>
+  </div>
+  <div class="panel fixed" data-in="guard:points" data-fx="right">
+    <div class="win-bar"><i></i><i></i><i></i><span>agent · retry over MCP</span></div>
+    <div class="code" style="font-size:21px"><span class="p">mariadb</span> · <span class="k">db.connect</span>
+  name=<span class="s">"sandbox-3310"</span>
+<span class="p">mariadb</span> · <span class="k">db.execute_sql</span>
+  <span class="s">"SELECT * FROM note"</span>
+
+<span class="ok">✓ 5 rows · no password seen</span></div>
+  </div>
+</section>
+
+<!-- 09 PITCH -->
+<section class="scene" id="s-pitch" data-scene="pitch" data-chap="09|Your talking points">
+  <div class="title"><div class="kick" data-in="pitch@0" data-fx="left">For your next call</div>
+    <div class="h2" style="margin-top:18px" data-words="pitch@0">Three things to remember.</div></div>
+  <div class="cards">
+    <div class="tp" data-in="pitch@1-0.1" data-fx="up"><div class="panel"></div><div class="no">1</div>
+      <h3>Meets developers where they work</h3><p>One plugin, the same skills and tools, in the agents they already use.</p>
+      <div class="chips"><span class="chip">Claude Code</span><span class="chip">Codex</span><span class="chip">OpenCode</span><span class="chip">Pi</span><span class="chip">Hermes</span></div></div>
+    <div class="tp" data-in="pitch@2-0.1" data-fx="up"><div class="panel"></div><div class="no">2</div>
+      <h3>Credentials never reach the model</h3><p>Secret store, scoped MCP accounts, allowed paths, and a guard on the CLI.</p>
+      <div class="chips"><span class="chip">secret store</span><span class="chip">least privilege</span><span class="chip">CLI guard</span></div></div>
+    <div class="tp" data-in="pitch@3-0.1" data-fx="up"><div class="panel"></div><div class="no">3</div>
+      <h3>Agents test on throwaway servers</h3><p>Real MariaDB sandboxes on demand — try it there, not on production.</p>
+      <div class="chips"><span class="chip">sandbox.deploy</span><span class="chip">no Docker</span><span class="chip">any version</span></div></div>
+  </div>
+</section>
+
+<!-- 10 CLOSE -->
+<section class="scene" id="s-close" data-scene="close" data-chap="10|Built right in">
+  <div class="quote" data-in="close:our-0.1" data-fx="blur" data-out="close@1-0.35">“Our developers live in AI agents now.”</div>
+  <div class="ans" data-in="close:have-0.1" data-fx="up" data-out="close@1-0.35">You have the answer.</div>
+  <div class="end">
+    <div data-in="close@1-0.1" data-fx="zoom" data-d="0.9"><img src="logo.png" alt=""></div>
+    <div class="bi grad" data-in="close:built" data-fx="blur">built right in.</div>
+  </div>
+  <div class="url">
+    <div data-in="close@2" data-fx="up"><span class="u">https://mariadb.com/docs/tools/community/mariadb-ai-plugins</span></div>
+    <div class="cmds"><span class="chip" data-in="close:docs+0.3" data-fx="pop">/plugin install dev@mariadb</span><span class="chip" data-in="close:docs+0.5" data-fx="pop">github.com/mariadb/ai-plugins</span></div>
+  </div>
+  <div class="foot" data-in="close@2+0.8" data-fx="fade">MariaDB AI Plugins · Sales Engineering Enablement · 2026</div>
+</section>
+
+<div id="flash"></div>
+<div id="chrome">
+  <div class="chap" id="chap"><i></i><b id="chapN">01</b><span id="chapT">The shift</span></div>
+  <img class="brand" src="logo.png" alt="">
+  <div class="tag">SE Enablement</div>
+</div>
+<div id="cap"></div>
+<div id="prog"></div>
+</div>
+
+<script src="timeline.js"></script>
+<script>
+const TL = window.TIMELINE;
+const SEG = Object.fromEntries(TL.segments.map(s => [s.id, s]));
+const DUR = TL.duration;
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const E = {
+  out: p => 1 - Math.pow(1 - p, 3),
+  expo: p => p >= 1 ? 1 : 1 - Math.pow(2, -10 * p),
+  inout: p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2,
+  back: p => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); },
+};
+const errors = [];
+
+// "seg", "seg@N" (sentence), "seg:word" / "seg:word#2", "seg$" (end), each with an optional +/-offset
+function cue(spec) {
+  const m = spec.match(/^([a-z]+)(?:@(\d+)|:([a-z0-9'\-]+?)(?:#(\d+))?|(\$))?([+-][\d.]+)?$/);
+  if (!m || !SEG[m[1]]) { errors.push('bad cue ' + spec); return 0; }
+  const s = SEG[m[1]]; let t = s.start;
+  if (m[2] != null) { const st = s.sentences[+m[2]]; if (!st) errors.push('no sentence ' + spec); else t = st.start; }
+  else if (m[3]) {
+    const ws = s.sentences.flatMap(x => x.words).filter(w => w.w === m[3]);
+    const w = ws[(+m[4] || 1) - 1];
+    if (!w) errors.push('no word ' + spec); else t = w.t;
+  } else if (m[5]) t = s.end;
+  if (m[6]) t += parseFloat(m[6]);
+  return t;
+}
+
+// ---- scenes
+const scenes = $$('[data-scene]').map((el, i, all) => {
+  const id = el.dataset.scene, s = SEG[id];
+  const next = all[i + 1] && SEG[all[i + 1].dataset.scene];
+  const [n, title] = el.dataset.chap.split('|');
+  return { el, id, n, title, tin: i ? s.start - 0.55 : -1, tout: next ? next.start - 0.55 : DUR + 1 };
+});
+
+// ---- word-by-word reveal lines
+$$('[data-words]').forEach(el => {
+  const base = cue(el.dataset.words);
+  const segId = el.dataset.words.split(/[@:]/)[0];
+  const sentIdx = +(el.dataset.words.split('@')[1] || 0);
+  const sent = SEG[segId].sentences[sentIdx];
+  let k = 0;
+  const walk = node => {
+    [...node.childNodes].forEach(ch => {
+      if (ch.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        ch.data.split(/(\s+)/).forEach(tok => {
+          if (!tok) return;
+          if (/^\s+$/.test(tok)) { frag.append(tok); return; }
+          const sp = document.createElement('span');
+          sp.className = 'w'; sp.textContent = tok;
+          const w = sent && sent.words[k];
+          sp.dataset.in = ''; sp._tin = w ? w.t - 0.08 : base + k * 0.18;
+          sp.dataset.fx = 'word'; sp.dataset.d = '0.45';
+          k++; frag.append(sp);
+        });
+        ch.replaceWith(frag);
+      } else walk(ch);
+    });
+  };
+  walk(el);
+});
+
+// ---- animated elements
+const anims = $$('[data-in]').map(el => ({
+  el, tin: el._tin ?? cue(el.dataset.in), d: +(el.dataset.d || (el.dataset.fx === 'growx' ? 0.9 : 0.7)),
+  fx: el.dataset.fx || 'up', tout: el.dataset.out ? cue(el.dataset.out) : null,
+}));
+$$('[data-out]:not([data-in])').forEach(el => anims.push({ el, tin: -99, d: 0.01, fx: 'fade', tout: cue(el.dataset.out) }));
+
+function applyFx(a, t) {
+  const raw = clamp((t - a.tin) / a.d);
+  const q = a.tout != null ? E.inout(clamp((t - a.tout) / 0.45)) : 0;
+  const p = E.out(raw);
+  let tf = '', op = p, fl = '';
+  switch (a.fx) {
+    case 'up': tf = `translateY(${(1 - p) * 50 - q * 30}px)`; break;
+    case 'down': tf = `translateY(${-(1 - p) * 50}px)`; break;
+    case 'left': tf = `translateX(${-(1 - p) * 70 - q * 60}px)`; break;
+    case 'right': tf = `translateX(${(1 - p) * 90 + q * 60}px)`; break;
+    case 'pop': { const b = E.back(raw); tf = `scale(${0.5 + 0.5 * b})`; op = clamp(raw * 3); break; }
+    case 'fade': break;
+    case 'word': tf = `translateY(${(1 - p) * 28}px)`; fl = `blur(${(1 - p) * 8}px)`; break;
+    case 'blur': tf = `scale(${1.08 - 0.08 * p})`; fl = `blur(${(1 - p) * 24}px)`; break;
+    case 'zoom': tf = `scale(${1.6 - 0.6 * E.expo(raw)})`; fl = `blur(${(1 - p) * 14}px)`; op = clamp(raw * 2); break;
+    case 'growx': tf = `scaleX(${E.inout(raw)})`; op = raw > 0 ? 1 : 0; a.el.style.transformOrigin = 'left center'; break;
+    case 'glitch': {
+      const j = raw < 1 ? (1 - raw) : 0;
+      tf = `translate(${Math.sin(t * 97) * 16 * j}px,${Math.cos(t * 71) * 6 * j}px)`;
+      op = clamp(raw * 4) * (raw < .35 ? (Math.sin(t * 140) > -.2 ? 1 : .35) : 1);
+      fl = j > 0 ? `drop-shadow(${6 * j}px 0 0 rgba(251,120,120,.8)) drop-shadow(${-6 * j}px 0 0 rgba(142,197,232,.8))` : '';
+      break;
+    }
+    case 'stamp': { const b = E.out(clamp((t - a.tin) / 0.28)); tf = `scale(${2.6 - 1.6 * b}) rotate(${-14 + 6 * b}deg)`; op = clamp((t - a.tin) / 0.12); break; }
+  }
+  op *= (1 - q);
+  if (q > 0 && a.fx !== 'up' && a.fx !== 'left' && a.fx !== 'right') fl += ` blur(${q * 10}px)`;
+  a.el.style.opacity = op;
+  a.el.style.transform = tf;
+  a.el.style.filter = fl;
+  a.el.style.visibility = op <= 0.001 ? 'hidden' : 'visible';
+}
+
+// ---- typewriters (text nodes truncated in place, so highlighting survives)
+const types = $$('[data-type]').map(el => {
+  const nodes = []; const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  while (tw.nextNode()) nodes.push({ n: tw.currentNode, full: tw.currentNode.data });
+  return { el, nodes, total: nodes.reduce((s, x) => s + x.full.length, 0), tin: cue(el.dataset.type), cps: +(el.dataset.cps || 45) };
+});
+function applyType(ty, t) {
+  const n = Math.floor(clamp((t - ty.tin) * ty.cps, 0, ty.total));
+  let left = n;
+  for (const x of ty.nodes) { const k = Math.min(left, x.full.length); x.n.data = x.full.slice(0, k); left -= k; }
+  if (ty.el.hasAttribute('data-caret')) {
+    ty.el.classList.toggle('typing', t >= ty.tin && n < ty.total);
+    const idle = n >= ty.total;
+    ty.el.classList.toggle('idle', idle);
+    ty.el.classList.toggle('blink', idle && Math.floor(t * 2.2) % 2 === 1);
+    if (t < ty.tin) ty.el.classList.remove('typing', 'idle');
+  }
+}
+
+// ---- counters
+const counters = $$('[data-count]').map(el => ({ el, to: +el.dataset.count, dec: +(el.dataset.dec || 0), tin: cue(el.dataset.in), d: +(el.dataset.cd || 1.2) }));
+
+// ---- skill marquee (the real dev plugin skill names)
+const SKILLS = "mariadb-aggregate-functions mariadb-alter-table mariadb-alter-user mariadb-binlog mariadb-call mariadb-client mariadb-connector-c-usage mariadb-connector-j-usage mariadb-connector-nodejs-usage mariadb-connector-python-usage mariadb-connector-r2dbc-usage mariadb-create-index mariadb-create-procedure mariadb-create-sequence mariadb-create-table mariadb-create-trigger mariadb-create-view mariadb-date-time-functions mariadb-dump mariadb-explain mariadb-features mariadb-grant mariadb-json-functions mariadb-laravel-vector mariadb-load-data mariadb-migrator mariadb-migrator-verify mariadb-query-optimization mariadb-rest-service-create mariadb-schema-create-script mariadb-schema-management-deploy mariadb-schema-management-release mariadb-select mariadb-system-versioned-tables mariadb-transactions mariadb-vector mariadb-vector-functions mariadb-window-functions mysql-to-mariadb".split(' ');
+$('#marq').innerHTML = SKILLS.concat(SKILLS).map(s => `<div>${s}</div>`).join('');
+
+// ---- captions: the narration's text as it should read
+const capText = s => s.replace(/Maria-DB/g, 'MariaDB').replace(/AI-Plugins/g, 'AI Plugins').replace(/My S Q L/g, 'MySQL').replace(/M C P/g, 'MCP')
+  .replace(/MariaDB dot com slash docs/g, 'mariadb.com/docs').replace(/thirty-three ten/g, '3310')
+  .replace(/Eighty-five/g, 'Eighty-five').replace(/forty-three/g, 'forty-three').replace(/version one point one/g, 'version 1.1');
+const SENTS = TL.segments.flatMap(s => s.sentences);
+// one-line caption chunks: break after punctuation once a chunk is long enough, or hard at ~60 chars
+const CAPS = [];
+SENTS.forEach(sn => {
+  const toks = [...sn.text.matchAll(/[A-Za-z0-9'\-]+/g)];
+  let start = 0, startT = sn.start;
+  toks.forEach((m, i) => {
+    const next = toks[i + 1];
+    if (!next) return;
+    const len = capText(sn.text.slice(start, next.index)).length;
+    const after = sn.text.slice(m.index + m[0].length, next.index);
+    const nextLen = capText(sn.text.slice(start, next.index + next[0].length)).length;
+    if ((len >= 34 && /[,;:]/.test(after)) || nextLen > 60) {
+      CAPS.push({ text: capText(sn.text.slice(start, next.index).trim()), start: startT, end: sn.words[i + 1].t - 0.05 });
+      start = next.index; startT = sn.words[i + 1].t;
+    }
+  });
+  CAPS.push({ text: capText(sn.text.slice(start).trim()), start: startT, end: sn.end });
+});
+
+// ---- background
+const bg = $('#bg'), g = bg.getContext('2d');
+function rng(seed) { return () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+const R = rng(42);
+const motes = Array.from({ length: 90 }, () => ({ x: R() * 1920, y: R() * 1080, r: 0.6 + R() * 2.2, v: 6 + R() * 22, ph: R() * 6.28 }));
+function sceneWeight(id, t) { const s = scenes.find(x => x.id === id); return clamp((t - s.tin) / 0.8) * (1 - clamp((t - s.tout) / 0.8)); }
+function drawBg(t) {
+  g.clearRect(0, 0, 1920, 1080);
+  const danger = sceneWeight('problem', t) + sceneWeight('guard', t) * 0.6;
+  const blobs = [
+    [960 + Math.sin(t * .13) * 520, 340 + Math.cos(t * .11) * 200, 760, `rgba(14,100,136,${.42 - danger * .2})`],
+    [380 + Math.cos(t * .09) * 300, 860 + Math.sin(t * .15) * 120, 620, `rgba(150,221,207,${.14 - danger * .08})`],
+    [1600 + Math.sin(t * .07) * 220, 820, 640, `rgba(251,120,120,${danger * .28})`],
+  ];
+  for (const [x, y, r, c] of blobs) { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, c); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 1920, 1080); }
+  // dot field rippling like a data surface
+  for (let y = 60; y < 1080; y += 44) for (let x = 40; x < 1920; x += 44) {
+    const w = Math.sin(x * .006 + t * .7) + Math.cos(y * .008 - t * .5) + Math.sin((x + y) * .003 + t * .3);
+    const a = clamp((w + 1.2) / 3.6) * .22;
+    if (a < .02) continue;
+    g.fillStyle = `rgba(150,221,207,${a})`; g.fillRect(x, y, 2, 2);
+  }
+  for (const m of motes) {
+    const y = (m.y - t * m.v + 2000) % 1080, x = m.x + Math.sin(t * .4 + m.ph) * 20;
+    g.fillStyle = `rgba(173,199,193,${.25 + .25 * Math.sin(t + m.ph)})`;
+    g.beginPath(); g.arc(x, y, m.r, 0, 6.28); g.fill();
+  }
+}
+
+// ---- scene-specific motion
+const P = (a, b, t) => clamp((t - a) / (b - a));
+function hooks(t) {
+  // open: headline lifts when the agents arrive
+  const lift = E.inout(P(cue('open@2') - 0.5, cue('open@2') + 0.3, t));
+  $('#openLines').style.transform = `translateY(${-110 * lift}px) scale(${1 - .12 * lift})`;
+  // problem: the production badge pulses
+  const pb = $('#prodBadge'); if (t > cue('problem:production')) pb.style.boxShadow = `0 0 ${18 + 14 * Math.sin(t * 9)}px rgba(251,120,120,.6)`;
+  // reveal: hero shrinks to a header when the three pillars arrive
+  const hk = E.inout(P(cue('reveal@1') - 0.2, cue('reveal@1') + 0.6, t));
+  $('#revealHero').style.transform = `translateY(${-205 * hk}px) scale(${1 - .45 * hk})`;
+  // install: password dots fly into the secret store
+  const pt0 = cue('install@3') - 0.1;
+  ['#pdot1', '#pdot2', '#pdot3'].forEach((id, i) => {
+    const p = E.inout(P(pt0 + i * .12, pt0 + i * .12 + .8, t)), el = $(id);
+    const x = 520 + 40 * i + (1280 - 520 - 40 * i) * p, y = 440 + (420 - 440) * p - Math.sin(p * 3.14) * 160;
+    el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.opacity = p > 0 && p < 1 ? 1 : 0;
+  });
+  // notes: SQL flowing from the file into the sandbox
+  flow('#flowbox', cue('notes:runs'), cue('notes:runs') + 1.8, t, [-360, 330], [330, 180], 14);
+  // migrate: rows streaming MySQL -> MariaDB
+  flow('#mflow', cue('migrate:runs'), cue('migrate:runs') + 2.3, t, [455, 455], [690, 455], 22);
+  // slow: the full-scan row flashes
+  const hr = $('#hotrow'); hr.className = t > cue('slow:spots') ? 'hot' : '';
+  // guard: the terminal shakes on the block
+  const sh = clamp(1 - (t - cue('guard:blocks')) / 0.4);
+  $('#gterm').style.translate = (t > cue('guard:blocks') && sh > 0) ? `${Math.sin(t * 120) * 14 * sh}px 0` : '0 0';
+  // white flash on the two brand hits
+  const f1 = 1 - clamp(Math.abs(t - cue('reveal@0') - 0.05) / 0.35), f2 = 1 - clamp(Math.abs(t - cue('close@1') + 0.05) / 0.35);
+  $('#flash').style.opacity = Math.max(f1, f2) * .8;
+}
+function flow(sel, a, b, t, from, to, n) {
+  const box = $(sel);
+  if (!box._dots) { box._dots = Array.from({ length: n }, () => { const d = document.createElement('i'); d.className = 'flow'; box.append(d); return d; }); }
+  box._dots.forEach((d, i) => {
+    const st = a + (b - a - 0.6) * (i / n), p = E.inout(P(st, st + 0.6, t));
+    const on = p > 0 && p < 1;
+    d.style.opacity = on ? 1 : 0;
+    if (on) { d.style.left = (from[0] + (to[0] - from[0]) * p) + 'px'; d.style.top = (from[1] + (to[1] - from[1]) * p - Math.sin(p * 3.14) * 50 + (i % 3 - 1) * 10) + 'px'; }
+  });
+}
+
+// ---- frame
+function seek(t) {
+  drawBg(t);
+  $('#seal').style.transform = `translate(${Math.sin(t * .05) * 30}px,${Math.cos(t * .04) * 20}px) rotate(${Math.sin(t * .03) * 2}deg)`;
+  let cur = scenes[0];
+  for (const s of scenes) {
+    const pin = E.out(clamp((t - s.tin) / 0.6)), pout = E.inout(clamp((t - s.tout) / 0.55));
+    const vis = t >= s.tin - 0.01 && t <= s.tout + 0.6;
+    s.el.style.display = vis ? 'block' : 'none';
+    if (!vis) continue;
+    if (t >= s.tin) cur = s;
+    s.el.style.opacity = pin * (1 - pout);
+    s.el.style.transform = `scale(${(1.035 - .035 * pin) * (1 - .04 * pout)})`;
+    s.el.style.filter = (pin < 1 || pout > 0) ? `blur(${(1 - pin) * 10 + pout * 12}px)` : '';
+  }
+  for (const a of anims) applyFx(a, t);
+  for (const ty of types) applyType(ty, t);
+  for (const c of counters) { const p = E.out(clamp((t - c.tin) / c.d)); c.el.textContent = (c.to * p).toFixed(c.dec); }
+  hooks(t);
+  // chrome
+  const chapIn = clamp((t - cur.tin) / 0.5);
+  $('#chapN').textContent = cur.n; $('#chapT').textContent = cur.title;
+  $('#chap').style.opacity = chapIn * clamp((t - 0.6) / 0.6);
+  $('#chap').style.transform = `translateX(${(1 - E.out(chapIn)) * -30}px)`;
+  $('#prog').style.width = (t / DUR * 1920) + 'px';
+  const sn = CAPS.find((s, i) => t >= s.start - 0.08 && t <= (CAPS[i + 1] && CAPS[i + 1].start - 0.08 < s.end + 0.3 ? CAPS[i + 1].start - 0.08 : s.end + 0.3));
+  const cap = $('#cap');
+  if (sn) { cap.textContent = capText(sn.text); cap.style.opacity = clamp((t - sn.start + 0.08) / 0.12) * (1 - clamp((t - sn.end - 0.15) / 0.15)); }
+  else cap.style.opacity = 0;
+  // the closing card speaks for itself
+  if (t > cue('close$') + 0.3) cap.style.opacity = 0;
+}
+window.seek = seek;
+window.DUR = DUR;
+window.cueErrors = errors;
+window.CAPS = CAPS;
+window.sfxEvents = () => {
+  const ev = [];
+  scenes.forEach((s, i) => { if (i) ev.push({ t: s.tin + 0.1, k: 'whoosh' }); });
+  ev.push({ t: cue('reveal@0'), k: 'impact' }, { t: cue('close@1') - 0.1, k: 'impact' }, { t: cue('guard:blocks'), k: 'thud' });
+  anims.filter(a => ['pop', 'glitch', 'stamp'].includes(a.fx)).forEach(a => ev.push({ t: a.tin, k: a.fx === 'glitch' ? 'glitch' : 'blip' }));
+  types.forEach(ty => { if (ty.cps <= 70) for (let i = 0; i < ty.total; i += 2) ev.push({ t: ty.tin + i / ty.cps, k: 'key' }); });
+  return ev;
+};
+seek(0);
+</script>
+</body>
+</html>

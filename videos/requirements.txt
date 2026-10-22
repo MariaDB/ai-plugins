@@ -1,0 +1,9 @@
+# Toolchain for the videos in videos/*/ — installed into videos/.cache/venv by setup.sh
+kokoro-onnx==0.4.7
+espeakng-loader==0.2.4
+phonemizer-fork==3.3.1
+onnxruntime==1.31.0
+soundfile==0.14.0
+numpy==2.5.4
+scipy==1.18.1
+playwright==1.64.0
