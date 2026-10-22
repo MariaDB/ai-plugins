@@ -30,7 +30,9 @@ MariaDB tooling itself). Unless you know you want otherwise, install `dev`.
 <div class="callout" markdown="1">
 On first start the plugin downloads and extracts the `mariadb-shell` package
 unless a suitable one is already installed. Depending on your connection this
-can take a minute. It only happens once.
+can take a minute. It only happens once. If you are on a corporate network
+that cannot reach GitHub, follow the
+[offline installation]({{ '/offline-install/' | relative_url }}) instead.
 
 Claude Code waits 30 seconds for an MCP server to connect. If the download takes
 longer, `/mcp` shows the `mariadb` server as failed, but the install keeps going
