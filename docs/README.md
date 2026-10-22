@@ -73,6 +73,7 @@ than producing a half-built site.
 docs/
 ├── _config.yml               # site config; `url` + `baseurl` are the only env-specific bits
 ├── _data/
+│   ├── downloads.yml         # offline-install.md's platforms + sandbox packages (/release checks it)
 │   ├── nav.yml               # the header's menu links
 │   ├── paths.yml             # learning paths (each `steps` entry is a tutorial `slug`)
 │   └── skills.yml            # GENERATED — see below

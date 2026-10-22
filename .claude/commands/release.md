@@ -121,7 +121,8 @@ script entirely when the floor is not moving. After each, note how many files
 changed (`git status --short | wc -l`). For reference, 26.9.5 moved 33 files for
 the shell floor and 17 for the plugin version; the Hermes plugins, added after
 26.10.2, add 8 and 6 to those, and `hermes/guard-plugin` (26.10.4) 2 more to the
-plugin version — 26.10.4 moved 39 and 25; a very different count is worth
+plugin version — 26.10.4 moved 39 and 25. Since 26.10.6 the plugin version also sets
+`plugin_version` in `docs/_config.yml`, one file more (26). A very different count is worth
 looking into before going on. If a version was already at its target the script
 changes nothing — say so, don't treat it as a failure. Commit each step on its
 own so the PR is reviewable per step.
@@ -140,7 +141,79 @@ the old → new upstream commits for `mariadb-docs` and `mariadb-shell` (from th
 `skills-source.json` diffs), any skills added, removed or changed, and the skill
 counts per variant (82 dev / 47 sql / 2 contributor as of 26.9.3). Commit.
 
-## 5. CHANGELOG entries
+## 5. Update the DevHub download links
+
+The offline installation page (`docs/offline-install.md`) links straight to the
+files this release ships, built from three places:
+
+- `plugin_version` in `docs/_config.yml`: the ai-plugins source archives
+  (`<repo>/archive/refs/tags/v<version>.tar.gz` and `.zip`). Set in step 3 by
+  `set-plugin-version.sh`.
+- `shell_floor` in `docs/_config.yml`: the mariadb-shell packages and
+  `SHA256SUMS` of `v<floor>`. Set in step 3 by `set-mariadb-shell-version.sh`
+  when the floor moved.
+- `sandbox` in `docs/_data/downloads.yml`: the MariaDB Server sandbox packages
+  (`release` and `versions`). No script sets it — check it here.
+
+Check that both `_config.yml` keys hold this release's values:
+
+```bash
+grep -nE '^(plugin_version|shell_floor):' docs/_config.yml
+```
+
+**The sandbox packages.** Not every mariadb-shell release ships them (26.10.1
+to 26.10.3 ship none; the shell's own index then points back at the newest one
+that does). Find the newest release at or below the floor that carries
+`*-sandbox.tar.gz` assets, and the server versions in it:
+
+```bash
+for t in $(gh release list --repo mariadb-corporation/mariadb-shell --exclude-drafts --limit 30 \
+             --json tagName -q '.[].tagName' | sort -rV); do
+  printf '%s\n%s\n' "${t#v}" "<floor>" | sort -CV || continue    # skip releases above the floor
+  names=$(gh release view "$t" --repo mariadb-corporation/mariadb-shell --json assets \
+            -q '.assets[].name | select(endswith("-sandbox.tar.gz"))')
+  [ -n "$names" ] || continue
+  echo "$t"; echo "$names" | sed -E 's/^mariadb-([0-9.]+)-.*/\1/' | sort -uV
+  break
+done
+```
+
+Compare the result with `sandbox.release` and `sandbox.versions` in
+`docs/_data/downloads.yml`:
+
+- **The same** → nothing to change; say so in the PR body.
+- **Different** → update both keys and report old → new (for example "sandbox
+  packages v26.10.0 → v26.11.0: 11.8.9, 12.3.3, 13.1.1 → 11.8.10, 12.3.4,
+  13.1.2").
+- **A platform missing**: every `platforms[].token` in `downloads.yml` must
+  have a package for every version, and a `mariadb-shell-<floor>-<token>.tar.gz`
+  in `v<floor>`. If an asset is missing, or the release carries a platform
+  `downloads.yml` does not list, stop and report it — the table would link to a
+  file that does not exist, or leave a platform out.
+
+If the shell is installed locally at the floor, its index is the authority on
+what it downloads; when it disagrees with the release listing, stop and report
+it:
+
+```bash
+grep -oE 'releases/download/[^/]+' \
+  ~/.local/share/mariadb-shell/<floor>/lib/mariadb-shell/plugins/mcp_plugin/lib/sandbox_server_versions.json | sort -u
+```
+
+Then build the site and check every GitHub link on the page. The archive links
+for `v<version>` answer 404 until step 10 pushes the tag — expected here, but
+every other link must answer 200:
+
+```bash
+npm run docs:build
+grep -oE 'href="https://github.com/[^"]*"' docs/_site/offline-install/index.html \
+  | sed 's/^href="//; s/"$//' | sort -u \
+  | while read -r u; do c=$(curl -s -o /dev/null -I -L -w '%{http_code}' "$u"); [ "$c" = 200 ] || echo "$c $u"; done
+```
+
+Commit any change to `downloads.yml`.
+
+## 6. CHANGELOG entries
 
 Add a `## [<version>] - <today>` section to the top of all fourteen `*/*/CHANGELOG.md`
 files, following the wording and structure of the previous release's section in
@@ -151,19 +224,19 @@ when nothing in it changed its section is the version bump alone. Mention the sh
 name the new floor), and carry each plugin's `[Unreleased]` section, if it has
 one, into the new section. Commit.
 
-## 6. Verify
+## 7. Verify
 
 Run `./run_tests.py -m static` and report the result. If it fails, stop and show
 the failure — do not open the PR on a red run.
 
-## 7. Checkpoint
+## 8. Checkpoint
 
 Run the `/checkpoint` command with `.` as the target, recording the release as
 in progress (PR about to open) in `release-history.md`, `current-state.md` and
 the index's "Latest work streams" and "Git state". Commit it on this branch so it
 ships in the release PR.
 
-## 8. Open the PR
+## 9. Open the PR
 
 ```bash
 git push -u origin wip/<version>
@@ -181,7 +254,7 @@ merge it yourself. Wait until the user says it is merged, then confirm with
 `gh pr view <N> --repo mariadb-corporation/ai-plugins --json state,mergeCommit,headRefOid`
 that `state` is `MERGED`, and note the squash commit.
 
-## 9. Tag and publish the release
+## 10. Tag and publish the release
 
 ```bash
 git switch main && git pull --ff-only origin main
@@ -207,7 +280,7 @@ gh release create v<version> --repo <repo> --title v<version> --notes-file <scra
 
 for `<repo>` = `mariadb-corporation/ai-plugins` and `mariadb/ai-plugins`.
 
-## 10. Sync the fork
+## 11. Sync the fork
 
 The fork's `main` carries the same tree as `origin/main`, `docs/CNAME`
 (`ai-plugins.mariadb.org`) included — the fork's Pages is what serves it. Sync with a **merge** of
@@ -234,7 +307,7 @@ refused if the fork moved meanwhile — then fetch and merge again, don't force)
 Return to `main` and delete the local `wip/<version>` and `sync/fork-<version>` branches, and
 delete `wip/<version>` on `origin` once its remote head matches the PR's `headRefOid`.
 
-## 11. Report
+## 12. Report
 
 Tell the user the release is published, with:
 

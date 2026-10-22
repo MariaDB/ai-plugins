@@ -428,6 +428,16 @@ body.menu-open { overflow: hidden; }
   max-width: 660px; margin: 0 0 1.75rem; }
 .hero__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-bottom: 1.5rem; }
 .hero__badges { display: flex; flex-wrap: wrap; gap: .5rem; }
+.hero__version {
+  margin-top: .9rem; font-size: .8rem; color: var(--ch-hero-muted);
+  display: flex; flex-wrap: wrap; gap: .4rem;
+}
+.hero__version a {
+  color: var(--ch-hero-accent); font-weight: 600;
+  text-decoration: underline; text-underline-offset: 3px;
+  text-decoration-color: var(--ch-hero-badge-border);
+}
+.hero__version a:hover { text-decoration-color: currentColor; }
 .hero__badge {
   display: inline-flex; align-items: center; gap: .35rem;
   border-radius: var(--ch-radius-full); padding: .2rem .7rem;

@@ -22,7 +22,7 @@
 # .codex-plugin/plugin.json, Hermes' plugin.json and plugin.yaml) and the "Version **x.y.z**"
 # line in each plugin README, for the dev-*, sql-* and contributor-* plugins
 # across claude/, codex/, opencode/, pi/ and hermes/, plus the repo-root
-# package.json.
+# package.json and `plugin_version` in docs/_config.yml.
 #
 # Not every plugin carries both: OpenCode has no manifest version field, so only
 # its README is updated, and pi has no per-plugin manifest at all — the repo-root
@@ -57,6 +57,7 @@ opencode/, pi/ and hermes/:
     .codex-plugin/plugin.json, hermes/*-plugin/plugin.json and plugin.yaml)
   - the "Version **x.y.z**" line in each plugin README
   - the repo-root package.json
+  - plugin_version in docs/_config.yml (the DevHub's download links)
 
 Not every plugin carries both: OpenCode has no manifest version field, so only
 its README is updated, and pi has no per-plugin manifest at all — the repo-root
@@ -114,12 +115,18 @@ while IFS= read -r f; do files+=("$f"); done < <(
 )
 files+=("$REPO_ROOT/package.json")
 
+# The DevHub's offline installation page builds its download links for the
+# release archives from this key, so it moves with every release.
+DOCS_CONFIG="$REPO_ROOT/docs/_config.yml"
+[ -f "$DOCS_CONFIG" ] && files+=("$DOCS_CONFIG")
+
 [ "${#files[@]}" -gt 0 ] || { echo "error: no plugin files found under $REPO_ROOT" >&2; exit 1; }
 
-# Three shapes the version appears in:
+# Four shapes the version appears in:
 #   plugin manifest JSON:  "version": "<v>"
 #   Hermes plugin.yaml:    version: "<v>"
 #   README header line:    Version **<v>**
+#   docs/_config.yml:      plugin_version: "<v>"
 #
 # The JSON substitution is anchored to the start of a line so it can only ever
 # hit a "version" key that stands on its own — package.json also carries
@@ -129,8 +136,9 @@ V="$VERSION" perl -i -pe '
   s/^(\s*"version"\s*:\s*")[^"]*(")/${1}${v}${2}/;
   s/^(version:\s*")[^"]*(")/${1}${v}${2}/;
   s/^(Version \*\*)[^*]*(\*\*)$/${1}${v}${2}/;
+  s/^(plugin_version:\s*")[^"]*(")/${1}${v}${2}/;
 ' "${files[@]}"
 
 echo "Set plugin version -> $VERSION in ${#files[@]} file(s):"
-grep -rnE "\"version\": \"${VERSION}\"|^version: \"${VERSION}\"|^Version \*\*${VERSION}\*\*" "${files[@]}" \
+grep -rnE "\"version\": \"${VERSION}\"|^(plugin_)?version: \"${VERSION}\"|^Version \*\*${VERSION}\*\*" "${files[@]}" \
   | sed 's/^/  /'

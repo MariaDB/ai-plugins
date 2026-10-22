@@ -18,9 +18,9 @@ a local folder. Nothing is fetched at run time after that.
 
 | What | Version | Where it comes from |
 | --- | --- | --- |
-| AI Plugins — skills, MCP launcher, SQL language server launcher, CLI guard | the newest release | [ai-plugins releases]({{ site.repo }}/releases), source code archive |
-| MariaDB Shell — runs the MCP server and the SQL language server | {{ site.shell_floor }} or newer | [mariadb-shell releases](https://github.com/mariadb-corporation/mariadb-shell/releases), one package per platform |
-| MariaDB Server sandbox packages (optional) | 11.8.9, 12.3.3, 13.1.1 | [mariadb-shell v26.10.0](https://github.com/mariadb-corporation/mariadb-shell/releases/tag/v26.10.0) |
+| AI Plugins — skills, MCP launcher, SQL language server launcher, CLI guard | {{ site.plugin_version }} | [ai-plugins v{{ site.plugin_version }}]({{ site.repo }}/releases/tag/v{{ site.plugin_version }}), source code archive |
+| MariaDB Shell — runs the MCP server and the SQL language server | {{ site.shell_floor }} or newer | [mariadb-shell v{{ site.shell_floor }}](https://github.com/mariadb-corporation/mariadb-shell/releases/tag/v{{ site.shell_floor }}), one package per platform |
+| MariaDB Server sandbox packages (optional) | {{ site.data.downloads.sandbox.versions | join: ", " }} | [mariadb-shell {{ site.data.downloads.sandbox.release }}](https://github.com/mariadb-corporation/mariadb-shell/releases/tag/{{ site.data.downloads.sandbox.release }}) |
 
 </div>
 
@@ -36,23 +36,31 @@ or an internal gateway. This page covers only the MariaDB parts.
 ## Step 1 — Download on a connected machine
 {: #step-1-download}
 
-1. From the newest [ai-plugins release]({{ site.repo }}/releases), download
-   **Source code (tar.gz)** for macOS and Linux, or **Source code (zip)** for
-   Windows. The tar.gz keeps the launcher scripts executable.
-2. From the [mariadb-shell v{{ site.shell_floor }} release](https://github.com/mariadb-corporation/mariadb-shell/releases/tag/v{{ site.shell_floor }}),
-   or any newer one, download `SHA256SUMS` and the package for each platform
-   your developers use:
+{% assign plugin_dl = site.repo | append: "/archive/refs/tags/v" | append: site.plugin_version %}
+{% assign shell_dl = "https://github.com/mariadb-corporation/mariadb-shell/releases/download/v" | append: site.shell_floor | append: "/" %}
+
+1. The [ai-plugins v{{ site.plugin_version }}]({{ site.repo }}/releases/tag/v{{ site.plugin_version }})
+   source code archive. The tar.gz keeps the launcher scripts executable:
+
+   <div class="table-wrap" markdown="1">
+
+   | Platform | Archive |
+   | --- | --- |
+   | macOS and Linux | [`ai-plugins-{{ site.plugin_version }}.tar.gz`]({{ plugin_dl }}.tar.gz) |
+   | Windows | [`ai-plugins-{{ site.plugin_version }}.zip`]({{ plugin_dl }}.zip) |
+
+   </div>
+2. From [mariadb-shell v{{ site.shell_floor }}](https://github.com/mariadb-corporation/mariadb-shell/releases/tag/v{{ site.shell_floor }}),
+   [`SHA256SUMS`]({{ shell_dl }}SHA256SUMS) and the package for each platform
+   your developers use. A newer shell release works too.
 
    <div class="table-wrap" markdown="1">
 
    | Platform | Package |
    | --- | --- |
-   | macOS 26+ on Apple silicon | `mariadb-shell-{{ site.shell_floor }}-macos26-arm-64bit.tar.gz` |
-   | macOS 15+ on Intel | `mariadb-shell-{{ site.shell_floor }}-macos15-x86-64bit.tar.gz` |
-   | Linux x86-64, glibc 2.34+ | `mariadb-shell-{{ site.shell_floor }}-linux-glibc2.34-x86-64bit.tar.gz` |
-   | Linux ARM64, glibc 2.34+ | `mariadb-shell-{{ site.shell_floor }}-linux-glibc2.34-arm-64bit.tar.gz` |
-   | Windows x86-64 | `mariadb-shell-{{ site.shell_floor }}-windows-x86-64bit.tar.gz` |
-   | Windows ARM64 | `mariadb-shell-{{ site.shell_floor }}-windows-arm-64bit.tar.gz` |
+   {% for p in site.data.downloads.platforms -%}
+   | {{ p.name }} | [`mariadb-shell-{{ site.shell_floor }}-{{ p.token }}.tar.gz`]({{ shell_dl }}mariadb-shell-{{ site.shell_floor }}-{{ p.token }}.tar.gz) |
+   {% endfor %}
 
    </div>
 
@@ -157,13 +165,10 @@ The release archive is a complete plugin marketplace, so Claude Code installs
 straight from the unpacked folder. Choose its place for good: Claude Code loads
 the plugin from that folder every time it starts.
 
-1. Unpack the archive and give the folder a stable name — the one inside the
-   archive is named after the repository and a commit, such as
-   `MariaDB-ai-plugins-af5dc47`:
+1. Unpack the archive. It holds a single folder, `ai-plugins-<version>`:
 
    ```bash
    mkdir -p ~/mariadb && tar -xzf ai-plugins-<version>.tar.gz -C ~/mariadb
-   mv ~/mariadb/*-ai-plugins-* ~/mariadb/ai-plugins-<version>
    ```
 
    On Windows, extract the zip with Explorer or `Expand-Archive`, to
@@ -242,23 +247,20 @@ Each version's folder is named with the full version, `11.8.9` say, and holds
 
 ### Download links
 
-These are the packages MariaDB Shell {{ site.shell_floor }} knows about, all from
-the [v26.10.0 release](https://github.com/mariadb-corporation/mariadb-shell/releases/tag/v26.10.0).
-Their checksums are in
-[`SERVER_SHA256SUMS`](https://github.com/mariadb-corporation/mariadb-shell/releases/download/v26.10.0/SERVER_SHA256SUMS).
+{% assign sandbox = site.data.downloads.sandbox %}
+{% assign sandbox_dl = "https://github.com/mariadb-corporation/mariadb-shell/releases/download/" | append: sandbox.release | append: "/" %}
 
-{% assign dl = "https://github.com/mariadb-corporation/mariadb-shell/releases/download/v26.10.0/mariadb-" %}
+These are the newest sandbox packages, from the
+[mariadb-shell {{ sandbox.release }} release](https://github.com/mariadb-corporation/mariadb-shell/releases/tag/{{ sandbox.release }}).
+Their checksums are in [`SERVER_SHA256SUMS`]({{ sandbox_dl }}SERVER_SHA256SUMS).
 
 <div class="table-wrap" markdown="1">
 
-| Platform | MariaDB 11.8 | MariaDB 12.3 | MariaDB 13.1 |
-| --- | --- | --- | --- |
-| macOS 26+ on Apple silicon | [11.8.9]({{ dl }}11.8.9-macos26-arm-64bit-sandbox.tar.gz) | [12.3.3]({{ dl }}12.3.3-macos26-arm-64bit-sandbox.tar.gz) | [13.1.1]({{ dl }}13.1.1-macos26-arm-64bit-sandbox.tar.gz) |
-| macOS 15+ on Intel | [11.8.9]({{ dl }}11.8.9-macos15-x86-64bit-sandbox.tar.gz) | [12.3.3]({{ dl }}12.3.3-macos15-x86-64bit-sandbox.tar.gz) | [13.1.1]({{ dl }}13.1.1-macos15-x86-64bit-sandbox.tar.gz) |
-| Linux x86-64, glibc 2.34+ | [11.8.9]({{ dl }}11.8.9-linux-glibc2.34-x86-64bit-sandbox.tar.gz) | [12.3.3]({{ dl }}12.3.3-linux-glibc2.34-x86-64bit-sandbox.tar.gz) | [13.1.1]({{ dl }}13.1.1-linux-glibc2.34-x86-64bit-sandbox.tar.gz) |
-| Linux ARM64, glibc 2.34+ | [11.8.9]({{ dl }}11.8.9-linux-glibc2.34-arm-64bit-sandbox.tar.gz) | [12.3.3]({{ dl }}12.3.3-linux-glibc2.34-arm-64bit-sandbox.tar.gz) | [13.1.1]({{ dl }}13.1.1-linux-glibc2.34-arm-64bit-sandbox.tar.gz) |
-| Windows x86-64 | [11.8.9]({{ dl }}11.8.9-windows-x86-64bit-sandbox.tar.gz) | [12.3.3]({{ dl }}12.3.3-windows-x86-64bit-sandbox.tar.gz) | [13.1.1]({{ dl }}13.1.1-windows-x86-64bit-sandbox.tar.gz) |
-| Windows ARM64 | [11.8.9]({{ dl }}11.8.9-windows-arm-64bit-sandbox.tar.gz) | [12.3.3]({{ dl }}12.3.3-windows-arm-64bit-sandbox.tar.gz) | [13.1.1]({{ dl }}13.1.1-windows-arm-64bit-sandbox.tar.gz) |
+| Platform |{% for v in sandbox.versions %}{% assign vp = v | split: "." %} MariaDB {{ vp[0] }}.{{ vp[1] }} |{% endfor %}
+| --- |{% for v in sandbox.versions %} --- |{% endfor %}
+{% for p in site.data.downloads.platforms -%}
+| {{ p.name }} |{% for v in sandbox.versions %} [{{ v }}]({{ sandbox_dl }}mariadb-{{ v }}-{{ p.token }}-sandbox.tar.gz) |{% endfor %}
+{% endfor %}
 
 </div>
 

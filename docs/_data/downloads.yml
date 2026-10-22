@@ -1,0 +1,33 @@
+# Download links on the offline installation page (offline-install.md).
+#
+# The page builds every URL from these values and from two keys in _config.yml:
+#   plugin_version  the ai-plugins release (scripts/set-plugin-version.sh)
+#   shell_floor     the mariadb-shell release (scripts/set-mariadb-shell-version.sh)
+#
+# `sandbox` is the one part no script sets: the newest mariadb-shell release
+# that carries MariaDB Server sandbox packages (*-sandbox.tar.gz), and the
+# server versions it carries. Shell releases do not all ship them — 26.10.1 to
+# 26.10.3 ship none, and their index points back at v26.10.0. /release checks it.
+
+# Platforms the mariadb-shell and sandbox packages are built for, in the order
+# the tables list them. `token` is the platform part of a package's file name.
+platforms:
+  - name: macOS 26+ on Apple silicon
+    token: macos26-arm-64bit
+  - name: macOS 15+ on Intel
+    token: macos15-x86-64bit
+  - name: Linux x86-64, glibc 2.34+
+    token: linux-glibc2.34-x86-64bit
+  - name: Linux ARM64, glibc 2.34+
+    token: linux-glibc2.34-arm-64bit
+  - name: Windows x86-64
+    token: windows-x86-64bit
+  - name: Windows ARM64
+    token: windows-arm-64bit
+
+sandbox:
+  release: v26.10.0
+  versions:
+    - 11.8.9
+    - 12.3.3
+    - 13.1.1
