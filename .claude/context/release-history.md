@@ -12,8 +12,9 @@ ported from the vscode-extension's `/release`): no version → the next `YY.MM.x
 and the month's tags; no floor → the latest published shell when it is newer than the floor.
 Anything suggested is confirmed in one summary before anything changes.
 
-## Landed on `main` (through PR #73)
+## Landed on `main` (through PR #74)
 
+**#74** `029f13f` (2026-10-24) was release 26.10.6 (below).
 **#73** `10f3095` (2026-10-22): **`videos/`** — a generated SE enablement video (2:11, MariaDB plc
 style from `docs-ref/`), built from source: HTML animation captured in headless Chrome, local
 Kokoro TTS narration, synthesized score/SFX. Tracked: `videos/{setup.sh,requirements.txt,README.md}`
@@ -142,7 +143,14 @@ overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-op
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
 
-## Release v26.10.6 (2026-10-24) — IN PROGRESS (PR about to open)
+## Release v26.10.6 (2026-10-24) — SHIPPED
+
+- **PR #74**, squash `029f13f` (merged head `2d17f40`, checkpoint included). **Annotated tag
+  `v26.10.6` = object `2f14570`** (subject `MariaDB AI Plugins 26.10.6`), pushed to `origin` and
+  `fork` as the same object; **prerelease on both repos**. Fork's `main` fast-forwarded
+  `ba71d8a` → `029f13f` (= `origin/main`, diff empty) — the fork was already at `ba71d8a`, not
+  the `3d84ff5` the last checkpoint recorded. `wip/26.10.6` deleted locally; GitHub had removed
+  it on `origin`. The offline page's `v26.10.6` archive links answer 200 since the tag push.
 
 - Bare `/release`: version **26.10.6** suggested (tags up to `v26.10.5`), floor **26.10.3 →
   26.10.4** suggested (mariadb-shell `v26.10.4`, published 2026-10-24 06:26 UTC, built from
