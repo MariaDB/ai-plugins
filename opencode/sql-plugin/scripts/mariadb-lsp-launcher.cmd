@@ -49,7 +49,7 @@ rem   MARIADB_LSP_WAIT       Seconds to wait for the MCP launcher's install
 rem                          (default 180; 0 does not wait).
 rem ============================================================================
 
-if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.10.3"
+if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.10.4"
 if not defined MARIADB_SHELL_BINDIR set "MARIADB_SHELL_BINDIR=%LOCALAPPDATA%\Programs\mariadb-shell\bin"
 if not defined MARIADB_LSP_WAIT set "MARIADB_LSP_WAIT=180"
 

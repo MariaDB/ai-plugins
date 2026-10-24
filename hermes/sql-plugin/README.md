@@ -1,6 +1,6 @@
 # MariaDB SQL plugin for Hermes Agent
 
-Version **26.10.5**
+Version **26.10.6**
 
 This plugin gives [Hermes Agent](https://hermes-agent.nousresearch.com/) first-class
 MariaDB SQL support through two parts:
@@ -50,7 +50,7 @@ Configured in [mcp.json](mcp.json):
       "type": "stdio",
       "command": "./scripts/mariadb-mcp-launcher.sh",
       "args": [],
-      "env": { "MARIADB_SHELL_VERSION": "26.10.3" }
+      "env": { "MARIADB_SHELL_VERSION": "26.10.4" }
     }
   }
 }
@@ -62,7 +62,7 @@ for example `mcp__mariadb__db_list_connections`.
 
 The launcher ([scripts/mariadb-mcp-launcher.sh](scripts/mariadb-mcp-launcher.sh)):
 
-- Resolves the minimum version from `MARIADB_SHELL_VERSION` (default `26.10.3`).
+- Resolves the minimum version from `MARIADB_SHELL_VERSION` (default `26.10.4`).
 - Runs the first `mariadb-shell` that meets it: `$MARIADB_SHELL_BIN`, then one on
   `PATH`, then a local install at `~/.local/bin/mariadb-shell`
   (`%LOCALAPPDATA%\Programs\mariadb-shell\bin\mariadb-shell.cmd` on Windows).
@@ -165,7 +165,7 @@ lsp:
       command: ["~/.hermes/plugins/mariadb-sql/scripts/mariadb-lsp-launcher.sh"]
       extensions: [".sql"]
       language_id: "sql"
-      env: { "MARIADB_SHELL_VERSION": "26.10.3" }
+      env: { "MARIADB_SHELL_VERSION": "26.10.4" }
 ```
 
 Hermes runs language servers only in git repositories, and custom ones only in

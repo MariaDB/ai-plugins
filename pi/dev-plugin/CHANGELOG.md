@@ -4,6 +4,22 @@ All notable changes to the MariaDB plugin for Pi are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [26.10.6] - 2026-10-24
+
+### Changed
+
+- The `LICENSE` file names the bundled-packages section's extension by its
+  current name, MariaDB Shell for VS Code.
+- `MARIADB_SHELL_VERSION`, the *minimum* `mariadb-shell` the launcher accepts,
+  now defaults to `26.10.4`, the newest published `mariadb-shell` release. An
+  install already at or above that version is still used as-is; only a machine
+  below it fetches anything.
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `62ef6fe` (synced 2026-10-24). The upstream default branch moved on, but
+  nothing under `agent-skills/` did, so the plugin's 85 vendored
+  skills are unchanged.
+- Version bumped to 26.10.6 to stay in lockstep with the other plugins.
+
 ## [26.10.5] - 2026-10-21
 
 ### Changed

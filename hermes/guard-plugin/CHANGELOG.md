@@ -4,6 +4,16 @@ All notable changes to the MariaDB guard plugin for Hermes Agent are documented
 here. The format is based on [Keep a Changelog](https://keepachangelog.com/), and
 this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [26.10.6] - 2026-10-24
+
+### Changed
+
+- The `LICENSE` file names the bundled-packages section's extension by its
+  current name, MariaDB Shell for VS Code.
+- Version bumped to 26.10.6 to stay in lockstep with the other plugins. This
+  plugin has neither skills nor an MCP server, so the skills re-vendor and the
+  `MARIADB_SHELL_VERSION` floor do not apply here.
+
 ## [26.10.5] - 2026-10-21
 
 ### Changed

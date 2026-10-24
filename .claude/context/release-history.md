@@ -142,6 +142,25 @@ overview + six topic skills), **#12** `ed6fd43` (**the DevHub**). So the long-op
 PR #12 is merged and the "enable GitHub Pages" step is done — the site is live
 at **https://ai-plugins.mariadb.com/**.
 
+## Release v26.10.6 (2026-10-24) — IN PROGRESS (PR about to open)
+
+- Bare `/release`: version **26.10.6** suggested (tags up to `v26.10.5`), floor **26.10.3 →
+  26.10.4** suggested (mariadb-shell `v26.10.4`, published 2026-10-24 06:26 UTC, built from
+  `b074605`). User confirmed both. Branch `wip/26.10.6` off `ba71d8a`.
+- `9c84891` floor → 26.10.4 (**55 files**, up from 39 at 26.10.4: #66 added 12 `mariadb-lsp`
+  launchers, 2 `.lsp.json` and 2 docs-ref pages; `/release`'s reference counts updated).
+  `e90e2a1` plugin version → 26.10.6 (**26 files**, incl. `plugin_version` in `docs/_config.yml`).
+- `8f39cbb` re-vendor, **provenance only** (13 `skills-source.json`): mariadb-docs `12d4cd3` →
+  `62ef6fe`, mariadb-shell `1413abd` → `b074605`. Counts 85 / 47 / 3.
+- DevHub download links: `downloads.yml` unchanged — the newest sandbox packages at or below
+  26.10.4 are still `v26.10.0` (11.8.9, 12.3.3, 13.1.1); `v26.10.4` has all six platform
+  packages + `SHA256SUMS`. All offline-page links 200 except the `v26.10.6` archive/tag links
+  (404 until the tag is pushed). No local shell at 26.10.4 to cross-check the index.
+- `5368d89` CHANGELOGs (fourteen): #70's LICENSE rename (all fourteen), the floor line in the
+  nine MCP-bearing plugins, the re-vendor, the version bump. No `[Unreleased]` sections.
+  #71–#73 touch no plugin.
+- Static tier green: claude 830, codex 811, hermes 904, opencode 689, pi 693.
+
 ## Release v26.10.5 (2026-10-21) — SHIPPED
 
 - **PR #68**, squash `6e63c80` (merged head `025fd13`, checkpoint included). **Annotated tag

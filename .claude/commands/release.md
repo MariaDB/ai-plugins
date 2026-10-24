@@ -122,7 +122,9 @@ changed (`git status --short | wc -l`). For reference, 26.9.5 moved 33 files for
 the shell floor and 17 for the plugin version; the Hermes plugins, added after
 26.10.2, add 8 and 6 to those, and `hermes/guard-plugin` (26.10.4) 2 more to the
 plugin version — 26.10.4 moved 39 and 25. Since 26.10.6 the plugin version also sets
-`plugin_version` in `docs/_config.yml`, one file more (26). A very different count is worth
+`plugin_version` in `docs/_config.yml`, one file more (26). The shell floor grew by 16
+with #66 (12 `mariadb-lsp` launchers, 2 `.lsp.json`, 2 docs-ref pages): 26.10.6 moved 55 and 26.
+A very different count is worth
 looking into before going on. If a version was already at its target the script
 changes nothing — say so, don't treat it as a failure. Commit each step on its
 own so the PR is reviewable per step.

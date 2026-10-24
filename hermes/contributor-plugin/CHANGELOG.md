@@ -4,6 +4,19 @@ All notable changes to the MariaDB contributor Hermes Agent plugin are documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [26.10.6] - 2026-10-24
+
+### Changed
+
+- The `LICENSE` file names the bundled-packages section's extension by its
+  current name, MariaDB Shell for VS Code.
+- Skills re-vendored from `mariadb-corporation/mariadb-shell` `.claude/skills/`
+  at commit `b074605` (synced 2026-10-24). Nothing under `.claude/skills/` changed,
+  so the plugin's 3 skills are unchanged.
+- Version bumped to 26.10.6 to stay in lockstep with the other plugins. This
+  plugin ships skills only and no MCP server, so the `MARIADB_SHELL_VERSION`
+  floor does not apply here.
+
 ## [26.10.5] - 2026-10-21
 
 ### Changed
