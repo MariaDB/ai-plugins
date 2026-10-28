@@ -4,9 +4,9 @@ title: Get Started
 subtitle: >-
   Install the plugin, tell the MCP server what it may touch, then build a real
   schema on a throwaway server. Fifteen minutes end to end.
-badges: ["Claude Code", "Codex", "OpenCode", "Pi", "Hermes Agent"]
+badges: ["Claude Code", "Codex", "OpenCode", "Pi", "Hermes Agent", "Cursor"]
 permalink: /get-started/
-description: Install the MariaDB AI Plugins into Claude Code, Codex, OpenCode, Pi or Hermes Agent, configure the mariadb-shell MCP server, and run your first working example.
+description: Install the MariaDB AI Plugins into Claude Code, Codex, OpenCode, Pi, Hermes Agent or Cursor, configure the mariadb-shell MCP server, and run your first working example.
 ---
 
 There are three steps, and only the first is mandatory. The **skills** work the
@@ -119,6 +119,16 @@ mcp_servers:
 ```
 
 Full steps are in [`hermes/dev-plugin/README.md`]({{ site.repo }}/blob/main/hermes/dev-plugin/README.md).
+
+### Cursor
+
+Cursor reads the same marketplace as Claude Code and installs its plugins into
+its own directory — Claude Code does not have to be installed. In Cursor:
+
+1. Click **Customize**, then **+ Add Marketplace**.
+2. Paste the marketplace URL, `https://github.com/{{ site.install_org }}/ai-plugins`, and confirm.
+3. Click **Add** on the `dev` plugin for full MariaDB support — or on `sql` or
+   `contributor`.
 
 ### Check that the skills arrived
 
@@ -272,7 +282,8 @@ shell's bundled Python as a workaround:
 `/plugin` lists what is installed; in Codex, `/plugins`. In pi, remember that a
 project-local package needs `--approve` at run time or it is configured and
 never loaded. In Hermes, `hermes plugins list` shows whether the plugin is
-installed *and* enabled.
+installed *and* enabled. In Cursor, check that the plugin is listed under
+**Customize**.
 
 **In pi, `/mcp` doesn't list the `mariadb` server.** You need Pi 1.0 or later,
 and no `pi-mcp-adapter`: the adapter replaces Pi's built-in MCP, so the server

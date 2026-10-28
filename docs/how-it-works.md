@@ -172,6 +172,9 @@ The content is identical; the packaging is not.
 
 - **Claude Code** and **Codex** both read a marketplace manifest and install a
   plugin directory. Codex reads `.agents/plugins/marketplace.json`.
+- **Cursor** reads the Claude Code marketplace and installs the very same
+  `claude/` plugins into its own directory. There is no Cursor-specific
+  packaging.
 - **OpenCode** has no marketplace, so its plugin is wired up by hand: one `mcp`
   block merged into your config, an env var, and a symlink for the skills.
 - **Pi** has no marketplace. A pi package is any directory with a `pi` field in

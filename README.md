@@ -22,7 +22,7 @@ Installing a plugin gives you three things:
 > **New to MCP?** The Model Context Protocol is a standardized interface for
 > AI agents to call tools — here, the tools that talk to MariaDB.
 
-Works with [Claude Code](https://claude.com/claude-code), [Codex](https://openai.com/codex), [OpenCode](https://opencode.ai), [Pi](https://pi.dev) and [Hermes Agent](https://hermes-agent.nousresearch.com/) — see [Installation](#installation).
+Works with [Claude Code](https://claude.com/claude-code), [Codex](https://openai.com/codex), [OpenCode](https://opencode.ai), [Pi](https://pi.dev), [Hermes Agent](https://hermes-agent.nousresearch.com/) and [Cursor](https://cursor.com) — see [Installation](#installation).
 
 > **Prefer a guided start?** The **[DevHub](https://mariadb.github.io/ai-plugins/)**
 > has the same installation steps plus hands-on tutorials — building a schema and
@@ -111,6 +111,18 @@ Then start a new Hermes session; MCP servers connect at session start.
 `--enable` is needed because Hermes installs portable packages disabled. On native Windows the MCP server needs an entry in Hermes'
 `config.yaml`. Full steps in
 [hermes/dev-plugin/README.md](hermes/dev-plugin/README.md).
+
+Then configure the MCP server — see
+[Configure the MCP server](#configure-the-mcp-server-all-harnesses) below.
+
+### Cursor
+
+Cursor installs the Claude Code plugins from this repo's marketplace into its
+own directory, so Claude Code does not need to be installed. In Cursor:
+
+1. Click **Customize**, then **+ Add Marketplace**.
+2. Paste the marketplace URL `https://github.com/mariadb/ai-plugins` and confirm.
+3. Click **Add** on the `dev` plugin (or `sql` / `contributor`).
 
 Then configure the MCP server — see
 [Configure the MCP server](#configure-the-mcp-server-all-harnesses) below.
