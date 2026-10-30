@@ -301,13 +301,74 @@ def test_shipped_scripts_are_present(script: str):
 
 
 # The LSP launchers' copies are compared in the claude suite, with every
-# plugin that ships them.
-@pytest.mark.parametrize("script", ["mariadb-mcp-launcher.sh", "mariadb-mcp-launcher.cmd"])
-def test_launcher_is_the_shared_launcher(script: str):
-    """The launchers are one script copied into every plugin; keep this copy current."""
+# plugin that ships them. The MCP launchers are Hermes' own: they install a
+# pinned release, where the other harnesses' install the newest.
+PINNED_FILES = ["mariadb-mcp-launcher.sh", "mariadb-mcp-launcher.cmd"]
+
+
+def _shell_version() -> str:
+    return _json("mcp.json")["mcpServers"]["mariadb"]["env"]["MARIADB_SHELL_VERSION"]
+
+
+def _sums_name() -> str:
+    return f"mariadb-shell-v{_shell_version()}.SHA256SUMS"
+
+
+def _installer_commits(script: str) -> set[str]:
+    """Every value assigned to INSTALLER_COMMIT (sh: X="…", cmd: set "X=…")."""
+    text = (skills.PLUGIN_ROOT / "scripts" / script).read_text(encoding="utf-8")
+    return set(re.findall(r'INSTALLER_COMMIT="?([0-9a-f]+)"', text))
+
+
+@pytest.mark.parametrize("script", [*PINNED_FILES, "mariadb-shell-vVERSION.SHA256SUMS"])
+def test_pinned_install_files_match_the_sql_plugin(script: str):
+    """Both Hermes plugins carry the same launchers and checksums."""
+    script = script.replace("mariadb-shell-vVERSION.SHA256SUMS", _sums_name())
     ours = (skills.PLUGIN_ROOT / "scripts" / script).read_bytes()
-    claude = (skills.REPO_ROOT / "claude" / "dev-plugin" / "scripts" / script).read_bytes()
-    assert ours == claude, f"scripts/{script} differs from claude/dev-plugin/scripts/{script}"
+    sql = (skills.REPO_ROOT / "hermes" / "sql-plugin" / "scripts" / script).read_bytes()
+    assert ours == sql, f"scripts/{script} differs from hermes/sql-plugin/scripts/{script}"
+
+
+def test_committed_checksums_are_the_pinned_release():
+    """One SHA256SUMS, for the release the launchers install, listing its packages."""
+    scripts = skills.PLUGIN_ROOT / "scripts"
+    sums = sorted(p.name for p in scripts.glob("*.SHA256SUMS"))
+    assert sums == [_sums_name()], (
+        f"expected only {_sums_name()} (scripts/set-mariadb-shell-version.sh writes it), found {sums}"
+    )
+    lines = (scripts / _sums_name()).read_text(encoding="utf-8").splitlines()
+    entry = re.compile(rf"^[0-9a-f]{{64}}  mariadb-shell-{re.escape(_shell_version())}-\S+\.tar\.gz$")
+    assert lines and all(entry.fullmatch(line) for line in lines), "not a SHA256SUMS for this version"
+    for platform in ("linux-glibc", "macos", "windows"):
+        assert any(f"-{platform}" in line for line in lines), f"no {platform} package listed"
+
+
+@pytest.mark.parametrize("script", PINNED_FILES)
+def test_launcher_installs_a_pinned_release(script: str):
+    """The installer comes from a fixed commit and installs v<floor>, with no prerelease retry."""
+    text = (skills.PLUGIN_ROOT / "scripts" / script).read_text(encoding="utf-8")
+    commits = _installer_commits(script)
+    assert len(commits) == 1 and len(next(iter(commits))) == 40, f"no pinned 40-hex installer commit: {commits}"
+    assert "/main/install." not in text and "raw/main/" not in text
+    assert "--pre-release" not in text and "MARIADB_SHELL_PRERELEASE" not in text
+    assert "mariadb-shell-" in text and ".SHA256SUMS" in text and "MARIADB_SHELL_SHA256SUMS" in text
+    tag_default = "MARIADB_SHELL_TAG:-v$VERSION" if script.endswith(".sh") else "MARIADB_SHELL_TAG=v%MARIADB_SHELL_VERSION%"
+    assert tag_default in text, "the tag must default to v<MARIADB_SHELL_VERSION>"
+
+
+def test_launchers_pin_the_same_installer_commit():
+    found = {script: _installer_commits(script) for script in PINNED_FILES}
+    assert found["mariadb-mcp-launcher.sh"] == found["mariadb-mcp-launcher.cmd"], (
+        f"the .sh and .cmd launchers pin different installer commits: {found}"
+    )
+
+
+@pytest.mark.parametrize("script", PINNED_FILES)
+def test_launcher_reads_no_github_credentials(script: str):
+    """The catalog forbids reading another tool's login; mariadb-shell is public anyway."""
+    text = (skills.PLUGIN_ROOT / "scripts" / script).read_text(encoding="utf-8")
+    for needle in ("GH_TOKEN", "GITHUB_TOKEN", "gh auth", "MARIADB_SHELL_TOKEN", "Authorization", "Bearer"):
+        assert needle not in text, f"scripts/{script} mentions {needle!r}"
 
 
 def test_hermes_accepts_the_plugin():

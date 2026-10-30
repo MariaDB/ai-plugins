@@ -59,6 +59,9 @@ Updates, across claude/, codex/, opencode/, pi/ and hermes/:
     mariadb-lsp-launcher.sh / .cmd)
   - the version the setup-*-mcp scripts write (codex, pi)
   - the MARIADB_SHELL_VERSION shown in each plugin README
+  - in hermes/, the committed copy of release v<version>'s SHA256SUMS that the
+    launchers check the package against (downloaded, so this needs the release
+    to be published)
 
 This is the mariadb-shell *binary* version, NOT the plugin package version —
 use scripts/set-plugin-version.sh for the latter.
@@ -98,6 +101,22 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 command -v perl >/dev/null 2>&1 || { echo "error: perl is required" >&2; exit 1; }
+
+# Hermes' launchers install exactly v<version> and check the package against a
+# copy of that release's SHA256SUMS committed next to them (the catalog review
+# asked for checksums kept in this repo). Fetched before anything is edited, so
+# a release that is not published yet leaves every file as it was.
+SUMS_URL="https://github.com/mariadb-corporation/mariadb-shell/releases/download/v$VERSION/SHA256SUMS"
+SUMS_TMP="$(mktemp)"
+trap 'rm -f "$SUMS_TMP"' EXIT
+curl -fsSL --retry 3 -o "$SUMS_TMP" "$SUMS_URL" || {
+  echo "error: could not download $SUMS_URL — is mariadb-shell v$VERSION published?" >&2
+  exit 1
+}
+grep -Eq "^[0-9a-f]{64}  mariadb-shell-$VERSION-" "$SUMS_TMP" || {
+  echo "error: $SUMS_URL does not list mariadb-shell $VERSION packages" >&2
+  exit 1
+}
 
 # Collect the files that carry the version: launcher scripts (MCP and LSP) and
 # the MCP config files, across every *-plugin dir (excludes *-plugin-test dirs).
@@ -149,6 +168,7 @@ done
 #   docs/_config.yml:                  shell_floor: "<v>"
 #   docs-ref variable table:           | `MARIADB_SHELL_VERSION` | `<v>` |
 #   docs-ref installation requirement: unless MariaDB Shell <v> or later is
+#   Hermes README checksum file:       mariadb-shell-v<v>.SHA256SUMS
 V="$VERSION" perl -i -pe '
   my $v = $ENV{V};
   s/("MARIADB_SHELL_VERSION"\s*:\s*")[^"]*(")/${1}${v}${2}/g;
@@ -159,7 +179,16 @@ V="$VERSION" perl -i -pe '
   s/^(shell_floor:\s*")[^"]*(")/${1}${v}${2}/g;
   s/^(\| `MARIADB_SHELL_VERSION` \| `)[^`]*(` \|)/${1}${v}${2}/g;
   s/(unless MariaDB Shell )[0-9][0-9.]*( or later is)/${1}${v}${2}/g;
+  s/(mariadb-shell-v)[0-9][0-9.]*(\.SHA256SUMS)/${1}${v}${2}/g;
 ' "${files[@]}"
+
+for dir in "$REPO_ROOT"/hermes/*-plugin/scripts; do
+  [ -f "$dir/mariadb-mcp-launcher.sh" ] || continue
+  rm -f "$dir"/mariadb-shell-v*.SHA256SUMS
+  cp "$SUMS_TMP" "$dir/mariadb-shell-v$VERSION.SHA256SUMS"
+  chmod 644 "$dir/mariadb-shell-v$VERSION.SHA256SUMS"
+  echo "Wrote ${dir#"$REPO_ROOT"/}/mariadb-shell-v$VERSION.SHA256SUMS"
+done
 
 echo "Set MARIADB_SHELL_VERSION -> $VERSION in ${#files[@]} file(s):"
 grep -rn 'SHELL_VERSION\|shell_floor\|MariaDB Shell [0-9]' "${files[@]}" \

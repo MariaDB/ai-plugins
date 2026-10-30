@@ -44,7 +44,12 @@ Everything below is for people working **on** the plugins rather than with them.
    declares the `mariadb` server with `./scripts/mariadb-mcp-launcher.sh` as its
    command. `mcp.json` cannot branch per OS, so native Windows users add the
    `.cmd` launcher in Hermes' `config.yaml` instead (see
-   [hermes/dev-plugin/README.md](hermes/dev-plugin/README.md)).
+   [hermes/dev-plugin/README.md](hermes/dev-plugin/README.md)). The Hermes
+   plugins carry their own copy of the launcher, as the Hermes plugin catalog
+   asked: it installs exactly `v$MARIADB_SHELL_VERSION` with the installer from
+   a fixed mariadb-shell commit, checks the package against
+   `scripts/mariadb-shell-v<version>.SHA256SUMS` committed next to it (written by
+   `scripts/set-mariadb-shell-version.sh`), and reads no GitHub credentials.
 
 ### Repository layout
 

@@ -8,3 +8,8 @@
 # match no *.sh rule, hence these.
 mariadb-mcp-launcher text eol=lf
 mariadb-lsp-launcher text eol=lf
+
+# The Hermes launchers' committed copies of a mariadb-shell release's SHA256SUMS
+# must stay LF: install.sh reads them line by line, and a CR would end up in
+# every package name it compares.
+*.SHA256SUMS text eol=lf

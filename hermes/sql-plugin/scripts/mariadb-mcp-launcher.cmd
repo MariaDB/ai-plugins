@@ -23,15 +23,21 @@ rem   1. %MARIADB_SHELL_BIN%, if set (explicit override).
 rem   2. A mariadb-shell on %PATH% whose version is >= MARIADB_SHELL_VERSION.
 rem   3. A local install at %MARIADB_SHELL_BINDIR%\mariadb-shell.cmd (default
 rem      %LOCALAPPDATA%\Programs\mariadb-shell\bin) at that version or newer.
-rem   4. Otherwise fetch and run the official installer,
-rem      https://raw.githubusercontent.com/mariadb-corporation/mariadb-shell/main/install.ps1,
-rem      which unpacks the newest release under %LOCALAPPDATA%\Programs\mariadb-shell
-rem      and writes .cmd shims into its bin dir -- then launch what it installed.
+rem   4. Otherwise fetch the official installer, install.ps1, from a pinned
+rem      mariadb-shell commit and install release v%MARIADB_SHELL_VERSION% -- the
+rem      one this plugin release was tested with, prerelease or not -- under
+rem      %LOCALAPPDATA%\Programs\mariadb-shell, with .cmd shims in its bin dir;
+rem      then launch what it installed.
 rem
 rem Installing is delegated to install.ps1 rather than reimplemented here: it
-rem picks the package matching the local CPU, reads the asset list from the
-rem release's own SHA256SUMS and verifies the checksum. Nothing in this launcher
+rem picks the package matching the local CPU and verifies its checksum. The
+rem checksums come from mariadb-shell-<tag>.SHA256SUMS next to this script, a
+rem copy of that release's SHA256SUMS committed with the plugin, so a package
+rem replaced on the release after the fact is refused. Nothing in this launcher
 rem needs to know how release assets are named.
+rem
+rem This copy is Hermes' own: the other harnesses' launchers install the newest
+rem release from the installer on main.
 rem
 rem However it resolves, the binary is run as
 rem   mariadb-shell -- mcp start-server --transport=stdio
@@ -45,22 +51,25 @@ rem   MARIADB_SHELL_BIN         Pre-installed binary; skips all other logic.
 rem   MARIADB_SHELL_BINDIR      Where install.ps1 writes its shims, and where
 rem                             step 3 looks.
 rem   MARIADB_SHELL_PREFIX      Passed through: where install.ps1 unpacks releases.
-rem   MARIADB_SHELL_TAG         Passed through: install this release tag.
-rem   MARIADB_SHELL_PRERELEASE  Normally unset: a stable release is preferred, and
-rem                             a prerelease installed only when there is no stable
-rem                             one. Set to 1 to go straight for a prerelease, or
-rem                             to 0 to refuse one entirely.
+rem   MARIADB_SHELL_TAG         Release tag to install (default
+rem                             v%MARIADB_SHELL_VERSION%). A tag with no committed
+rem                             SHA256SUMS next to this script is checked against
+rem                             the release's own.
 rem   MARIADB_SHELL_REPO        Passed through: owner/repo to install from.
-rem   MARIADB_SHELL_TOKEN       Token for a private repository. GH_TOKEN and
-rem                             GITHUB_TOKEN are consulted too, then
-rem                             `gh auth token` -- install.ps1's own order.
 rem ============================================================================
 
 if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.10.4"
 if not defined MARIADB_SHELL_REPO set "MARIADB_SHELL_REPO=mariadb-corporation/mariadb-shell"
 if not defined MARIADB_SHELL_BINDIR set "MARIADB_SHELL_BINDIR=%LOCALAPPDATA%\Programs\mariadb-shell\bin"
 
-set "INSTALLER_URL=https://raw.githubusercontent.com/%MARIADB_SHELL_REPO%/main/install.ps1"
+if not defined MARIADB_SHELL_TAG set "MARIADB_SHELL_TAG=v%MARIADB_SHELL_VERSION%"
+
+rem The mariadb-shell commit the installer is taken from: fixed, so the script
+rem that runs is the one this launcher was tested with, not whatever main holds.
+rem Move it only when the installers change in a way the launcher needs.
+set "INSTALLER_COMMIT=664993ccbc523cc82218251fcbe9c2fb8a209cdb"
+set "INSTALLER_URL=https://raw.githubusercontent.com/%MARIADB_SHELL_REPO%/%INSTALLER_COMMIT%/install.ps1"
+set "SUMS_FILE=%~dp0mariadb-shell-%MARIADB_SHELL_TAG%.SHA256SUMS"
 set "LOCAL_BIN=%MARIADB_SHELL_BINDIR%\mariadb-shell.cmd"
 
 rem Arguments that start the mariadb-shell MCP server over stdio.
@@ -96,69 +105,37 @@ call "%LOCAL_BIN%" %MCP_ARGS%
 exit /b %errorlevel%
 
 :local_too_old
-echo mariadb-mcp-launcher: installed mariadb-shell at %LOCAL_BIN% does not meet required %MARIADB_SHELL_VERSION%; installing the newest release 1>&2
+echo mariadb-mcp-launcher: installed mariadb-shell at %LOCAL_BIN% does not meet required %MARIADB_SHELL_VERSION%; installing %MARIADB_SHELL_TAG% 1>&2
 
-rem --- 4. Install the newest release -------------------------------------------
-rem The token is resolved here as well as inside install.ps1 because fetching the
-rem installer from a private repository needs it too -- raw.githubusercontent.com
-rem answers 404, not 401, without credentials. It is exported under the name
-rem install.ps1 reads, so one lookup serves both.
+rem --- 4. Install the pinned release ------------------------------------------
+rem mariadb-shell is public: nothing here sends credentials, and nothing reads
+rem another tool's stored login.
+rem
+rem A tag the plugin carries no SHA256SUMS for was chosen by whoever set
+rem MARIADB_SHELL_TAG or MARIADB_SHELL_VERSION; that release's own is used then.
 :install
-if not defined MARIADB_SHELL_TOKEN set "MARIADB_SHELL_TOKEN=%GH_TOKEN%"
-if not defined MARIADB_SHELL_TOKEN set "MARIADB_SHELL_TOKEN=%GITHUB_TOKEN%"
-if defined MARIADB_SHELL_TOKEN goto have_token
-for /f "delims=" %%T in ('gh auth token 2^>nul') do if not defined MARIADB_SHELL_TOKEN set "MARIADB_SHELL_TOKEN=%%T"
-:have_token
+set "MARIADB_SHELL_SHA256SUMS="
+if exist "%SUMS_FILE%" set "MARIADB_SHELL_SHA256SUMS=%SUMS_FILE%"
+if not defined MARIADB_SHELL_SHA256SUMS echo mariadb-mcp-launcher: no committed checksums for %MARIADB_SHELL_TAG%; checking against the release's own SHA256SUMS 1>&2
 
 set "INSTALL_FAILED=0"
 set "PS_INSTALLER=%TEMP%\mariadb-shell-install-%RANDOM%.ps1"
 
-echo mariadb-mcp-launcher: no suitable mariadb-shell found; installing from %MARIADB_SHELL_REPO% ... 1>&2
+echo mariadb-mcp-launcher: no suitable mariadb-shell found; installing %MARIADB_SHELL_TAG% from %MARIADB_SHELL_REPO% ... 1>&2
 echo mariadb-mcp-launcher: a first install can take a minute. If the harness gives up on this server meanwhile (Claude Code waits 30 s unless MCP_TIMEOUT is raised), the install still finishes: reconnect the server then (/mcp in Claude Code), or start a new session. 1>&2
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ErrorActionPreference='Stop'; $ProgressPreference='SilentlyContinue';" ^
   "try{ [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 }catch{};" ^
-  "$h=@{}; if($env:MARIADB_SHELL_TOKEN){ $h['Authorization']='Bearer ' + $env:MARIADB_SHELL_TOKEN };" ^
-  "Invoke-WebRequest -Headers $h -Uri $env:INSTALLER_URL -OutFile $env:PS_INSTALLER" 1>&2
+  "Invoke-WebRequest -UseBasicParsing -Uri $env:INSTALLER_URL -OutFile $env:PS_INSTALLER" 1>&2
 if errorlevel 1 goto download_failed
 
-rem MARIADB_SHELL_BINDIR is already in this process's environment, so the shims
-rem land exactly where step 3 looks; MARIADB_SHELL_TAG is read by the installer
-rem from there too.
-rem
-rem Prereleases: wanted when they are all there is, but not preferred over a
-rem stable release. install.ps1 skips them exactly as /releases/latest does, so a
-rem repository whose only release is a prerelease has nothing to install and this
-rem first attempt fails -- the retry below then gets it, with no decision needed
-rem from whoever is running this. MARIADB_SHELL_PRERELEASE short-circuits the
-rem choice: truthy goes straight for the prerelease, an explicit 0/false/no keeps
-rem the install stable-only.
-if not defined MARIADB_SHELL_PRERELEASE goto install_stable_first
-if /i "%MARIADB_SHELL_PRERELEASE%"=="0" goto install_stable_only
-if /i "%MARIADB_SHELL_PRERELEASE%"=="false" goto install_stable_only
-if /i "%MARIADB_SHELL_PRERELEASE%"=="no" goto install_stable_only
-if /i "%MARIADB_SHELL_PRERELEASE%"=="off" goto install_stable_only
-rem Truthy: the installer reads MARIADB_SHELL_PRERELEASE itself, so one run does it.
+rem MARIADB_SHELL_BINDIR, MARIADB_SHELL_TAG and MARIADB_SHELL_SHA256SUMS are
+rem already in this process's environment, which is where install.ps1 reads them,
+rem so the shims land exactly where step 3 looks. A pinned tag needs no
+rem prerelease handling: the installer takes a named release whether or not it
+rem is a prerelease.
 powershell -NoProfile -ExecutionPolicy Bypass -File "%PS_INSTALLER%" 1>&2
 if errorlevel 1 goto installer_failed
-goto installer_done
-
-:install_stable_only
-set "MARIADB_SHELL_PRERELEASE="
-powershell -NoProfile -ExecutionPolicy Bypass -File "%PS_INSTALLER%" 1>&2
-if errorlevel 1 goto installer_failed
-goto installer_done
-
-:install_stable_first
-powershell -NoProfile -ExecutionPolicy Bypass -File "%PS_INSTALLER%" 1>&2
-if not errorlevel 1 goto installer_done
-echo mariadb-mcp-launcher: no stable release to install; retrying with a prerelease 1>&2
-set "MARIADB_SHELL_PRERELEASE=1"
-powershell -NoProfile -ExecutionPolicy Bypass -File "%PS_INSTALLER%" 1>&2
-if errorlevel 1 goto installer_failed
-echo mariadb-mcp-launcher: installed a prerelease -- no stable %MARIADB_SHELL_REPO% release is published yet 1>&2
-
-:installer_done
 del /q "%PS_INSTALLER%" >nul 2>&1
 goto after_install
 
@@ -171,7 +148,6 @@ goto after_install
 :download_failed
 set "INSTALL_FAILED=1"
 echo mariadb-mcp-launcher: error: could not download the installer from %INSTALLER_URL% 1>&2
-if not defined MARIADB_SHELL_TOKEN echo mariadb-mcp-launcher: no token found -- while %MARIADB_SHELL_REPO% is private, set MARIADB_SHELL_TOKEN or GH_TOKEN, or run gh auth login 1>&2
 
 rem A concurrent launcher may have completed the install that this one lost the
 rem race for, so the binary -- not the installer's exit status -- is the last word.
@@ -180,7 +156,7 @@ if not exist "%LOCAL_BIN%" goto no_binary
 if "%INSTALL_FAILED%"=="1" echo mariadb-mcp-launcher: using the mariadb-shell already present at %LOCAL_BIN% 1>&2
 
 rem Below the required version is worth saying, but not worth refusing to start
-rem over: the newest published release is the best that can be had.
+rem over: a MARIADB_SHELL_TAG older than the floor was asked for by name.
 call :check_version "%LOCAL_BIN%"
 if errorlevel 1 echo mariadb-mcp-launcher: warning: installed mariadb-shell [%CAND_VER%] is below the required %MARIADB_SHELL_VERSION%; starting it anyway 1>&2
 
@@ -191,7 +167,8 @@ exit /b %errorlevel%
 :no_binary
 echo mariadb-mcp-launcher: error: no mariadb-shell at %LOCAL_BIN% after installing 1>&2
 echo mariadb-mcp-launcher: install it by hand, then retry: 1>&2
-echo     irm https://github.com/%MARIADB_SHELL_REPO%/raw/main/install.ps1 ^| iex 1>&2
+echo     $env:MARIADB_SHELL_TAG = '%MARIADB_SHELL_TAG%' 1>&2
+echo     irm https://github.com/%MARIADB_SHELL_REPO%/raw/%INSTALLER_COMMIT%/install.ps1 ^| iex 1>&2
 exit /b 1
 
 rem ============================================================================

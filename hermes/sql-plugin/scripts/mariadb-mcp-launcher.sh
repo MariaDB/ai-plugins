@@ -23,15 +23,21 @@
 #   2. A mariadb-shell found on $PATH whose version is >= MARIADB_SHELL_VERSION.
 #   3. A local install at $MARIADB_SHELL_BINDIR/mariadb-shell (default
 #      ~/.local/bin/mariadb-shell) at that version or newer.
-#   4. Otherwise fetch and run the official installer,
-#      https://raw.githubusercontent.com/mariadb-corporation/mariadb-shell/main/install.sh,
-#      which unpacks the newest release into ~/.local/share/mariadb-shell/<version>
-#      and links it into ~/.local/bin — then launch what it installed.
+#   4. Otherwise fetch the official installer, install.sh, from a pinned
+#      mariadb-shell commit and install release v$MARIADB_SHELL_VERSION — the one
+#      this plugin release was tested with, prerelease or not — into
+#      ~/.local/share/mariadb-shell/<version>, linked into ~/.local/bin; then
+#      launch what it installed.
 #
 # Installing is delegated to install.sh rather than reimplemented here: it picks
-# the package matching the local OS, CPU and glibc version, reads the asset list
-# from the release's own SHA256SUMS and verifies the checksum. Nothing in this
+# the package matching the local OS, CPU and glibc version and verifies its
+# checksum. The checksums come from mariadb-shell-<tag>.SHA256SUMS next to this
+# script, a copy of that release's SHA256SUMS committed with the plugin, so a
+# package replaced on the release after the fact is refused. Nothing in this
 # launcher needs to know how release assets are named.
+#
+# This copy is Hermes' own: the other harnesses' launchers install the newest
+# release from the installer on main.
 #
 # However it is resolved, the binary is exec'd as
 #   mariadb-shell -- mcp start-server --transport=stdio
@@ -44,28 +50,28 @@
 #   MARIADB_SHELL_VERSION     Minimum acceptable version (default below). A PATH
 #                             or locally installed binary is accepted when equal
 #                             or higher; anything lower triggers an install of
-#                             the newest release.
+#                             release v<this version>.
 #   MARIADB_SHELL_BIN         Path to a pre-installed binary; skips all other logic.
 #   MARIADB_SHELL_BINDIR      Where install.sh links the binary (default ~/.local/bin);
 #                             this is also where step 3 looks.
 #   MARIADB_SHELL_PREFIX      Passed through: where install.sh unpacks releases.
-#   MARIADB_SHELL_TAG         Passed through: install this release tag rather than
-#                             the newest.
-#   MARIADB_SHELL_PRERELEASE  Normally unset: a stable release is preferred, and a
-#                             prerelease is installed only when there is no stable
-#                             one to install. Set to 1 to go straight for a
-#                             prerelease, or to 0 to refuse one entirely.
+#   MARIADB_SHELL_TAG         Release tag to install (default v$MARIADB_SHELL_VERSION).
+#                             A tag with no committed SHA256SUMS next to this
+#                             script is checked against the release's own.
 #   MARIADB_SHELL_REPO        Passed through: owner/repo to install from.
-#   MARIADB_SHELL_TOKEN       Token for a private repository. GH_TOKEN and
-#                             GITHUB_TOKEN are consulted too, then `gh auth token`
-#                             — the same order install.sh itself uses.
 
 set -euo pipefail
 
 VERSION="${MARIADB_SHELL_VERSION:-26.10.4}"
 REPO="${MARIADB_SHELL_REPO:-mariadb-corporation/mariadb-shell}"
 BINDIR="${MARIADB_SHELL_BINDIR:-$HOME/.local/bin}"
-INSTALLER_URL="https://raw.githubusercontent.com/$REPO/main/install.sh"
+TAG="${MARIADB_SHELL_TAG:-v$VERSION}"
+# The mariadb-shell commit the installer is taken from: fixed, so the script
+# that runs is the one this launcher was tested with, not whatever main holds.
+# Move it only when the installers change in a way the launcher needs.
+INSTALLER_COMMIT="664993ccbc523cc82218251fcbe9c2fb8a209cdb"
+INSTALLER_URL="https://raw.githubusercontent.com/$REPO/$INSTALLER_COMMIT/install.sh"
+SUMS_FILE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/mariadb-shell-$TAG.SHA256SUMS"
 
 # Arguments that start the mariadb-shell MCP server over stdio. Every resolved
 # binary (override / PATH / local install / fresh install) is launched with
@@ -143,7 +149,7 @@ if [ -x "$LOCAL_BIN" ]; then
     log "using installed mariadb-shell $LOCAL_VER: $LOCAL_BIN (>= required $VERSION)"
     exec "$LOCAL_BIN" "${MCP_ARGS[@]}"
   fi
-  log "installed mariadb-shell (${LOCAL_VER:-unknown version}) at $LOCAL_BIN does not meet required $VERSION; installing the newest release"
+  log "installed mariadb-shell (${LOCAL_VER:-unknown version}) at $LOCAL_BIN does not meet required $VERSION; installing $TAG"
 fi
 
 if [ "$WINDOWS" = 1 ]; then
@@ -151,22 +157,17 @@ if [ "$WINDOWS" = 1 ]; then
   This launcher does not install on Windows — install.sh has no Windows package.
   Either run scripts/mariadb-mcp-launcher.cmd instead (it uses install.ps1), or
   install once by hand:
-      irm https://github.com/$REPO/raw/main/install.ps1 | iex"
+      \$env:MARIADB_SHELL_TAG = '$TAG'
+      irm https://github.com/$REPO/raw/$INSTALLER_COMMIT/install.ps1 | iex"
 fi
 
-# --- Step 4: install the newest release --------------------------------------
-# The token is resolved here as well as inside install.sh because fetching the
-# installer from a private repository needs it too — raw.githubusercontent.com
-# answers 404, not 401, without credentials.
-TOKEN="${MARIADB_SHELL_TOKEN:-${GH_TOKEN:-${GITHUB_TOKEN:-}}}"
-if [ -z "$TOKEN" ] && command -v gh >/dev/null 2>&1; then
-  TOKEN="$(gh auth token 2>/dev/null || true)"
-fi
-
+# --- Step 4: install the pinned release --------------------------------------
+# mariadb-shell is public: nothing here sends credentials, and nothing reads
+# another tool's stored login.
 if command -v curl >/dev/null 2>&1; then
-  fetch() { curl -fsSL --retry 3 ${TOKEN:+-H "Authorization: Bearer $TOKEN"} -o "$2" "$1"; }
+  fetch() { curl -fsSL --retry 3 -o "$2" "$1"; }
 elif command -v wget >/dev/null 2>&1; then
-  fetch() { wget -q ${TOKEN:+--header="Authorization: Bearer $TOKEN"} -O "$2" "$1"; }
+  fetch() { wget -q -O "$2" "$1"; }
 else
   die "neither curl nor wget is available; cannot fetch the mariadb-shell installer"
 fi
@@ -174,58 +175,39 @@ fi
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
+# A tag the plugin carries no SHA256SUMS for was chosen by whoever set
+# MARIADB_SHELL_TAG or MARIADB_SHELL_VERSION; that release's own is used then.
+if [ -f "$SUMS_FILE" ]; then
+  SUMS="$SUMS_FILE"
+else
+  SUMS=""
+  log "no committed checksums for $TAG; checking against the release's own SHA256SUMS"
+fi
+
 install_failed=0
-# run_installer [extra args...] — install, with output kept off stdout.
+# run_installer — install, with output kept off stdout.
 #
-# BINDIR is exported so the installer links where step 3 looks. Its own progress
-# output would corrupt the MCP stream, hence the redirect to stderr.
+# BINDIR is exported so the installer links where step 3 looks. A pinned tag
+# needs no prerelease handling: the installer takes a named release whether or
+# not it is a prerelease. Its own progress output would corrupt the MCP stream,
+# hence the redirect to stderr.
 run_installer() {
   MARIADB_SHELL_BINDIR="$BINDIR" \
-  MARIADB_SHELL_TOKEN="$TOKEN" \
-  sh "$TMP/install.sh" "$@" >&2
+  MARIADB_SHELL_TAG="$TAG" \
+  MARIADB_SHELL_SHA256SUMS="$SUMS" \
+  sh "$TMP/install.sh" >&2
 }
 
-log "no suitable mariadb-shell found; installing from $REPO ..."
+log "no suitable mariadb-shell found; installing $TAG from $REPO ..."
 # A harness that stops waiting for the server (Claude Code gives up after 30 s
 # unless MCP_TIMEOUT is raised) signals this script, but the installer it runs
 # finishes regardless — so say how to pick the install up afterwards.
 log "a first install can take a minute. If the harness gives up on this server meanwhile (Claude Code waits 30 s unless MCP_TIMEOUT is raised), the install still finishes: reconnect the server then (/mcp in Claude Code), or start a new session."
 if fetch "$INSTALLER_URL" "$TMP/install.sh"; then
-  # Prereleases: wanted when they are all there is, but not preferred over a
-  # stable release. install.sh skips them exactly as /releases/latest does, so a
-  # repository whose only release is a prerelease has nothing to install and the
-  # first attempt fails — retrying with --pre-release then gets it, and needs no
-  # decision from whoever is running this.
-  #
-  # MARIADB_SHELL_PRERELEASE still short-circuits the choice: truthy takes the
-  # prerelease straight away (one fewer round trip when stable is known to be
-  # absent), and an explicit 0/false/no refuses the fallback and keeps this
-  # install stable-only.
-  case "${MARIADB_SHELL_PRERELEASE:-}" in
-    1|true|yes|on) prefer_prerelease=1; allow_fallback=1 ;;
-    0|false|no|off) prefer_prerelease=0; allow_fallback=0 ;;
-    *) prefer_prerelease=0; allow_fallback=1 ;;
-  esac
-
-  if [ "$prefer_prerelease" = 1 ]; then
-    run_installer --pre-release || install_failed=1
-  elif run_installer; then
-    :
-  elif [ "$allow_fallback" = 1 ]; then
-    log "no stable release to install; retrying with --pre-release"
-    if run_installer --pre-release; then
-      log "installed a prerelease — no stable $REPO release is published yet"
-    else
-      install_failed=1
-    fi
-  else
-    install_failed=1
-  fi
-  [ "$install_failed" = 0 ] || log "the mariadb-shell installer failed"
+  run_installer || { install_failed=1; log "the mariadb-shell installer failed"; }
 else
   install_failed=1
   log "could not download the installer from $INSTALLER_URL"
-  [ -n "$TOKEN" ] || log "no token found — while $REPO is private, set MARIADB_SHELL_TOKEN (or GH_TOKEN), or run 'gh auth login'"
 fi
 
 # A concurrent launcher may have completed the install that this one lost the
@@ -233,13 +215,13 @@ fi
 if [ ! -x "$LOCAL_BIN" ]; then
   die "no mariadb-shell at $LOCAL_BIN after installing.
   Install it by hand and retry, or point MARIADB_SHELL_BIN at an existing binary:
-      curl -fsSLo install.sh https://github.com/$REPO/raw/main/install.sh
-      bash install.sh"
+      curl -fsSLo install.sh https://github.com/$REPO/raw/$INSTALLER_COMMIT/install.sh
+      MARIADB_SHELL_TAG=$TAG bash install.sh"
 fi
 [ "$install_failed" = 0 ] || log "using the mariadb-shell already present at $LOCAL_BIN"
 
 # Below the required version is worth saying, but not worth refusing to start
-# over: the newest published release is the best that can be had.
+# over: a MARIADB_SHELL_TAG older than the floor was asked for by name.
 NEW_VER="$(shell_version "$LOCAL_BIN")"
 if [ -n "$NEW_VER" ] && ! version_ge "$NEW_VER" "$VERSION"; then
   log "warning: installed mariadb-shell $NEW_VER is below the required $VERSION; starting it anyway"

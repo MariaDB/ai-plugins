@@ -35,8 +35,9 @@ To update later, run `hermes plugins update mariadb-sql`; to remove it,
 On first use of a MariaDB tool, the launcher looks for a `mariadb-shell` it can
 run — `$MARIADB_SHELL_BIN`, one on `PATH`, or an existing install in
 `~/.local/bin` (`%LOCALAPPDATA%\Programs\mariadb-shell\bin` on Windows) — and
-otherwise installs the newest release there with the shell's own installer. Then
-it starts that binary as the MCP server. Later runs reuse the install.
+otherwise installs the `mariadb-shell` release this plugin was tested with there,
+using the shell's own installer. Then it starts that binary as the MCP server.
+Later runs reuse the install.
 
 ## The MCP server
 
@@ -66,12 +67,16 @@ The launcher ([scripts/mariadb-mcp-launcher.sh](scripts/mariadb-mcp-launcher.sh)
 - Runs the first `mariadb-shell` that meets it: `$MARIADB_SHELL_BIN`, then one on
   `PATH`, then a local install at `~/.local/bin/mariadb-shell`
   (`%LOCALAPPDATA%\Programs\mariadb-shell\bin\mariadb-shell.cmd` on Windows).
-- Failing all three, runs the shell's own installer — `install.sh`, or
-  `install.ps1` on Windows, fetched from
-  `raw.githubusercontent.com/mariadb-corporation/mariadb-shell/main/`. It picks
-  the package matching this OS, CPU and glibc version, verifies it against the
-  release's `SHA256SUMS`, unpacks it under `~/.local/share/mariadb-shell/` and
-  links the binary into `~/.local/bin`. Later starts reuse that install.
+- Failing all three, installs release `v$MARIADB_SHELL_VERSION` with the
+  shell's own installer — `install.sh`, or `install.ps1` on Windows, fetched from
+  a fixed mariadb-shell commit rather than `main`. It picks the package matching
+  this OS, CPU and glibc version and verifies it against
+  [`scripts/mariadb-shell-v26.10.4.SHA256SUMS`](scripts/mariadb-shell-v26.10.4.SHA256SUMS),
+  a copy of that release's checksums kept in this repository, so a package
+  replaced on the release afterwards is refused. It unpacks under
+  `~/.local/share/mariadb-shell/` and links the binary into `~/.local/bin`.
+  Later starts reuse that install.
+- Sends no credentials and reads none: `mariadb-shell` is public.
 - Execs whichever binary it settled on as
   `mariadb-shell -- mcp start-server --transport=stdio`. stdout belongs to the
   MCP transport alone, so the launcher's own messages — and the installer's — go
@@ -88,11 +93,13 @@ mcp_servers:
     args: []
 ```
 
-**Prereleases:** nothing to set. The installer skips prereleases, as
-`releases/latest` does, so the launcher tries a stable release first and retries
-with `--pre-release` when there is none — which is the case until a stable
-`mariadb-shell` is published. `MARIADB_SHELL_PRERELEASE=1` skips straight to a
-prerelease; `=0` refuses one and keeps the install stable-only.
+**Another release:** a newer `mariadb-shell` you install yourself, on `PATH` or
+in `~/.local/bin`, is used as it is. To have the launcher install a different
+release, set `MARIADB_SHELL_TAG` (for example `v26.10.5`) in the server's `env`;
+a release this plugin carries no checksums for is verified against its own
+published `SHA256SUMS`, and the launcher says so. Unlike the other harnesses'
+plugins, which install the newest release, this one moves to a newer
+`mariadb-shell` only with a plugin release.
 
 ### Configure what the server may access
 

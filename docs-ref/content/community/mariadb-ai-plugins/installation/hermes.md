@@ -41,6 +41,8 @@ After the installation, start a new Hermes session. Hermes connects MCP servers 
 
 The `mcp.json` file of the `dev` and `sql` plugins registers the MCP server under the name `mariadb`, so you don't need to register it separately. Hermes runs the launcher script of the plugin, which starts MariaDB Shell as the MCP server. The tools are available to the model as `mcp__mariadb__<tool>`, for example `mcp__mariadb__db_list_connections`.
 
+When no suitable MariaDB Shell is installed, the launcher installs the release that the plugin was tested with and verifies it against checksums that the plugin carries. Unlike the plugins for the other harnesses, it doesn't install the newest release. See [Configuration Reference](../configuration-reference.md#hermes-agent).
+
 Before the agent can use the server, you must configure the connections and directories it may access. See [Configuring the MCP Server](../configuring-the-mcp-server/README.md).
 
 ### Windows

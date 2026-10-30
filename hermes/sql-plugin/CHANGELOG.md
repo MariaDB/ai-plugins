@@ -4,6 +4,29 @@ All notable changes to the MariaDB SQL Hermes Agent plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- When no suitable `mariadb-shell` is installed, the MCP launcher installs the
+  release this plugin was tested with, `v` followed by `MARIADB_SHELL_VERSION`
+  (now `v26.10.4`), instead of the newest release. A newer `mariadb-shell` you
+  installed yourself is still used. The other harnesses' plugins keep installing
+  the newest release.
+- The launcher fetches the installer from a fixed `mariadb-shell` commit instead
+  of `main`, and verifies the package against
+  `scripts/mariadb-shell-v26.10.4.SHA256SUMS`, a copy of that release's checksums
+  kept in this repository, instead of the file published with the release.
+  `MARIADB_SHELL_TAG` installs another release, checked against its own
+  `SHA256SUMS`.
+
+### Removed
+
+- The launcher's prerelease fallback and `MARIADB_SHELL_PRERELEASE`: a named
+  release is installed whether or not it is a prerelease.
+- The launcher no longer reads `MARIADB_SHELL_TOKEN`, `GH_TOKEN`, `GITHUB_TOKEN`
+  or `gh auth token`, and sends no credentials. `mariadb-shell` is public.
+
 ## [26.10.6] - 2026-10-24
 
 ### Changed
