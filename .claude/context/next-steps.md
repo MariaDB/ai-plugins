@@ -2,7 +2,7 @@
 
 [← Project Context](../PROJECT_CONTEXT.md)
 
-1. **On the next release, check the CHANGELOGs cover everything since the last tag** (`git log <last-tag>..main`): #77's Hermes launcher is under `[Unreleased]`; #76/#79 are docs-only, #78 changes `mariadb-schema-management-create`. That release is the first to run **`/release` step 12** (catalog bump PR). The first catalog pin is `fde0a1f` (#77's commit, labelled 26.10.6), not a release commit — use it as the old end of the compare link. If the floor moves, add the new `SHA256SUMS` file and change the dev disclosure's version and filename (twice each).
+1. **The first catalog bump, `/release` step 12, for 26.11.0.** The first catalog pin is `fde0a1f` (#77's commit, labelled 26.10.6), not a release commit — use it as the old end of the compare link. 26.11.0 raises the floor to 26.11.2: the dev disclosure's version and checksum filename change to `v26.11.2` and `scripts/mariadb-shell-v26.11.2.SHA256SUMS` (twice each).
 2. **Turn on "Enforce HTTPS" on the fork's Pages settings** — until then `mariadb.github.io/ai-plugins/` 301s to `http://` and plain-http visits aren't upgraded.
 3. **Hero code cut-off on phones — finish or decide not to.** The longest sample line is ~391px of monospace against a ~278px panel at 390px, so no box-model change closes it. Options: (a) wrap long lines below the threshold (`white-space: pre-wrap` + a hanging indent) — the only one that shows everything at 320px; (b) shorten the sample in `docs/index.html`; (c) keep the horizontal scroll, which the `…` marker announces.
 4. (Optional, a11y) **Make scrollable code blocks keyboard-reachable** — `tabindex="0"` + an accessible name, on every code block of the site.

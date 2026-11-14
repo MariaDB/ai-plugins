@@ -1,6 +1,6 @@
 # MariaDB SQL plugin for Hermes Agent
 
-Version **26.10.6**
+Version **26.11.0**
 
 This plugin gives [Hermes Agent](https://hermes-agent.nousresearch.com/) first-class
 MariaDB SQL support through two parts:
@@ -53,7 +53,7 @@ Configured in [mcp.json](mcp.json):
       "type": "stdio",
       "command": "./scripts/mariadb-mcp-launcher.sh",
       "args": [],
-      "env": { "MARIADB_SHELL_VERSION": "26.10.4" }
+      "env": { "MARIADB_SHELL_VERSION": "26.11.2" }
     }
   }
 }
@@ -65,7 +65,7 @@ for example `mcp__mariadb__db_list_connections`.
 
 The launcher ([scripts/mariadb-mcp-launcher.sh](scripts/mariadb-mcp-launcher.sh)):
 
-- Resolves the minimum version from `MARIADB_SHELL_VERSION` (default `26.10.4`).
+- Resolves the minimum version from `MARIADB_SHELL_VERSION` (default `26.11.2`).
 
 - Passes `MARIADB_RESTD_VERSION` (default `26.11.0`) on to the MCP server: the lowest MariaDB REST Daemon (mariadb-restd) it accepts when it sets one up.
 - Runs the first `mariadb-shell` that meets it: `$MARIADB_SHELL_BIN`, then one on
@@ -75,7 +75,7 @@ The launcher ([scripts/mariadb-mcp-launcher.sh](scripts/mariadb-mcp-launcher.sh)
   shell's own installer — `install.sh`, or `install.ps1` on Windows, fetched from
   a fixed mariadb-shell commit rather than `main`. It picks the package matching
   this OS, CPU and glibc version and verifies it against
-  [`scripts/mariadb-shell-v26.10.4.SHA256SUMS`](scripts/mariadb-shell-v26.10.4.SHA256SUMS),
+  [`scripts/mariadb-shell-v26.11.2.SHA256SUMS`](scripts/mariadb-shell-v26.11.2.SHA256SUMS),
   a copy of that release's checksums kept in this repository, so a package
   replaced on the release afterwards is refused. It unpacks under
   `~/.local/share/mariadb-shell/` and links the binary into `~/.local/bin`.
@@ -182,7 +182,7 @@ lsp:
       command: ["~/.hermes/plugins/mariadb-sql/scripts/mariadb-lsp-launcher.sh"]
       extensions: [".sql"]
       language_id: "sql"
-      env: { "MARIADB_SHELL_VERSION": "26.10.4" }
+      env: { "MARIADB_SHELL_VERSION": "26.11.2" }
 ```
 
 Hermes runs language servers only in git repositories, and custom ones only in

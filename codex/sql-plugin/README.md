@@ -1,6 +1,6 @@
 # MariaDB SQL plugin for Codex
 
-Version **26.10.6**
+Version **26.11.0**
 
 This plugin gives [OpenAI Codex](https://developers.openai.com/codex/) first-class
 MariaDB SQL support through two parts:
@@ -51,7 +51,7 @@ Declared in [.mcp.json](.mcp.json):
       "command": "./scripts/mariadb-mcp-launcher",
       "cwd": ".",
       "args": [],
-      "env": { "MARIADB_SHELL_VERSION": "26.10.4" }
+      "env": { "MARIADB_SHELL_VERSION": "26.11.2" }
     }
   }
 }
@@ -92,7 +92,7 @@ that entry takes precedence over the plugin's.
 
 The real launcher ([scripts/mariadb-mcp-launcher.sh](scripts/mariadb-mcp-launcher.sh)), which the shim execs:
 
-- Resolves the minimum version from `MARIADB_SHELL_VERSION` (default `26.10.4`).
+- Resolves the minimum version from `MARIADB_SHELL_VERSION` (default `26.11.2`).
 
 - Passes `MARIADB_RESTD_VERSION` (default `26.11.0`) on to the MCP server: the lowest MariaDB REST Daemon (mariadb-restd) it accepts when it sets one up.
 - Runs the first `mariadb-shell` that meets it: `$MARIADB_SHELL_BIN`, then one on

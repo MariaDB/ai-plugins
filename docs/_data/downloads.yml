@@ -26,8 +26,8 @@ platforms:
     token: windows-arm-64bit
 
 sandbox:
-  release: v26.10.0
+  release: v26.11.2
   versions:
-    - 11.8.9
-    - 12.3.3
+    - 11.8.10
+    - 12.3.4
     - 13.1.1

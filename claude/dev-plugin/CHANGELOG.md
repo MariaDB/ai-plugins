@@ -4,7 +4,7 @@ All notable changes to the MariaDB Claude Code plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [26.11.0] - 2026-11-14
 
 ### Added
 
@@ -20,6 +20,15 @@ project adheres to [Semantic Versioning](https://semver.org/).
   link with separately licensed software, and the third-party list adds
   the packages the VS Code extension's notebooks bundle (sucrase and its
   dependencies, acorn).
+- `MARIADB_SHELL_VERSION`, the *minimum* `mariadb-shell` the launcher accepts,
+  now defaults to `26.11.2`, the newest published `mariadb-shell` release. An
+  install already at or above that version is still used as-is; only a machine
+  below it fetches anything.
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `114a4b7` (synced 2026-11-14). `mariadb-string-functions` adds the two
+  XML functions, `EXTRACTVALUE` and `UPDATEXML`, which query and update XML
+  strings with XPath; the plugin's 85 skills are otherwise unchanged.
+- Version bumped to 26.11.0 to stay in lockstep with the other plugins.
 
 ### Fixed
 

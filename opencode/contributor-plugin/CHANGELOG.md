@@ -4,7 +4,7 @@ All notable changes to the MariaDB contributor OpenCode plugin are documented he
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [26.11.0] - 2026-11-14
 
 ### Changed
 
@@ -13,6 +13,17 @@ project adheres to [Semantic Versioning](https://semver.org/).
   link with separately licensed software, and the third-party list adds
   the packages the VS Code extension's notebooks bundle (sucrase and its
   dependencies, acorn).
+- Skills re-vendored from `mariadb-corporation/mariadb-shell` `.claude/skills/`
+  at commit `fa2ec8a` (synced 2026-11-14). `create-shell-plugin` explains how to
+  offer a plugin function as an MCP tool of the MariaDB MCP Server (`mcp=` on
+  `@plugin_function`), the plugin search paths in order with
+  `MARIADB_SHELL_PLUGINS_PATH` and `MARIADB_SHELL_DISABLE_BUILTIN_PLUGINS`, and
+  `plugin.json` for a plugin that extends an object another plugin creates;
+  `review-shell-change` reworks its review steps. The plugin's 3 skills are
+  otherwise unchanged.
+- Version bumped to 26.11.0 to stay in lockstep with the other plugins. This
+  plugin ships skills only and no MCP server, so the `MARIADB_SHELL_VERSION`
+  floor does not apply here.
 
 ## [26.10.6] - 2026-10-24
 

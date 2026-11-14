@@ -6,7 +6,7 @@
       ".sql": "sql"
     },
     "env": {
-      "MARIADB_SHELL_VERSION": "26.10.4"
+      "MARIADB_SHELL_VERSION": "26.11.2"
     },
     "startupTimeout": 240000
   }

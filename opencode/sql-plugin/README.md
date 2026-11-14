@@ -1,6 +1,6 @@
 # MariaDB SQL plugin for OpenCode
 
-Version **26.10.6**
+Version **26.11.0**
 
 This plugin gives [OpenCode](https://opencode.ai) first-class MariaDB SQL support
 through two parts:
@@ -61,7 +61,7 @@ Configured in [opencode.json](opencode.json):
     "mariadb": {
       "type": "local",
       "command": ["{env:MARIADB_SQL_PLUGIN}/scripts/mariadb-mcp-launcher"],
-      "environment": { "MARIADB_SHELL_VERSION": "26.10.4" },
+      "environment": { "MARIADB_SHELL_VERSION": "26.11.2" },
       "enabled": true
     }
   }
@@ -74,7 +74,7 @@ is started.
 
 The launcher ([scripts/mariadb-mcp-launcher.sh](scripts/mariadb-mcp-launcher.sh)):
 
-- Resolves the minimum version from `MARIADB_SHELL_VERSION` (default `26.10.4`).
+- Resolves the minimum version from `MARIADB_SHELL_VERSION` (default `26.11.2`).
 
 - Passes `MARIADB_RESTD_VERSION` (default `26.11.0`) on to the MCP server: the lowest MariaDB REST Daemon (mariadb-restd) it accepts when it sets one up.
 - Runs the first `mariadb-shell` that meets it: `$MARIADB_SHELL_BIN`, then one on
@@ -171,7 +171,7 @@ the MCP server:
     "mariadb": {
       "command": ["{env:MARIADB_SQL_PLUGIN}/scripts/mariadb-lsp-launcher"],
       "extensions": [".sql"],
-      "env": { "MARIADB_SHELL_VERSION": "26.10.4" }
+      "env": { "MARIADB_SHELL_VERSION": "26.11.2" }
     }
   }
 }

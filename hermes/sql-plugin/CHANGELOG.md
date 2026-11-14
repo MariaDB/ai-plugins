@@ -4,7 +4,7 @@ All notable changes to the MariaDB SQL Hermes Agent plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [26.11.0] - 2026-11-14
 
 ### Added
 
@@ -35,6 +35,17 @@ project adheres to [Semantic Versioning](https://semver.org/).
   kept in this repository, instead of the file published with the release.
   `MARIADB_SHELL_TAG` installs another release, checked against its own
   `SHA256SUMS`.
+- `MARIADB_SHELL_VERSION`, the *minimum* `mariadb-shell` the launcher accepts,
+  now defaults to `26.11.2`, the newest published `mariadb-shell` release. An
+  install already at or above that version is still used as-is; only a machine
+  below it fetches anything.
+- The launchers' committed checksum file moves with the floor, to
+  `scripts/mariadb-shell-v26.11.2.SHA256SUMS`.
+- Skills re-vendored from `mariadb-corporation/mariadb-docs` `agent-skills/` at
+  commit `114a4b7` (synced 2026-11-14). `mariadb-string-functions` adds the two
+  XML functions, `EXTRACTVALUE` and `UPDATEXML`, which query and update XML
+  strings with XPath; this plugin's 47 skills are otherwise unchanged.
+- Version bumped to 26.11.0 to stay in lockstep with the other plugins.
 
 ### Removed
 

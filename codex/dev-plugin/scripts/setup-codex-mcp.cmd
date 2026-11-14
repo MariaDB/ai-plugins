@@ -49,7 +49,7 @@ rem   MARIADB_RESTD_VERSION   Lowest mariadb-restd the MCP server accepts by def
 rem ============================================================================
 
 set "SERVER_NAME=mariadb"
-if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.10.4"
+if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.11.2"
 if not defined MARIADB_RESTD_VERSION set "MARIADB_RESTD_VERSION=26.11.0"
 
 rem %~dp0 is this script's directory, with a trailing backslash.

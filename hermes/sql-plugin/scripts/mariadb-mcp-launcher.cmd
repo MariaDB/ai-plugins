@@ -76,7 +76,7 @@ rem modules and loses cmdlets such as Get-FileHash. Without the variable, 5.1
 rem builds its own default. setlocal keeps this to the launcher and its children.
 set "PSModulePath="
 
-if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.10.4"
+if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.11.2"
 rem The MCP server reads this, not the launcher (see MARIADB_RESTD_VERSION above).
 if not defined MARIADB_RESTD_VERSION set "MARIADB_RESTD_VERSION=26.11.0"
 rem mariadb-restd is pinned as the shell is: the MCP server installs exactly

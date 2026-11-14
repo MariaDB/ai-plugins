@@ -18,8 +18,8 @@ repo-specific policy the built-in cannot know.
 2. **Invoke the built-in `code-review` skill** with those arguments. It owns the
    mechanics: effort levels, the adversarial verification pass, inline comment
    posting, and applying fixes.
-3. **Apply §1–§7 below to the result, before anything is reported or posted.**
-   Drop the findings §1 puts out of scope, move the ones §7 says are not about
+3. **Apply §1–§8 below to the result, before anything is reported or posted.**
+   Drop the findings §1 puts out of scope, move the ones §8 says are not about
    the change to the follow-up list, re-rate the ones §2 and §4 change, and add
    anything §3–§5 calls for that the pass missed.
 
@@ -30,7 +30,7 @@ it hands back. Do not post or report a finding that has not been through it.
 Three sections change verdicts rather than adding to them: §1 (a finding the
 other CI already reports, or a scenario the product cannot produce, is noise),
 §4 (a guard that looks wrong is usually correct, and a guard that looks correct
-is sometimes wrong) and §7 (a defect outside the change is a follow-up, not a
+is sometimes wrong) and §8 (a defect outside the change is a follow-up, not a
 finding).
 
 ## 1. Out of scope — other jobs already cover these
@@ -69,7 +69,7 @@ Do not propose defensive code for these. The product's own write paths define
 what can exist; when a later change adds a path that can create the state, the
 behaviour becomes that change's problem, and the review of that change is
 where to raise it. If the review happens to notice such a case and it seems
-worth remembering, it goes in the follow-up list of §7, in one line, marked as
+worth remembering, it goes in the follow-up list of §8, in one line, marked as
 unreachable, not among the findings.
 
 This is deliberate: a finding implies something must be fixed. Reporting an
@@ -226,7 +226,33 @@ elsewhere in the tree.
 Do **not** flag naming taste or style. This section is about code that is harder
 to reason about than the problem requires, nothing else.
 
-## 7. Discipline
+## 7. Comments, documentation and messages name nothing outside this repository
+
+Code comments, docstrings, API documentation (help text, `--export-help`
+output and the API reference generated from it) and user-facing strings
+(messages, warnings, errors, prompts) must not reference a component that
+lives in another repository: the VS Code extension, the MCP plugin, the
+dba plugin and its cloud deployments, the REST daemon, or any plugin not under
+`python/plugins/`. This tree is read and shipped on its own: a consumer's name
+in it goes stale the moment the consumer changes, and ties the meaning of an
+API to something a reader of this repository cannot see.
+
+Describe the behaviour in this repository's own terms instead: what the
+function does and what a caller sees, with examples drawn from here (the
+sandbox plugin, `util`, a dump or a load, an abstract `object.function`).
+Where an external consumer is the reason for a design, the place to say so is
+`.claude/context/` (which is expected to describe cross-repo integration), the
+commit message or the PR, not the code.
+
+A new or changed comment, docstring, help text or user-facing string that
+names one of these is a finding. Hunt for it in messages especially: a
+comment is read by a maintainer, a message by every user of the shell, who
+may not have the component it names. Test data is held to the same rule: a
+fixture's task type, kind, title or function name comes from this repository
+(`util`, `sandbox`, a dump) or is abstract (`object.function`), never from an
+external plugin.
+
+## 8. Discipline
 
 - **A finding is about the change.** It concerns lines the diff adds or
   alters, or behaviour the change introduces or relies on. A defect the review

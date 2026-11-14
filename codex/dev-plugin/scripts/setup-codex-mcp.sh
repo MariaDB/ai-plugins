@@ -46,7 +46,7 @@
 set -euo pipefail
 
 SERVER_NAME="mariadb"
-SHELL_VERSION="26.10.4"
+SHELL_VERSION="26.11.2"
 RESTD_VERSION="26.11.0"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

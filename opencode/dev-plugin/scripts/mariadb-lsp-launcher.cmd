@@ -55,7 +55,7 @@ rem modules and loses cmdlets such as Get-FileHash. Without the variable, 5.1
 rem builds its own default. setlocal keeps this to the launcher and its children.
 set "PSModulePath="
 
-if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.10.4"
+if not defined MARIADB_SHELL_VERSION set "MARIADB_SHELL_VERSION=26.11.2"
 if not defined MARIADB_SHELL_BINDIR set "MARIADB_SHELL_BINDIR=%LOCALAPPDATA%\Programs\mariadb-shell\bin"
 if not defined MARIADB_LSP_WAIT set "MARIADB_LSP_WAIT=180"
 

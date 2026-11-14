@@ -60,6 +60,8 @@
 - **Read `git status -sb` before `git commit`** — the user may have switched branches mid-session.
 - When writing a re-vendor commit message, take the upstream commits per plugin from `skills-source.json`, not from the order `git diff` lists plugins in (contributor sorts before dev).
 - **`set-mariadb-shell-version.sh`'s "N file(s)" is the number it SCANNED, not changed.**
+- **`set-mariadb-shell-version.sh` leaves the new Hermes `mariadb-shell-v<floor>.SHA256SUMS` untracked** and deletes the old one: `git add -A` the floor change, or the commit ships launchers pointing at a missing file. Check the new file against the release's `SHA256SUMS` asset (not `SERVER_SHA256SUMS`).
+- **`release.md` step 8 asks for a `release-history.md` and "Latest work streams"/"Git state" index sections that don't exist**, and that the checkpoint rules forbid (no PR or git state). Follow the checkpoint rules: record only what stays true.
 - **docs-ref skill pages are generated: hand edits are lost.** Regenerate with `python3 docs-ref/scripts/generate-skill-pages.py` and diff.
 
 ## Harnesses
@@ -86,6 +88,7 @@
 - **Claude Code on native Windows runs a `.sh` MCP/LSP command through `bash`**, and Git for Windows puts only `Git\cmd` on PATH ("'bash' is not recognized"; LSP: "exceeded max crash recovery attempts (3)"). Hence the extensionless commands, resolving through `%PATHEXT%` to the `.cmd` (verified with Claude Code 2.1.306 on Windows 11 ARM64).
 - **OpenCode gives a language server a fixed 45 s (`INITIALIZE_TIMEOUT_MS`, 1.19.3) and marks a failed one `broken`** for the instance; no config changes it. `opencode debug lsp diagnostics <file>` exercises LSP servers without a model (prints `{}` on failure).
 - **OpenCode on Windows: `{env:VAR}` is pasted into the JSON text before parsing**, so a backslash path invalidates the whole config (`InvalidEscapeCharacter`) — use forward slashes. Its program lookup walks `%PATHEXT%` like Claude Code's.
+- **`run_tests.py` prints `PASSED` for a suite whose tests all SKIPPED** (pi with no reachable provider, OpenCode without auth). Read each suite's pytest summary line and the `SKIPPED` reasons before calling an e2e run green.
 - **OpenCode's free models are unreliable** (< 1.18 gets HTTP 426; 1.19.3's free models often don't answer), and with `GOOGLE_API_KEY` set it defaults to Google and wants `GOOGLE_GENERATIVE_AI_API_KEY`. A model-driven OpenCode test needs `opencode auth login`.
 - **`@opencode/cli` (2.x) is NOT `opencode-ai` (1.x).** 2.x accepts the `lsp` block but has no LSP runtime, no `debug lsp`, a different `models` CLI, and credentials in `opencode.db`, which 1.x refuses ("has no session table").
 - **A multi-line prompt through an npm `.cmd` wrapper (`opencode.cmd`) is cut at the first line break** — keep e2e prompts on Windows to one line.

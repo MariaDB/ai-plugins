@@ -76,7 +76,7 @@
 
 set -euo pipefail
 
-VERSION="${MARIADB_SHELL_VERSION:-26.10.4}"
+VERSION="${MARIADB_SHELL_VERSION:-26.11.2}"
 # The MCP server reads this, not the launcher: the floor for the mariadb-restd it
 # installs, kept beside the shell's by scripts/set-mariadb-restd-version.sh.
 export MARIADB_RESTD_VERSION="${MARIADB_RESTD_VERSION:-26.11.0}"

@@ -22,7 +22,7 @@ The Hermes Agent plugins' launchers install a fixed release rather than the newe
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `MARIADB_SHELL_VERSION` | `26.10.4` | The minimum acceptable MariaDB Shell version. A binary on the `PATH` or in the local install directory is used when it is this version or later; otherwise the newest release is installed. |
+| `MARIADB_SHELL_VERSION` | `26.11.2` | The minimum acceptable MariaDB Shell version. A binary on the `PATH` or in the local install directory is used when it is this version or later; otherwise the newest release is installed. |
 | `MARIADB_RESTD_VERSION` | `26.11.0` | The minimum acceptable MariaDB REST Daemon (`mariadb-restd`) version, passed on to the MCP server. When an agent sets up a REST Daemon without naming a version, an installed one older than this is passed over and the newest release is installed. |
 | `MARIADB_SHELL_BIN` | — | The path of a MariaDB Shell binary to use. Skips all other resolution. |
 | `MARIADB_SHELL_BINDIR` | `~/.local/bin` | Where the installer links the binary, and where the launcher looks for a local install. On Windows: `%LOCALAPPDATA%\Programs\mariadb-shell\bin`. |
